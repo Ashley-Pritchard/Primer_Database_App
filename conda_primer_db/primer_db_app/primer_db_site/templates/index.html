@@ -1,0 +1,74 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Home</a>
+ </div> 
+  <h1>Primer Database</h1>
+  <p>Welcome to the Primer Database for the OUH Molecular Genetics Laboratory. We currently have <strong>{{ num_primers }}</strong> primers covering <strong>{{ num_amplicons }}</strong> amplicons and <strong>{{ num_genes }}</strong> genes.<br><br></p>
+  <div>
+    <form id="searchform" method="get" action="{% url 'search' %}">
+      <table class=form>
+        <tr>
+          <td>
+            Amplicon ID:
+          </td>
+          <td>
+            <input id="searchbox" name="amp_id_input" type="text"><br>
+          </td>
+          <td>
+      Genomic Location:
+          </td>
+          <td>
+      <input id="searchbox" name="gen_loc_input" type="text"><br>
+          <td>
+        </tr>
+        <tr>
+          <td>
+      Analysis Type:
+          </td>
+          <td>
+      <input id="searchbox" name="analysis_input" type="text"><br>
+          </td>
+          <td>
+      Primer Set:
+          </td>
+          <td>
+      <input id="searchbox" name="set_input" type="text"><br>
+          </td>
+        <tr>
+          <td>
+      Gene:
+          </td>
+          <td>
+      <input id="searchbox" name="gene_input" type="text"><br>
+          </td>
+          <td>
+      Chromosome:
+          </td>
+          <td>
+      <input id="searchbox" name="chr_input" type="text"><br>
+          </td>
+        </tr>
+        <tr>
+          <td>
+      Imported By:
+          </td>
+          <td>
+      <input id="searchbox" name="imp_by_input" type="text"><br>
+          </td>
+          <td>
+      Date Imported:
+          </td>
+          <td>
+      <input id="searchbox" name="date_input" type="text"><br>
+          </td>
+        </tr>
+      </table><br><br>
+      <input type="submit" value="Submit">
+    </form>
+  </div>
+{% endblock %}
+
+
+
