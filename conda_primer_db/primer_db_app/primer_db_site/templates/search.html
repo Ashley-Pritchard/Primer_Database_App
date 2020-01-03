@@ -1,0 +1,36 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Home</a>
+ </div> 
+  <h1>Primer Database</h1>
+  <p>Your search returned {{ num_primers }} primer(s): <br><br></p>
+  <table>
+    <tr>
+  {% for primer in primer_search_results %}
+      <td>
+	{{ primer.sequence }}
+    </tr>
+      </td>
+  {% endfor %}
+    <tr>
+  {% for primer in primer_search_results %}
+      <td>
+	{{ primer.direction }}
+    </tr>
+      </td>
+  {% endfor %}
+    </tr>
+      </td>
+    <tr>
+  {% for primer in primer_search_results %}
+      <td>
+	{{ primer.location }}
+      </td>
+  {% endfor %}
+    </tr>
+  </table>
+{% endblock %}
+
+
