@@ -161,6 +161,16 @@ def search(request):
 	}
 
 	return render(request, 'search.html', context=context)
+
+def primer(request):
+	primer_input = request.GET.get('selected_primer', None)
+	amplicon = Amplicon.objects.get(amplicon_name=primer_input)
+	context = {
+		'amplicon': amplicon,
+		'primer_input': primer_input
+	}
+
+	return render(request, 'primer.html', context=context)
 	
 
 

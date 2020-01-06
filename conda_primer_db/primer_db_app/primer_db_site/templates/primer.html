@@ -1,0 +1,53 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Home</a>
+ </div> 
+  <h1>Primer Database</h1><br><br>
+  <table>
+        <tr>
+          <td>
+            <strong>Analysis</strong>:
+          </td>
+          <td>
+            {{ amplicon.analysis_type_id.analysis_type }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>Gene</strong>:
+          </td>
+          <td>
+            {{ amplicon.gene_id.gene_name }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>Chromosome</strong>:
+          </td>
+          <td>
+            {{ amplicon.gene_id.chromosome }}
+          </td>
+        <tr>
+          <td>
+            <strong>Exon</strong>:
+          </td>
+          <td>
+            {{ amplicon.exon }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>Direction</strong>:
+          </td>
+          <td>
+            {{ amplicon.amplicon_name.amplicon_id.direction }}
+          </td>
+
+
+
+      
+{% endblock %}
+
+

@@ -55,5 +55,29 @@ form {
 	text-align: center;
 }
 
+table.table2 {
+	text-align: left;
+	width: 100%;
+	margin-left: -10px;
+	margin-right: -10px;
+	
+}
+
+table.table2 th {
+	text-align: left;
+	padding: 10px;
+}
+
+table.table2 td {
+	padding: 10px;
+}
+
+table.table2 tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+a {
+	color: #5d5c61
+}
 
 

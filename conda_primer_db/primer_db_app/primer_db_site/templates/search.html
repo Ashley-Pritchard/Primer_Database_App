@@ -5,32 +5,47 @@
    <a class="active" href="{% url 'index' %}">Home</a>
  </div> 
   <h1>Primer Database</h1>
-  <p>Your search returned {{ num_primers }} primer(s): <br><br></p>
-  <table>
+  <p>Your search returned {{ num_primers }} primer(s). Click on the Amplicon ID for full information. <br><br></p>
+  <table class="table2" order_by = "Genomic Start"  >
     <tr>
-  {% for primer in primer_search_results %}
-      <td>
-	{{ primer.sequence }}
-    </tr>
-      </td>
-  {% endfor %}
+      <th>
+        Gene
+      </th>
+      <th>
+        Direction
+      </th>
+      <th>
+        Genomic Start
+      </th>
+      <th>
+        Genomic End
+      </th>
+      <th>
+        Amplicon ID
+      </th>
     <tr>
-  {% for primer in primer_search_results %}
+      {% for primer in primer_search_results %}
       <td>
-	{{ primer.direction }}
-    </tr>
+        {{ primer.amplicon_id.gene_id.gene_name }}
       </td>
-  {% endfor %}
-    </tr>
-      </td>
-    <tr>
-  {% for primer in primer_search_results %}
       <td>
-	{{ primer.location }}
+        {{ primer.direction }}
       </td>
-  {% endfor %}
+      <td>
+        {{ primer.amplicon_id.genomic_location_start }}
+      </td>
+      <td>
+        {{ primer.amplicon_id.genomic_location_end }}
+      </td>
+      <td>
+        <form id = selected_primer method = get action = {% url 'primer' %} > 
+          <input type = "radio" name = "selected_primer" value = "{{ primer.amplicon_id.amplicon_name }}"> {{ primer.amplicon_id.amplicon_name }}
+      </td>
     </tr>
-  </table>
+    {% endfor %}
+  </table><br><br>
+         <input type=submit>
+       </form>
 {% endblock %}
 
 

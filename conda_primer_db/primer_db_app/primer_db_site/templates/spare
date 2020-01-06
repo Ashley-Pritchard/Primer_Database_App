@@ -1,0 +1,15 @@
+        {{ primer.amplicon_id.genomic_location_start }}
+      </td>
+      <td>
+        {{ primer.amplicon_id.genomic_location_end }}
+      </td>
+      <td>
+        <form id = selected_primer method = get action = {% url 'primer' %} > 
+          <input type = "radio" name = "selected_primer" value = "{{ primer.amplicon_id.amplicon_name }}"> {{ primer.amplicon_id.amplicon_name }}
+      </td>
+    </tr>
+    {% endfor %}
+  </table><br><br>
+         <input type=submit>
+       </form>
+{% endblock %}
