@@ -4,14 +4,14 @@
  <div class="topnav">
    <a class="active" href="{% url 'index' %}">Home</a>
  </div> 
-  <h1>Primer Database</h1><br><br>
-  <table>
+  <h1>Primer Database: {{ primer }}</h1><br><br>
+  <table class="table2">
         <tr>
           <td>
             <strong>Analysis</strong>:
           </td>
           <td>
-            {{ amplicon.analysis_type_id.analysis_type }}
+            {{ primer.amplicon_id.analysis_type_id.analysis_type }}
           </td>
           <td>
           </td>
@@ -19,7 +19,7 @@
             <strong>Gene</strong>:
           </td>
           <td>
-            {{ amplicon.gene_id.gene_name }}
+            {{ primer.amplicon_id.gene_id.gene_name }}
           </td>
           <td>
           </td>
@@ -27,14 +27,14 @@
             <strong>Chromosome</strong>:
           </td>
           <td>
-            {{ amplicon.gene_id.chromosome }}
+            {{ primer.amplicon_id.gene_id.chromosome }}
           </td>
         <tr>
           <td>
             <strong>Exon</strong>:
           </td>
           <td>
-            {{ amplicon.exon }}
+            {{ primer.amplicon_id.exon }}
           </td>
           <td>
           </td>
@@ -42,12 +42,88 @@
             <strong>Direction</strong>:
           </td>
           <td>
-            {{ amplicon.amplicon_name.amplicon_id.direction }}
+            {{ primer.direction }}
           </td>
-
-
-
-      
+          <td>
+          </td>
+          <td>
+            <strong>Genomic Start</strong>:
+          </td>
+          <td>
+            {{ primer.amplicon_id.genomic_location_start }}
+          </td>
+        <tr>
+          <td>
+            <strong>Genomic End</strong>:
+          </td>
+          <td>
+            {{ primer.amplicon_id.genomic_location_end }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>Sequence</strong>:
+          </td>
+          <td>
+            {{ primer.sequence }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>Location</strong>:
+          </td>
+          <td>
+            {{ primer.location }}
+          </td>
+        <tr>
+          <td>
+            <strong>Set</strong>:
+          </td>
+          <td>
+            {{ primer.amplicon_id.primer_set_id.primer_set }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>NGS Audit Number</strong>:
+          </td>
+          <td>
+            {{ primer.ngs_audit_number }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>Imported By</strong>:
+          </td>
+          <td>
+            {{ primer.imported_by_id.imported_by }}
+          </td>
+        <tr>
+          <td>
+            <strong>Date Imported</strong>:
+          </td>
+          <td>
+            {{ primer.date_imported }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>Amplicon Name</strong>:
+          </td>
+          <td>
+            {{ primer.amplicon_id.amplicon_name }}
+          </td>
+          <td>
+          </td>
+          <td>
+            <strong>Alternative Name</strong>:
+          </td>
+          <td>
+            {{ primer.alt_name }}
+          </td>
+        </tr>
+      </table><br>
+      <p><strong>Comments: </strong> {{ primer.amplicon_id.comments }}</p>      
 {% endblock %}
 
 

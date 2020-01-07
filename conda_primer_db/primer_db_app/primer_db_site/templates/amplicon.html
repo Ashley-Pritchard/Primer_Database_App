@@ -1,0 +1,131 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Home</a>
+ </div> 
+  <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1><br><br>
+  {% for p in primer %}
+    <table class="table2">
+      <tr>
+        <td>
+          <strong>Analysis</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.analysis_type_id.analysis_type }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Gene</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.gene_id.gene_name }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Chromosome</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.gene_id.chromosome }}
+        </td>
+      <tr>
+        <td>
+          <strong>Exon</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.exon }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Direction</strong>:
+        </td>
+        <td>
+          {{ p.direction }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Genomic Start</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.genomic_location_start }}
+        </td>
+      <tr>
+        <td>
+          <strong>Genomic End</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.genomic_location_end }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Sequence</strong>:
+        </td>
+        <td>
+          {{ p.sequence }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Location</strong>:
+        </td>
+        <td>
+          {{ p.location }}
+        </td>
+      <tr>
+        <td>
+          <strong>Set</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.primer_set_id.primer_set }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>NGS Audit Number</strong>:
+        </td>
+        <td>
+          {{ p.ngs_audit_number }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Imported By</strong>:
+        </td>
+        <td>
+          {{ p.imported_by_id.imported_by }}
+        </td>
+      <tr>
+        <td>
+          <strong>Date Imported</strong>:
+        </td>
+        <td>
+          {{ p.date_imported }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Amplicon Name</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.amplicon_name }}
+        </td>
+        <td>
+        </td>
+        <td>
+          <strong>Alternative Name</strong>:
+        </td>
+        <td>
+          {{ p.alt_name }}
+        </td>
+      </tr>
+    </table>
+    <p><strong>Comments: </strong> {{ p.amplicon_id.comments }}</p><br><br><br><br>
+  {% endfor %}     
+{% endblock %}
+
+
