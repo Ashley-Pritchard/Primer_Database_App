@@ -132,10 +132,16 @@ def search(request):
 		for x in c:
 			primer_search.append(x)
 	for i in primer_imp_by:
-		primer_search.append(i)
+		for x in i:
+			primer_search.append(x)
 	for d in date_query:
 		primer_search.append(d)
-	
+
+	test = []
+	for g in primer_gene_loc:
+		for x in g:
+			test.append(x)
+
 	occurence_count = collections.Counter(primer_search)
 	primer_search_results = []
 	for primer, count in occurence_count.items():
@@ -146,6 +152,8 @@ def search(request):
 	context = {
 		'amp_id_query': amp_id_query,
 		'primer_amp': primer_amp,
+		'gen_loc_fw_query': gen_loc_fw_query,
+		'gen_loc_rev_query': gen_loc_rev_query,
 		'gen_loc_query': gen_loc_query,
 		'primer_gene_loc': primer_gene_loc,
 		'primer_analysis': primer_analysis,
@@ -157,21 +165,35 @@ def search(request):
 		'primer_search': primer_search,
 		'occurence_count': occurence_count,
 		'primer_search_results': primer_search_results,
-		'num_primers': num_primers
+		'num_primers': num_primers,
+		'test': test
 	}
 
 	return render(request, 'search.html', context=context)
 
 def primer(request):
 	primer_input = request.GET.get('selected_primer', None)
-	amplicon = Amplicon.objects.get(amplicon_name=primer_input)
+	if primer_input != "":
+		primer = Primer.objects.get(id=primer_input)
+	else:
+		primer = ""
 	context = {
-		'amplicon': amplicon,
-		'primer_input': primer_input
+		'primer_input': primer_input,
+		'primer':primer
 	}
 
 	return render(request, 'primer.html', context=context)
 	
+def amplicon(request):
+	amplicon_input = request.GET.get('selected_amplicon', None)
+	amplicon = Amplicon.objects.get(amplicon_name=amplicon_input)
+	primer = amplicon.primer_set.all()
+	context = {
+		'amplicon': amplicon,
+		'primer': primer
+	}
+
+	return render(request, 'amplicon.html', context=context)
 
 
 
