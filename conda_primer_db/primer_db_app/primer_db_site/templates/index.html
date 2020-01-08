@@ -3,69 +3,95 @@
 {% block content %}
  <div class="topnav">
    <a class="active" href="{% url 'index' %}">Home</a>
+   <a class="active" href="{% url 'order' %}">Order Primer</a>
  </div> 
-  <h1>Primer Database</h1>
-  <p>Welcome to the Primer Database for the OUH Molecular Genetics Laboratory. We currently have <strong>{{ num_primers }}</strong> primers covering <strong>{{ num_amplicons }}</strong> amplicons and <strong>{{ num_genes }}</strong> genes.<br><br></p>
+  <h1>Primer Database</h1><br>
+  <p>Welcome to the Primer Database for the OUH Molecular Genetics Laboratory. We currently have <strong>{{ num_primers }}</strong> primers covering <strong>{{ num_amplicons }}</strong> amplicons and <strong>{{ num_genes }}</strong> genes. Fill in one or more boxes in the form below to search for primers - note that the Amplicon ID is case sensitive: </p><br>
   <div>
-    <form id="searchform" method="get" action="{% url 'search' %}">
-      <table class=form>
+    <form class="SearchForm" method="get" action="{% url 'search' %}">
+      <table>
         <tr>
+          <td>
+          </td>
           <td>
             Amplicon ID:
           </td>
-          <td>
+          <td colspan="4">
             <input id="searchbox" name="amp_id_input" type="text"><br>
+          </td>
+          <td>
           </td>
           <td>
       Genomic Location:
           </td>
-          <td>
+          <td colspan="4">
       <input id="searchbox" name="gen_loc_input" type="text"><br>
           <td>
         </tr>
         <tr>
           <td>
-      Analysis Type:
           </td>
-          <td>
-      <input id="searchbox" name="analysis_input" type="text"><br>
-          </td>
-          <td>
-      Primer Set:
-          </td>
-          <td>
-      <input id="searchbox" name="set_input" type="text"><br>
-          </td>
-        <tr>
           <td>
       Gene:
           </td>
-          <td>
+          <td colspan="4">
       <input id="searchbox" name="gene_input" type="text"><br>
+          </td>
+          <td>
           </td>
           <td>
       Chromosome:
           </td>
-          <td>
+          <td colspan="4">
       <input id="searchbox" name="chr_input" type="text"><br>
           </td>
         </tr>
         <tr>
           <td>
-      Imported By:
           </td>
           <td>
+      Imported By:
+          </td>
+          <td colspan="4">
       <input id="searchbox" name="imp_by_input" type="text"><br>
+          </td>
+          <td>
           </td>
           <td>
       Date Imported:
           </td>
-          <td>
+          <td colspan="4">
       <input id="searchbox" name="date_input" type="text"><br>
+          </td>
+        <tr>
+          <td>
+          </td>
+          <td>
+      Analysis Type:
+          </td>
+          <td colspan="4">
+      <select name="analysis_input" type="text"><br>
+        <option value="">Select</option>
+        <option value="NGS">NGS</option>
+        <option value="Sanger">Sanger</option>
+        <option value="Other">Other</option>
+          </td>
+          <td>
+          </td>
+          <td>
+      Primer Set:
+          </td>
+          <td colspan="4">
+      <select name="set_input" type="text"><br>
+        <option value="">Select</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="Other">Other</option>
           </td>
         </tr>
       </table><br><br>
-      <input type="submit" value="Submit">
+      <input class="p1" type="submit" value="Submit">
     </form>
   </div>
 {% endblock %}

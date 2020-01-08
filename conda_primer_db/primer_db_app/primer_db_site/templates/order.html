@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Home</a>
+   <a class="active" href="{% url 'order' %}">Order Primer</a>
+ </div> 
+  <h1>Primer Database</h1><br>
+ <form action="" method="POST">
+ {% csrf_token %}
+ <input type="submit" value="Post"/>
+ </form>
+{% endblock %}
+ 
+
+

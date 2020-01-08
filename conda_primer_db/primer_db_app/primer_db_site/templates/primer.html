@@ -3,25 +3,36 @@
 {% block content %}
  <div class="topnav">
    <a class="active" href="{% url 'index' %}">Home</a>
+   <a class="active" href="{% url 'order' %}">Order Primer</a>
  </div> 
-  <h1>Primer Database: {{ primer }}</h1><br><br>
-  <table class="table2">
+  <h1>Primer Database: {{ primer }}</h1><br><br>  
+  <table class="table2" style="table-layout: fixed; width: 100%">
         <tr>
           <td>
+              <strong>Order Status:</strong>
+            <td>
+              {{ primer.order_status }}
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+            <td>
+            </td>
+          <tr>
+            <td>
             <strong>Analysis</strong>:
           </td>
           <td>
             {{ primer.amplicon_id.analysis_type_id.analysis_type }}
           </td>
           <td>
-          </td>
-          <td>
             <strong>Gene</strong>:
           </td>
           <td>
             {{ primer.amplicon_id.gene_id.gene_name }}
-          </td>
-          <td>
           </td>
           <td>
             <strong>Chromosome</strong>:
@@ -37,14 +48,10 @@
             {{ primer.amplicon_id.exon }}
           </td>
           <td>
-          </td>
-          <td>
             <strong>Direction</strong>:
           </td>
           <td>
             {{ primer.direction }}
-          </td>
-          <td>
           </td>
           <td>
             <strong>Genomic Start</strong>:
@@ -60,14 +67,10 @@
             {{ primer.amplicon_id.genomic_location_end }}
           </td>
           <td>
-          </td>
-          <td>
             <strong>Sequence</strong>:
           </td>
-          <td>
+          <td style="word-wrap: break-word">
             {{ primer.sequence }}
-          </td>
-          <td>
           </td>
           <td>
             <strong>Location</strong>:
@@ -83,14 +86,10 @@
             {{ primer.amplicon_id.primer_set_id.primer_set }}
           </td>
           <td>
-          </td>
-          <td>
             <strong>NGS Audit Number</strong>:
           </td>
           <td>
             {{ primer.ngs_audit_number }}
-          </td>
-          <td>
           </td>
           <td>
             <strong>Imported By</strong>:
@@ -106,14 +105,10 @@
             {{ primer.date_imported }}
           </td>
           <td>
-          </td>
-          <td>
             <strong>Amplicon Name</strong>:
           </td>
           <td>
             {{ primer.amplicon_id.amplicon_name }}
-          </td>
-          <td>
           </td>
           <td>
             <strong>Alternative Name</strong>:
