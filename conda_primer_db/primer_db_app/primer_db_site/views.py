@@ -15,14 +15,17 @@ def index(request):
 	}
 	return render(request, 'index.html', context=context)
 
+def order(request):
+	return render(request, 'order.html')
+
 def search(request):
 	amp_id_input = request.GET.get('amp_id_input', None)
 	gen_loc_input = request.GET.get('gen_loc_input', None)
 	analysis_input = request.GET.get('analysis_input', None)
 	set_input = request.GET.get('set_input', None)
-	gene_input = request.GET.get('gene_input', None)
-	chr_input = request.GET.get('chr_input', None)
-	imp_by_input = request.GET.get('imp_by_input', None)
+	gene_input = request.GET.get('gene_input', None).upper()
+	chr_input = request.GET.get('chr_input', None).upper()
+	imp_by_input = request.GET.get('imp_by_input', None).upper()
 	date_input = request.GET.get('date_input', None)
 
 	completed_fields = 0
@@ -137,11 +140,6 @@ def search(request):
 	for d in date_query:
 		primer_search.append(d)
 
-	test = []
-	for g in primer_gene_loc:
-		for x in g:
-			test.append(x)
-
 	occurence_count = collections.Counter(primer_search)
 	primer_search_results = []
 	for primer, count in occurence_count.items():
@@ -152,8 +150,6 @@ def search(request):
 	context = {
 		'amp_id_query': amp_id_query,
 		'primer_amp': primer_amp,
-		'gen_loc_fw_query': gen_loc_fw_query,
-		'gen_loc_rev_query': gen_loc_rev_query,
 		'gen_loc_query': gen_loc_query,
 		'primer_gene_loc': primer_gene_loc,
 		'primer_analysis': primer_analysis,
@@ -166,7 +162,6 @@ def search(request):
 		'occurence_count': occurence_count,
 		'primer_search_results': primer_search_results,
 		'num_primers': num_primers,
-		'test': test
 	}
 
 	return render(request, 'search.html', context=context)

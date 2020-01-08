@@ -3,10 +3,11 @@
 {% block content %}
  <div class="topnav">
    <a class="active" href="{% url 'index' %}">Home</a>
+   <a class="active" href="{% url 'order' %}">Order Primer</a>
  </div> 
   <h1>Primer Database: Search Results</h1>
   <p>Your search returned <strong>{{ num_primers }}</strong> primer(s). Click on either the Primer or Amplicon ID for full information about individual primers or primer sets respectively. <br><br></p>
-  <table class="table2" >
+  <table class="table2" style="table-layout: fixed; width: 100%">
     <tr>
       <th>
         Gene
@@ -42,12 +43,12 @@
       </td>
       <td>
         <form class="search" id = selected_primer method = get action = {% url 'primer' %} > 
-          <input type = "submit" default = None name = "selected_primer" value = "{{ primer.id }}"> 
+          <input type = "submit" default = None name = "selected_primer" value = "{{ primer.id }}" white-space: normal; word-wrap: break-word; width: 100%> 
         </form>
       </td>
       <td>
         <form class="search" id = selected_amplicon method = get action = {% url 'amplicon' %} >
-          <input type = "submit" default = None name = "selected_amplicon" value = "{{ primer.amplicon_id.amplicon_name }}">
+          <input type = "submit" default = None name = "selected_amplicon" value = "{{ primer.amplicon_id.amplicon_name }}" white-space: normal; word-wrap: break-word; width: 100%>
         </form>
       </td>
     </tr>

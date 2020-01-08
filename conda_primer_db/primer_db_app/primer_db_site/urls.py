@@ -5,5 +5,6 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('search/', views.search, name='search'),
     path('primer/', views.primer, name='primer'),
-    path('amplicon/', views.amplicon, name='amplicon')
+    path('amplicon/', views.amplicon, name='amplicon'),
+    path('order/', views.order, name='order')
 ]
