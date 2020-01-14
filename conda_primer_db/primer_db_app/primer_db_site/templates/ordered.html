@@ -6,24 +6,25 @@
    <a class="active" href="{% url 'order' %}">Order Primer</a>
    <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
  </div> 
-  <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
-  <p> Primer information for amplicon {{amplicon.amplicon_name }}:<br><br><br><br>
-  {% for p in primer %}
+  <h1>Primer Database: Primers on Order</h1>
+  <p> Primer information for primers on order:<br><br><br><br>
+  {% for p in ordered %}
     <table class="table2" style="table-layout: fixed; width: 100%">
       <tr>
         <td>
-            <strong>Order Status:</strong>
+            <strong>Primer ID:</strong>
           <td>
-            {{ p.order_status }}
+            {{ p.id }}
           </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+      </tr>
       <tr>
         <td>
           <strong>Analysis</strong>:

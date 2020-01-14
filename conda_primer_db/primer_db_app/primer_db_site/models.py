@@ -52,5 +52,8 @@ class Primer(models.Model):
 	imported_by_id = models.ForeignKey(Imported_By, on_delete = models.SET_NULL, null=True, blank=True)
 	date_imported = models.CharField(max_length=20, null=True, blank=True)
 	amplicon_id = models.ForeignKey(Amplicon, on_delete = models.SET_NULL, null=True, blank=True)
-	order_status = models.CharField(max_length=50, default='Stocked')
+	version = models.IntegerField(blank=True, default='1')
+	choice = [("Stocked", "Stocked"), ("Ordered", "Ordered"), ("Archived", "Archived")]
+	order_status = models.CharField(max_length=50, default='Stocked', choices=choice)
+
 

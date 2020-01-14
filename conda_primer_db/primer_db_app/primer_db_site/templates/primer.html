@@ -2,8 +2,9 @@
 
 {% block content %}
  <div class="topnav">
-   <a class="active" href="{% url 'index' %}">Home</a>
+   <a class="active" href="{% url 'index' %}">Search PrimersS</a>
    <a class="active" href="{% url 'order' %}">Order Primer</a>
+   <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
  </div> 
   <h1>Primer Database: {{ primer }}</h1><br><br>  
   <table class="table2" style="table-layout: fixed; width: 100%">
@@ -115,6 +116,14 @@
           </td>
           <td>
             {{ primer.alt_name }}
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <strong>Version:</strong>
+          </td>
+          <td>
+            {{ primer.version }}
           </td>
         </tr>
       </table><br>
