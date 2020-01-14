@@ -2,14 +2,158 @@
 
 {% block content %}
  <div class="topnav">
-   <a class="active" href="{% url 'index' %}">Home</a>
+   <a class="active" href="{% url 'index' %}">Search Primers</a>
    <a class="active" href="{% url 'order' %}">Order Primer</a>
+   <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
  </div> 
-  <h1>Primer Database</h1><br>
- <form action="" method="POST">
- {% csrf_token %}
- <input type="submit" value="Post"/>
- </form>
+  <h1>Primer Database</h1>
+  <p> Fill in the form below to order a primer. </p><br>
+  <form action="{% url 'submitted' %}" method="POST">
+    <table>
+      <tr>
+        <td>
+        Amplicon Name:
+        </td>
+        <td>
+        <input name="amplicon" type="text">
+        </td>
+      </tr>
+    <tr>
+      <td>
+      Analysis Type:
+      </td>
+      <td>
+        <select name = "analysis_type" type = "text">
+          <option value="NGS">NGS</option>
+          <option value="Sanger">Sanger</option>
+          <option value="MLPA">MLPA</option>
+          <option value="Long-Range">Long Range</option>
+          <option value="Taqman">Taqman</option>
+          <option value="RT-PCR">RT-PCR</option>
+          <option value="Pyrosequencing">Pyrosequencing</option>
+          <option value="ARMS: Mutant">ARMS: Mutant</option>
+          <option value="ARMS: Normal">ARMS: Normal</option>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        NGS Number (if applicable):
+        </td>
+        <td>
+        <input name="ngs" type="number">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Gene:
+        </td>
+        <td>
+        <input name="gene" type="text" required>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Chromosome:
+        </td>
+        <td>
+        <input name="chr" type="text" required>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Exon:
+        </td>
+        <td>
+        <input name="exon" type="text">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Sequence:
+        </td>
+        <td>
+        <input name="seq" type="text" required>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Direction:
+        </td>
+        <td>
+        <select name="direction" type="text">
+          <option value="f">F</option>
+          <option value="r">R</otion>
+          <option value="t">T</otion>
+          <option value="left">Left</otion>
+          <option value="right">Right</otion>
+          <option value="s">S</otion>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Genomic Location Start:
+        </td>
+        <td>
+        <input name="start" type="number">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Genomic Location End:
+        </td>
+        <td>
+        <input name="end" type="number">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Primer Set: 
+        </td>
+        <td>
+        <select name="set" type="text">
+          <option value="">Select</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="Other">Other</option>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Version Number:
+        </td>
+        <td>
+        <input name="version" type="number" placeholder="1">
+      <tr>
+        <td>
+        Imported by (initials): 
+        </td>
+        <td>
+        <select name="imp_by" type="text">
+          {% for i in imp_by %}
+            <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+          {% endfor %}
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Alternative Name: 
+        </td>
+        <td>
+        <input name="alt_name" type="text">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Comments:
+        </td>
+        <td>
+        <input name="comments" type="text">
+        </td>
+      </tr>
+    </table><br><br>
+  <input class="p1" type="submit" value="Submit">            
+  </form>
 {% endblock %}
  
 

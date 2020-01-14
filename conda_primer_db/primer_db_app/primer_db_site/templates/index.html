@@ -2,8 +2,9 @@
 
 {% block content %}
  <div class="topnav">
-   <a class="active" href="{% url 'index' %}">Home</a>
+   <a class="active" href="{% url 'index' %}">Search Primers</a>
    <a class="active" href="{% url 'order' %}">Order Primer</a>
+   <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
  </div> 
   <h1>Primer Database</h1><br>
   <p>Welcome to the Primer Database for the OUH Molecular Genetics Laboratory. We currently have <strong>{{ num_primers }}</strong> primers covering <strong>{{ num_amplicons }}</strong> amplicons and <strong>{{ num_genes }}</strong> genes. Fill in one or more boxes in the form below to search for primers - note that the Amplicon ID is case sensitive: </p><br>
@@ -91,7 +92,7 @@
           </td>
         </tr>
       </table><br><br>
-      <input class="p1" type="submit" value="Submit">
+      <input class="p1" type="submit" value="Search">
     </form>
   </div>
 {% endblock %}

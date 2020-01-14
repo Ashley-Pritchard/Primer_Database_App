@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .models import Primer, Amplicon, Analysis_Type, Imported_By, Gene, Primer_Set
 from itertools import chain
 from collections import Counter
+from datetime import date 
 import collections
 
 def index(request):
@@ -15,8 +16,78 @@ def index(request):
 	}
 	return render(request, 'index.html', context=context)
 
+def submitted2(request):
+
+	amplicon = Amplicon()
+	if request.POST.get('amplicon') == "":
+		amplicon.amplicon_name = request.POST.get('set') + '_' + request.POST.get('analysis_type') + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + request.POST.get('ngs') + '_' + request.POST.get('direction') + '_' + request.POST.get('version')
+	else:
+		amplicon.amplicon_name = request.POST.get('amplicon').upper()
+	amplicon.exon = request.POST.get('exon')
+	amplicon.comments = request.POST.get('comments')
+	if request.POST.get('start') != "":
+		amplicon.genomic_location_start = request.POST.get('start')
+	else:
+		amplicon.genomic_location_start = None
+	if request.POST.get('end') != "":
+		amplicon.genomic_location_end = request.POST.get('end')
+	else:
+		amplicon.genomic_location_end = None
+	find_gene = Gene.objects.filter(gene_name=request.POST.get('gene'))
+	for f in find_gene:
+		amplicon.gene_id = f
+	find_analysis = Analysis_Type.objects.filter(analysis_type=request.POST.get('analysis_type'))
+	for f in find_analysis:
+		amplicon.analysis_type_id = f
+	find_set = Primer_Set.objects.filter(primer_set=request.POST.get('set'))
+	for f in find_set:
+		amplicon.primer_set_id = f
+	amplicon.save()	
+	
+	return render(request, 'submitted.html')
+
+def submitted(request):
+	submitted2(request)
+
+	genes = Gene.objects.all()
+	gene_names = []
+	for g in genes:
+		gene_names.append(g.gene_name)
+	if request.POST.get('gene') != "" and request.POST.get('gene') not in gene_names:
+		gene = Gene()
+		gene.gene_name = request.POST.get('gene').upper()
+		gene.chromosome = request.POST.get('chr').upper()
+		gene.save()
+
+	primer = Primer()
+	primer.sequence = request.POST.get('seq').upper()
+	primer.direction = request.POST.get('direction').upper()
+	primer.alt_name = request.POST.get('alt_name')
+	if request.POST.get('ngs') != "":
+		primer.ngs_audit_number = request.POST.get('ngs')
+	else:
+		primer.ngs_audit_number = None
+	today = date.today()
+	primer.date_imported = today.strftime("%d/%m/%Y")
+	primer.order_status = "Ordered"
+	find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+	for f in find_imp:
+		primer.imported_by_id = f
+	if request.POST.get('version') == "":
+		primer.version = 1
+	else:
+		primer.version = request.POST.get('version')
+	primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
+	primer.save()
+
+	return render(request, 'submitted.html')
+
 def order(request):
-	return render(request, 'order.html')
+	imp_by = Imported_By.objects.all()
+	context = {
+		"imp_by": imp_by
+	}
+	return render(request, 'order.html', context=context)
 
 def search(request):
 	amp_id_input = request.GET.get('amp_id_input', None)
@@ -189,6 +260,14 @@ def amplicon(request):
 	}
 
 	return render(request, 'amplicon.html', context=context)
+
+def ordered(request):
+	ordered = Primer.objects.filter(order_status = "Ordered")
+	context = {
+		"ordered": ordered
+	}
+
+	return render(request, 'ordered.html', context=context)
 
 
 
