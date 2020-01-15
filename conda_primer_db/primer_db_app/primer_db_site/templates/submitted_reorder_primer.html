@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Search Primers</a>
+   <a class="active" href="{% url 'order' %}">Order Primer</a>
+   <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
+ </div> 
+  <h1>Primer Database</h1><br><br><br>
+  <p><strong> Thank you for reordering Primer {{ reorder.id }}. </strong></p><br>
+{% endblock %}
+ 
+
+

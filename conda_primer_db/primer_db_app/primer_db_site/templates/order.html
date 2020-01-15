@@ -7,9 +7,11 @@
    <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
  </div> 
   <h1>Primer Database</h1>
-  <p> Fill in the form below to order a primer. </p><br>
+  <p> Fill in the form below to order one or more <strong>new</strong> primers associated with a single amplicon. Fill in the amplicon information first, then complete the tables for one, two or three primers as appropriate. <br><br> To <strong>reorder</strong> a primer or to order an <strong>additional</strong> primer for an amplicon, please first use the <a class="active" href="{% url 'index' %}">search</a> function and then follow the appropriate links. </p><br>
   <form action="{% url 'submitted' %}" method="POST">
+  <strong><p>Amplicon (Required)</p></strong><br>
     <table>
+      </tr>
       <tr>
         <td>
         Amplicon Name:
@@ -20,7 +22,7 @@
       </tr>
     <tr>
       <td>
-      Analysis Type:
+      Analysis Type (Required):
       </td>
       <td>
         <select name = "analysis_type" type = "text">
@@ -37,15 +39,7 @@
       </tr>
       <tr>
         <td>
-        NGS Number (if applicable):
-        </td>
-        <td>
-        <input name="ngs" type="number">
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Gene:
+        Gene (Required):
         </td>
         <td>
         <input name="gene" type="text" required>
@@ -53,7 +47,7 @@
       </tr>
       <tr>
         <td>
-        Chromosome:
+        Chromosome (Required):
         </td>
         <td>
         <input name="chr" type="text" required>
@@ -65,28 +59,6 @@
         </td>
         <td>
         <input name="exon" type="text">
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Sequence:
-        </td>
-        <td>
-        <input name="seq" type="text" required>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Direction:
-        </td>
-        <td>
-        <select name="direction" type="text">
-          <option value="f">F</option>
-          <option value="r">R</otion>
-          <option value="t">T</otion>
-          <option value="left">Left</otion>
-          <option value="right">Right</otion>
-          <option value="s">S</otion>
         </td>
       </tr>
       <tr>
@@ -120,12 +92,6 @@
       </tr>
       <tr>
         <td>
-        Version Number:
-        </td>
-        <td>
-        <input name="version" type="number" placeholder="1">
-      <tr>
-        <td>
         Imported by (initials): 
         </td>
         <td>
@@ -133,6 +99,47 @@
           {% for i in imp_by %}
             <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
           {% endfor %}
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Comments:
+        </td>
+        <td>
+        <input name="comments" type="text">
+        </td>
+      </tr>
+    </table><br><br>
+    <strong><p>Primer 1 (Required)</p></strong><br>
+    <table>
+      <tr>
+        <td>
+        Sequence (Required):
+        </td>
+        <td>
+        <input name="seq" type="text" required>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Direction:
+        </td>
+        <td>
+        <select name="direction" type="text">
+          <option value="f">F</option>
+          <option value="r">R</otion>
+          <option value="t">T</otion>
+          <option value="left">Left</otion>
+          <option value="right">Right</otion>
+          <option value="s">S</otion>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        NGS Number (if applicable):
+        </td>
+        <td>
+        <input name="ngs" type="number">
         </td>
       </tr>
       <tr>
@@ -145,10 +152,112 @@
       </tr>
       <tr>
         <td>
-        Comments:
+        Version Number:
         </td>
         <td>
-        <input name="comments" type="text">
+        <input name="version" type="number" placeholder="1">
+        </td>
+      </tr>
+    </table><br><br>
+    <strong><p>Primer 2 (Optional)</p></strong>
+    <p>Note: As the order of additional primers is optional, the form will submit without the below sequence field completed. However, the field must be completed for an additional primer to be ordered.</p><br>
+    <table>
+      <tr>
+        <td>
+        Sequence (Required):
+        </td>
+        <td>
+        <input name="seq2" type="text">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Direction:
+        </td>
+        <td>
+        <select name="direction2" type="text">
+          <option value="">Select</option>
+          <option value="f">F</option>
+          <option value="r">R</otion>
+          <option value="t">T</otion>
+          <option value="left">Left</otion>
+          <option value="right">Right</otion>
+          <option value="s">S</otion>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        NGS Number (if applicable):
+        </td>
+        <td>
+        <input name="ngs2" type="number">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Alternative Name: 
+        </td>
+        <td>
+        <input name="alt_name2" type="text">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Version Number:
+        </td>
+        <td>
+        <input name="version2" type="number" placeholder="1">
+        </td>
+      </tr>
+    </table><br><br>
+    <strong><p>Primer 3 (Optional)</p></strong>
+    <p>Note: As the order of additional primers is optional, the form will submit without the below sequence field completed. However, the field must be completed for an additional primer to be ordered.</p><br>
+    <table>
+      <tr>
+        <td>
+        Sequence (Required):
+        </td>
+        <td>
+        <input name="seq3" type="text">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Direction:
+        </td>
+        <td>
+        <select name="direction3" type="text">
+          <option value="">Select</option>
+          <option value="f">F</option>
+          <option value="r">R</otion>
+          <option value="t">T</otion>
+          <option value="left">Left</otion>
+          <option value="right">Right</otion>
+          <option value="s">S</otion>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        NGS Number (if applicable):
+        </td>
+        <td>
+        <input name="ngs3" type="number">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Alternative Name: 
+        </td>
+        <td>
+        <input name="alt_name3" type="text">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Version Number:
+        </td>
+        <td>
+        <input name="version3" type="number" placeholder="1">
         </td>
       </tr>
     </table><br><br>
