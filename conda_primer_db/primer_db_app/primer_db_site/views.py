@@ -16,11 +16,23 @@ def index(request):
 	}
 	return render(request, 'index.html', context=context)
 
-def submitted2(request):
+def submitted1(request):
+	genes = Gene.objects.all()
+	gene_names = []
+	for g in genes:
+		gene_names.append(g.gene_name)
+	if request.POST.get('gene').upper() not in gene_names:
+		gene = Gene()
+		gene.gene_name = request.POST.get('gene').upper()
+		gene.chromosome = request.POST.get('chr').upper()
+		gene.save()
+	return render(request, 'submitted.html')
 
+def submitted2(request):
+	submitted1(request)
 	amplicon = Amplicon()
 	if request.POST.get('amplicon') == "":
-		amplicon.amplicon_name = request.POST.get('set') + '_' + request.POST.get('analysis_type') + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + request.POST.get('ngs') + '_' + request.POST.get('direction') + '_' + request.POST.get('version')
+		amplicon.amplicon_name = request.POST.get('set') + '_' + request.POST.get('analysis_type') + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + request.POST.get('ngs') + '_' + request.POST.get('version')
 	else:
 		amplicon.amplicon_name = request.POST.get('amplicon').upper()
 	amplicon.exon = request.POST.get('exon')
@@ -33,31 +45,22 @@ def submitted2(request):
 		amplicon.genomic_location_end = request.POST.get('end')
 	else:
 		amplicon.genomic_location_end = None
-	find_gene = Gene.objects.filter(gene_name=request.POST.get('gene'))
-	for f in find_gene:
-		amplicon.gene_id = f
 	find_analysis = Analysis_Type.objects.filter(analysis_type=request.POST.get('analysis_type'))
 	for f in find_analysis:
 		amplicon.analysis_type_id = f
+	find_gene = Gene.objects.filter(gene_name=request.POST.get('gene').upper())
+	for f in find_gene:
+		amplicon.gene_id = f
 	find_set = Primer_Set.objects.filter(primer_set=request.POST.get('set'))
 	for f in find_set:
 		amplicon.primer_set_id = f
 	amplicon.save()	
-	
+
 	return render(request, 'submitted.html')
 
 def submitted(request):
+	submitted1(request)
 	submitted2(request)
-
-	genes = Gene.objects.all()
-	gene_names = []
-	for g in genes:
-		gene_names.append(g.gene_name)
-	if request.POST.get('gene') != "" and request.POST.get('gene') not in gene_names:
-		gene = Gene()
-		gene.gene_name = request.POST.get('gene').upper()
-		gene.chromosome = request.POST.get('chr').upper()
-		gene.save()
 
 	primer = Primer()
 	primer.sequence = request.POST.get('seq').upper()
@@ -80,6 +83,50 @@ def submitted(request):
 	primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
 	primer.save()
 
+	if request.POST.get('seq2') != "":
+		primer = Primer()
+		primer.sequence = request.POST.get('seq2').upper()
+		primer.direction = request.POST.get('direction2').upper()
+		primer.alt_name = request.POST.get('alt_name2')
+		if request.POST.get('ngs2') != "":
+			primer.ngs_audit_number = request.POST.get('ngs2')
+		else:
+			primer.ngs_audit_number = None
+		today = date.today()
+		primer.date_imported = today.strftime("%d/%m/%Y")
+		primer.order_status = "Ordered"
+		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+		for f in find_imp:
+			primer.imported_by_id = f
+		if request.POST.get('version2') == "":
+			primer.version = 1
+		else:
+			primer.version = request.POST.get('version2')
+		primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
+		primer.save()
+
+	if request.POST.get('seq3') != "":
+		primer = Primer()
+		primer.sequence = request.POST.get('seq3').upper()
+		primer.direction = request.POST.get('direction3').upper()
+		primer.alt_name = request.POST.get('alt_name3')
+		if request.POST.get('ngs3') != "":
+			primer.ngs_audit_number = request.POST.get('ngs3')
+		else:
+			primer.ngs_audit_number = None
+		today = date.today()
+		primer.date_imported = today.strftime("%d/%m/%Y")
+		primer.order_status = "Ordered"
+		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+		for f in find_imp:
+			primer.imported_by_id = f
+		if request.POST.get('version3') == "":
+			primer.version = 1
+		else:
+			primer.version = request.POST.get('version3')
+		primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
+		primer.save()
+	
 	return render(request, 'submitted.html')
 
 def order(request):
@@ -243,9 +290,11 @@ def primer(request):
 		primer = Primer.objects.get(id=primer_input)
 	else:
 		primer = ""
+	imp_by = Imported_By.objects.all()
 	context = {
 		'primer_input': primer_input,
-		'primer':primer
+		'primer':primer,
+		'imp_by':imp_by
 	}
 
 	return render(request, 'primer.html', context=context)
@@ -269,6 +318,66 @@ def ordered(request):
 
 	return render(request, 'ordered.html', context=context)
 
+def order_to_amplicon(request): 
+	pulled = Amplicon.objects.filter(pk=request.POST.get('amplicon'))
+	imp_by = Imported_By.objects.all()
+	context = {
+	'pulled':pulled,
+        'imp_by':imp_by
+	}
+	return render(request, 'order_to_amplicon.html', context=context)
+
+def submitted_to_amplicon(request):
+	primer = Primer()
+	primer.sequence = request.POST.get('seq').upper()
+	primer.direction = request.POST.get('direction').upper()
+	primer.alt_name = request.POST.get('alt_name')
+	if request.POST.get('ngs') != "":
+		primer.ngs_audit_number = request.POST.get('ngs')
+	else:
+		primer.ngs_audit_number = None
+	today = date.today()
+	primer.date_imported = today.strftime("%d/%m/%Y")
+	primer.order_status = "Ordered"
+	find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+	for f in find_imp:
+		primer.imported_by_id = f
+	if request.POST.get('version') == "":
+		primer.version = 1
+	else:
+		primer.version = request.POST.get('version')
+	amp = Amplicon.objects.filter(pk=request.POST.get('amplicon'))
+	for a in amp:
+		primer.amplicon_id = a
+	primer.save()
+	context = {
+		'amp':amp
+	}
+	
+	return render(request, 'submitted_to_amplicon.html', context=context)
+
+def reorder_primer(request):
+	reorder = Primer.objects.get(pk=request.POST.get('primer'))
+	primer = Primer()
+	primer.sequence = reorder.sequence
+	primer.direction = reorder.direction
+	primer.alt_name = reorder.alt_name
+	primer.ngs_audit_number = reorder.ngs_audit_number
+	find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+	for f in find_imp:
+		primer.imported_by_id = f	
+	today = date.today()
+	primer.date_imported = today.strftime("%d/%m/%Y")
+	primer.order_status = "Ordered"
+	primer.version = reorder.version
+	primer.amplicon_id = reorder.amplicon_id
+	primer.save()
+	
+	context = {
+		'reorder':reorder
+	}
+	
+	return render(request, 'submitted_reorder_primer.html', context=context)
 
 
 	

@@ -1,0 +1,76 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Search Primers</a>
+   <a class="active" href="{% url 'order' %}">Order Primer</a>
+   <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
+ </div> 
+  <h1>Primer Database</h1>
+  <p> Fill in the form below to order a primer for amplicon {% for p in pulled %}{{ p.amplicon_name }}{% endfor %} </p>
+  <form action="{% url 'submitted_to_amplicon' %}" method="POST">
+    <table>
+      <tr>
+        <td>
+        Imported by (initials): 
+        </td>
+        <td>
+        <select name="imp_by" type="text">
+          {% for i in imp_by %}
+            <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+          {% endfor %}
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Sequence (Required):
+        </td>
+        <td>
+        <input name="seq" type="text" required>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Direction:
+        </td>
+        <td>
+        <select name="direction" type="text">
+          <option value="f">F</option>
+          <option value="r">R</otion>
+          <option value="t">T</otion>
+          <option value="left">Left</otion>
+          <option value="right">Right</otion>
+          <option value="s">S</otion>
+        </td>
+      </tr>
+      <tr>
+        <td>
+        NGS Number (if applicable):
+        </td>
+        <td>
+        <input name="ngs" type="number">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Alternative Name: 
+        </td>
+        <td>
+        <input name="alt_name" type="text">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Version Number:
+        </td>
+        <td>
+        <input name="version" type="number" placeholder="1">
+        </td>
+      </tr>
+    </table><br><br>
+  <button name="amplicon" value="{% for p in pulled %}{{ p.id }}{% endfor %}">Submit</button>       
+  </form>
+{% endblock %}
+ 
+
+

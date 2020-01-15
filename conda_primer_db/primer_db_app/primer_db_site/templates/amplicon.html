@@ -7,7 +7,10 @@
    <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
  </div> 
   <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
-  <p> Primer information for amplicon {{amplicon.amplicon_name }}:<br><br><br><br>
+  <p> Primer information for amplicon {{amplicon.amplicon_name }}:<br><br>
+  <form action="{% url 'order_to_amplicon' %}" method="POST">
+  <button name="amplicon" type="submit" value="{{ amplicon.id }}">Order New Primer for this Amplicon</button><br><br><br>
+  </form>
   {% for p in primer %}
     <table class="table2" style="table-layout: fixed; width: 100%">
       <tr>
@@ -130,7 +133,7 @@
       </tr>
     </table>
     <p><strong>Comments:</strong> {{ p.amplicon_id.comments }}</p><br><br><br>
-  {% endfor %}     
+  {% endfor %}  
 {% endblock %}
 
 

@@ -2,7 +2,7 @@
 
 {% block content %}
  <div class="topnav">
-   <a class="active" href="{% url 'index' %}">Search PrimersS</a>
+   <a class="active" href="{% url 'index' %}">Search Primers</a>
    <a class="active" href="{% url 'order' %}">Order Primer</a>
    <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
  </div> 
@@ -127,7 +127,15 @@
           </td>
         </tr>
       </table><br>
-      <p><strong>Comments: </strong> {{ primer.amplicon_id.comments }}</p>      
+      <p><strong>Comments: </strong> {{ primer.amplicon_id.comments }}</p><br>
+      <p> To reorder this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
+    <form action="{% url 'reorder_primer' %}" method="POST">  
+    <select name="imp_by" type="text">
+      {% for i in imp_by %}
+        <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+      {% endfor %}</select>
+    <button name="primer" value="{{ primer.id }}">Reorder Primer</button>
+    </form>
 {% endblock %}
 
 
