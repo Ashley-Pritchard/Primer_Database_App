@@ -61,14 +61,14 @@
           <strong>Start</strong>:
         </td>
         <td>
-          {{ p.amplicon_id.genomic_location_start }}
+          {{ p.genomic_location_start }}
         </td>
       <tr>
         <td>
           <strong>End</strong>:
         </td>
         <td>
-          {{ p.amplicon_id.genomic_location_end }}
+          {{ p.genomic_location_end }}
         </td>
         <td>
           <strong>Set</strong>:
@@ -130,7 +130,7 @@
         </td>
       </tr>
     </table>
-    <p><strong>Comments:</strong> {{ p.amplicon_id.comments }}</p><br><br><br>
+    <p><strong>Comments:</strong> {{ p.comments }}</p><br><br><br>
   {% endfor %}     
 {% endblock %}
 

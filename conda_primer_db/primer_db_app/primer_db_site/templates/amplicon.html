@@ -7,7 +7,7 @@
    <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
  </div> 
   <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
-  <p> Primer information for amplicon {{amplicon.amplicon_name }}:<br><br>
+  <p> Primer information for amplicon {{ amplicon.amplicon_name }}:<br><br>
   <form action="{% url 'order_to_amplicon' %}" method="POST">
   <button name="amplicon" type="submit" value="{{ amplicon.id }}">Order New Primer for this Amplicon</button><br><br><br>
   </form>
@@ -63,14 +63,14 @@
           <strong>Start</strong>:
         </td>
         <td>
-          {{ p.amplicon_id.genomic_location_start }}
+          {{ p.genomic_location_start }}
         </td>
       <tr>
         <td>
           <strong>End</strong>:
         </td>
         <td>
-          {{ p.amplicon_id.genomic_location_end }}
+          {{ p.genomic_location_end }}
         </td>
         <td>
           <strong>Set</strong>:
@@ -129,10 +129,28 @@
         </td>
         <td>
           {{ p.version }}
-        </td>
-      </tr>
-    </table>
-    <p><strong>Comments:</strong> {{ p.amplicon_id.comments }}</p><br><br><br>
+          </td>
+          {% if p.order_status == "Archived" %}
+          <td>
+          <strong>Archived By:</strong>
+          </td>
+          <td>
+          {{ p.archived_by_id.imported_by }}
+          </td>
+          <td>
+          <strong>Date Archived:</strong>
+          </td>
+          <td>
+          {{ p.date_archived }}
+          </td>
+        </tr>
+      </table><br>
+      <p><strong>Reason Archived: </strong> {{ p.reason_archived }}</p><br>
+      {% else %}
+        </tr>
+      </table><br>
+      {% endif %}
+    <p><strong>Comments:</strong> {{ p.comments }}</p><br><br><br>
   {% endfor %}  
 {% endblock %}
 
