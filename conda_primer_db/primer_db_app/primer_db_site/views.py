@@ -1,3 +1,4 @@
+#import relevant libraries
 from django.shortcuts import render, get_object_or_404
 from .models import Primer, Amplicon, Analysis_Type, Imported_By, Gene, Primer_Set
 from itertools import chain
@@ -5,59 +6,107 @@ from collections import Counter
 from datetime import date 
 import collections
 
+
+#provides context for the index / search page 
 def index(request):
+
+	#pull the count of primers, amplicons and genes
 	num_primers = Primer.objects.all().count()
+
 	num_amplicons = Amplicon.objects.all().count()
+
 	num_genes = Gene.objects.all().count()
+
 	context = {
 		'num_primers': num_primers,
 		'num_amplicons': num_amplicons,
 		'num_genes': num_genes
 	}
+
 	return render(request, 'index.html', context=context)
 
+
+#called after a primer is submitted on the order.html page. Function one of three - separated as the first two make changes to the database required for the third.
+#adds a new gene to the database if the requested primer is in a gene not currently stored
 def submitted1(request):
+	
+	#pull all genes from the database and store as a list 
 	genes = Gene.objects.all()
 	gene_names = []
 	for g in genes:
 		gene_names.append(g.gene_name)
+
+	#if the submitted gene is not in the gene list, add the gene and respective chromosome to the database 
 	if request.POST.get('gene').upper() not in gene_names:
 		gene = Gene()
 		gene.gene_name = request.POST.get('gene').upper()
 		gene.chromosome = request.POST.get('chr').upper()
+
+		#save the changes to the database 
 		gene.save()
+
+	#render the submitted html page 
 	return render(request, 'submitted.html')
 
+
+#function two of three for primer order submission. 
 def submitted2(request):
+
+	#call first function
 	submitted1(request)
+
+	#make changes to the amplicon table of the primer database 
 	amplicon = Amplicon()
+
+	#if the primer order did not state an amplicon name, create one using the other fields
 	if request.POST.get('amplicon') == "":
 		amplicon.amplicon_name = request.POST.get('set') + '_' + request.POST.get('analysis_type') + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + request.POST.get('ngs') + '_' + request.POST.get('version')
+
+	#if an amplicon name was stated, convert it to uppercase
 	else:
 		amplicon.amplicon_name = request.POST.get('amplicon').upper()
+
+	#set exon based on form submission
 	amplicon.exon = request.POST.get('exon')
+
+	#select analysis type from database by filtering on what was input in the submission
 	find_analysis = Analysis_Type.objects.filter(analysis_type=request.POST.get('analysis_type'))
 	for f in find_analysis:
 		amplicon.analysis_type_id = f
+
+	#select gene from database by filtering on what was input in the submission
 	find_gene = Gene.objects.filter(gene_name=request.POST.get('gene').upper())
 	for f in find_gene:
 		amplicon.gene_id = f
+	
+	#select set from database by filtering on what was input in the submission
 	find_set = Primer_Set.objects.filter(primer_set=request.POST.get('set'))
 	for f in find_set:
 		amplicon.primer_set_id = f
+
+	#save the changes to the database
 	amplicon.save()	
 
+	#render the submitted html page
 	return render(request, 'submitted.html')
 
+
+#function three of three for primer order submission 
 def submitted(request):
-	submitted1(request)
+	
+	#call second function
 	submitted2(request)
 
+	#make changes to the primer table of the database 
 	primer = Primer()
+
+	#set the sequence, direction , alt_name and comments from the primer order submission - convert the sequence and direction to uppercase
 	primer.sequence = request.POST.get('seq').upper()
 	primer.direction = request.POST.get('direction').upper()
 	primer.alt_name = request.POST.get('alt_name')
 	primer.comments = request.POST.get('comments')
+
+	#set the start and end genomic locations and ngs audit number based on primer order submission, if none were submitted set to None
 	if request.POST.get('start') != "":
 		primer.genomic_location_start = request.POST.get('start')
 	else:
@@ -70,63 +119,100 @@ def submitted(request):
 		primer.ngs_audit_number = request.POST.get('ngs')
 	else:
 		primer.ngs_audit_number = None
+
+	#pull todays date and set it as the date imported 
 	today = date.today()
 	primer.date_imported = today.strftime("%d/%m/%Y")
+
+	#set the primer status to order
 	primer.order_status = "Ordered"
+
+	#select imported_by from database by filtering on what was input in the submission
 	find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
 	for f in find_imp:
 		primer.imported_by_id = f
+
+	#set the version if it was input in the submission, otherwise set as one
 	if request.POST.get('version') == "":
 		primer.version = 1
 	else:
 		primer.version = request.POST.get('version')
+
+	#set the resepctive amplicon to the new primer as the foreign key by selecting the amplicon that was most recently added 
 	primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
+
+	#save to database 
 	primer.save()
 
+	#if a second or third primer was submitted, repeat the above
 	if request.POST.get('seq2') != "":
+
 		primer = Primer()
+
 		primer.sequence = request.POST.get('seq2').upper()
+
 		primer.direction = request.POST.get('direction2').upper()
+
 		primer.alt_name = request.POST.get('alt_name2')
+
 		if request.POST.get('ngs2') != "":
 			primer.ngs_audit_number = request.POST.get('ngs2')
 		else:
 			primer.ngs_audit_number = None
+
 		today = date.today()
 		primer.date_imported = today.strftime("%d/%m/%Y")
+
 		primer.order_status = "Ordered"
+
 		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+
 		for f in find_imp:
 			primer.imported_by_id = f
+
 		if request.POST.get('version2') == "":
 			primer.version = 1
 		else:
 			primer.version = request.POST.get('version2')
+
 		primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
+
 		primer.save()
 
 	if request.POST.get('seq3') != "":
+
 		primer = Primer()
+
 		primer.sequence = request.POST.get('seq3').upper()
+
 		primer.direction = request.POST.get('direction3').upper()
+
 		primer.alt_name = request.POST.get('alt_name3')
+
 		if request.POST.get('ngs3') != "":
 			primer.ngs_audit_number = request.POST.get('ngs3')
 		else:
 			primer.ngs_audit_number = None
+
 		today = date.today()
 		primer.date_imported = today.strftime("%d/%m/%Y")
+
 		primer.order_status = "Ordered"
+
 		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
 		for f in find_imp:
 			primer.imported_by_id = f
+
 		if request.POST.get('version3') == "":
 			primer.version = 1
 		else:
 			primer.version = request.POST.get('version3')
+
 		primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
+
 		primer.save()
 	
+	#render the submitted html page 
 	return render(request, 'submitted.html')
 
 def order(request):

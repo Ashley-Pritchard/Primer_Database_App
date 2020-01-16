@@ -363,7 +363,7 @@ def primer():
 	#replace empty ngs numbers with 0 to prevent errors downstream 
 	df_p3['ngs_audit_number'] = df_p3['ngs_audit_number'].replace(np.nan, 0)
 
-	#if there is a primer version number it is stored in the alt name column as the final component after the '_'. Pull this for primers and store as '1' otherwise
+	#if there is a primer version number it is stored in the alt name column as the final component after the '_'. Pull this for primers and store as '1' otherwise. Store as new column.
 	version = []
 	for index, row in df_p3.iterrows():
 		if pd.isnull(row[2]) == True or str(row[2]).split('_')[-1].startswith('v') == False:
@@ -371,8 +371,14 @@ def primer():
 		else:
 			version.append(str(row[2]).split('_')[-1])
 	df_p3['version'] = version
+
+	#strip the v from the version number to store as int
 	df_p3['version'] = df_p3['version'].str.strip('v')
+
+	#convert names to uppercase
 	df_p3['archived_by'] = df_p3['archived_by'].str.upper()
+
+	#replace all names in the imported_by field with appropriate initials 
 	name = []
 	for index, row in df_p3.iterrows():
 		if 'ARIELE' in str(row[6]):
@@ -430,19 +436,27 @@ def primer():
 		else:
 			name.append(row[6])
 	df_p3['archived_by'] = name
+
+	#create a dictionary to pull the appropriate archived_by_id for each record from the imported_by.csv file. Store these as a new column. 
 	archived_by_dict = dict(zip(df5.imported_by, df5.imported_by_id))
 	df_p3['archived_by_id'] = df_p3['archived_by'].map(imported_by_dict)
+
+	#standardise the date_archived field by replacing . and - with /
 	df_p3['date_archived'] = df_p3['date_archived'].replace(to_replace = '\.', value = '/', regex=True)
 	df_p3['date_archived'] = df_p3['date_archived'].replace(to_replace = '-', value = '/', regex=True)
+
+	#drop irrelevant column
 	df_p3 = df_p3.drop(columns = ['archived_by'])
+
+	#replace null values in genomic start and end locations with 0 values to prevent errors with database
 	df_p3['genomic_location_start'] = df_p3['genomic_location_start'].replace(np.nan, 0)
 	df_p3['genomic_location_end'] = df_p3['genomic_location_end'].replace(np.nan, 0)
-	df_p3['primer_id'] = df_p3.groupby(['sequence', 'location', 'direction', 'amplicon_id']).ngroup()
-	df_p3.to_csv('primer.csv', sep=',')
-primer()
-
-#df7 = pd.read_csv('primer.csv')
-
-
-
 	
+	#create a primer id for each unique record
+	df_p3['primer_id'] = df_p3.groupby(['sequence', 'location', 'direction', 'amplicon_id']).ngroup()
+
+	#save as csv
+	df_p3.to_csv('primer.csv', sep=',')
+
+#call function
+primer()	
