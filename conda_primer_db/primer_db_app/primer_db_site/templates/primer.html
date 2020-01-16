@@ -58,14 +58,14 @@
             <strong>Genomic Start</strong>:
           </td>
           <td>
-            {{ primer.amplicon_id.genomic_location_start }}
+            {{ primer.genomic_location_start }}
           </td>
         <tr>
           <td>
             <strong>Genomic End</strong>:
           </td>
           <td>
-            {{ primer.amplicon_id.genomic_location_end }}
+            {{ primer.genomic_location_end }}
           </td>
           <td>
             <strong>Sequence</strong>:
@@ -125,9 +125,27 @@
           <td>
             {{ primer.version }}
           </td>
+          {% if primer.order_status == "Archived" %}
+          <td>
+          <strong>Archived By:</strong>
+          </td>
+          <td>
+          {{ primer.archived_by_id.imported_by }}
+          </td>
+          <td>
+          <strong>Date Archived:</strong>
+          </td>
+          <td>
+          {{ primer.date_archived }}
+          </td>
         </tr>
       </table><br>
-      <p><strong>Comments: </strong> {{ primer.amplicon_id.comments }}</p><br>
+      <p><strong>Reason Archived: </strong> {{ primer.reason_archived }}</p><br>
+      {% else %}
+        </tr>
+      </table><br>
+      {% endif %}
+      <p><strong>Comments: </strong> {{ primer.comments }}</p><br>
       <p> To reorder this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
     <form action="{% url 'reorder_primer' %}" method="POST">  
     <select name="imp_by" type="text">
@@ -135,7 +153,18 @@
         <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
       {% endfor %}</select>
     <button name="primer" value="{{ primer.id }}">Reorder Primer</button>
+    </form><br>
+    {% if primer.order_status == 'Stocked' %}
+    <p> To archive this primer, please add a reason for archiving and then use the drop-down menu to select your initials before clicking the 'archive primer' button</p><br>
+    <form action="{% url 'archive_primer' %}" method="POST">  
+    Reason for Archiving: <input name="reason_archived" type="text"><br>
+    <select name="arc_by" type="text">
+      {% for i in imp_by %}
+        <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+      {% endfor %}</select>
+    <button name="archive" value="{{ primer.id }}">Archive Primer</button>
     </form>
+    {% endif %}
 {% endblock %}
 
 

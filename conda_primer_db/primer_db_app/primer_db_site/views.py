@@ -36,15 +36,6 @@ def submitted2(request):
 	else:
 		amplicon.amplicon_name = request.POST.get('amplicon').upper()
 	amplicon.exon = request.POST.get('exon')
-	amplicon.comments = request.POST.get('comments')
-	if request.POST.get('start') != "":
-		amplicon.genomic_location_start = request.POST.get('start')
-	else:
-		amplicon.genomic_location_start = None
-	if request.POST.get('end') != "":
-		amplicon.genomic_location_end = request.POST.get('end')
-	else:
-		amplicon.genomic_location_end = None
 	find_analysis = Analysis_Type.objects.filter(analysis_type=request.POST.get('analysis_type'))
 	for f in find_analysis:
 		amplicon.analysis_type_id = f
@@ -66,6 +57,15 @@ def submitted(request):
 	primer.sequence = request.POST.get('seq').upper()
 	primer.direction = request.POST.get('direction').upper()
 	primer.alt_name = request.POST.get('alt_name')
+	primer.comments = request.POST.get('comments')
+	if request.POST.get('start') != "":
+		primer.genomic_location_start = request.POST.get('start')
+	else:
+		primer.genomic_location_start = None
+	if request.POST.get('end') != "":
+		primer.genomic_location_end = request.POST.get('end')
+	else:
+		primer.genomic_location_end = None
 	if request.POST.get('ngs') != "":
 		primer.ngs_audit_number = request.POST.get('ngs')
 	else:
@@ -158,16 +158,12 @@ def search(request):
 
 	if gen_loc_input !="":
 		completed_fields +=1
-		gen_loc_fw_query = Amplicon.objects.filter(genomic_location_start__lte=gen_loc_input, genomic_location_end__gte=gen_loc_input)
-		gen_loc_rev_query = Amplicon.objects.filter(genomic_location_start__gte=gen_loc_input, genomic_location_end__lte=gen_loc_input)
+		gen_loc_fw_query = Primer.objects.filter(genomic_location_start__lte=gen_loc_input, genomic_location_end__gte=gen_loc_input)
+		gen_loc_rev_query = Primer.objects.filter(genomic_location_start__gte=gen_loc_input, genomic_location_end__lte=gen_loc_input)
 		gen_loc_query = list(chain(gen_loc_fw_query, gen_loc_rev_query))
-		primer_gene_loc = []
-		for g in gen_loc_query:
-			primer_gene_loc.append(g.primer_set.all())
 
 	else: 
 		gen_loc_query = ""
-		primer_gene_loc = ""
 
 	if analysis_input !="":
 		completed_fields +=1
@@ -237,9 +233,8 @@ def search(request):
 
 	for a in primer_amp:
 		primer_search.append(a)
-	for g in primer_gene_loc:
-		for x in g:
-			primer_search.append(x)
+	for g in gen_loc_query:
+		primer_search.append(g)
 	for a in primer_analysis:
 		for x in a:
 			primer_search.append(x)
@@ -269,7 +264,6 @@ def search(request):
 		'amp_id_query': amp_id_query,
 		'primer_amp': primer_amp,
 		'gen_loc_query': gen_loc_query,
-		'primer_gene_loc': primer_gene_loc,
 		'primer_analysis': primer_analysis,
 		'primer_set': primer_set,
 		'primer_gene': primer_gene,
@@ -378,6 +372,23 @@ def reorder_primer(request):
 	}
 	
 	return render(request, 'submitted_reorder_primer.html', context=context)
+
+def archive_primer(request):
+	archive = Primer.objects.get(pk=request.POST.get('archive'))
+	archive.order_status = 'Archived'
+	find_arc = Imported_By.objects.filter(imported_by=request.POST.get('arc_by'))
+	for f in find_arc:
+		archive.archived_by = f
+	today = date.today()
+	archive.date_archived = today.strftime("%d/%m/%Y")
+	archive.reason_archived = request.POST.get('reason_archived')
+	archive.save()
+	
+	context = {
+		'archive':archive
+	}
+	
+	return render(request, 'archive_primer.html', context=context)
 
 
 	

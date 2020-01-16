@@ -1,3 +1,5 @@
+#ended up created the database with django - not required
+
 import mysql.connector
 
 db = mysql.connector.connect(
