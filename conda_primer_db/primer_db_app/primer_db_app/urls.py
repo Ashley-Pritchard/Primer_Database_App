@@ -16,6 +16,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 
+#include the django admin url and the urls defined as part of the primer database site 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('primer_database/', include('primer_db_site.urls'))
