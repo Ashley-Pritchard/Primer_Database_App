@@ -231,7 +231,14 @@ def submitted(request):
 		primer.save()
 	
 	#render the submitted html page 
-	return render(request, 'submitted.html')
+	if request.POST.get('quit') == "Submit and Quit":
+		return render(request, 'submitted.html')
+	if request.POST.get('reload') == "Submit and Order More Primers":
+		imp_by = Imported_By.objects.all()
+		context = {
+			"imp_by": imp_by
+		}
+		return render(request, 'order.html', context=context)
 
 
 #returns the order page for a new primer in response to user clicking the 'order primer' searchbar option
