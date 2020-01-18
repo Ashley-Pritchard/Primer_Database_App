@@ -668,6 +668,70 @@ def archive_primer(request):
 	return render(request, 'archive_primer.html', context=context)
 
 
+#allow users to update the status of a primer from having been requested to order placed with the company from the 'primers to be ordered' page  
+def submit_order(request):
+
+	#pull the selected primers for the status change based on the checkboxes selected on the 'primers to be ordered' html page
+	primer_list = request.POST.getlist('primer')
+	
+	#iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
+	if 'ordered' in request.POST:
+		for primer in primer_list:
+			order = Primer.objects.get(pk=primer)
+			order.order_status = 'Order Placed'
+			today = date.today()
+			order.date_order_placed = today.strftime("%d/%m/%Y")
+			order.save()		
+
+	if 'delete' in request.POST:
+		for primer in primer_list:
+			delete = Primer.objects.get(pk=primer)
+			delete.delete()			
+
+	#render the 'submit order' html page 
+	return render(request, 'submit_order.html')
+
+#pulls the information of all primers with an order status of 'ordered' in response to the user clicking the 'primers on order' searchbar link
+def order_placed(request):
+
+	ordered = Primer.objects.filter(order_status = "Order Placed")
+
+	#provide context for the ordered html page 
+	context = {
+		"ordered": ordered
+	}
+
+	#render the ordered html page 
+	return render(request, 'order_placed.html', context=context)
+
+#allow users to update the status of a primer from having been requested to order placed with the company from the 'primers to be ordered' page  
+def order_recieved(request):
+
+	#pull the selected primers for the status change based on the checkboxes selected on the 'primers to be ordered' html page
+	primer_list = request.POST.getlist('primer')
+	
+	#iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
+	if 'test' in request.POST:
+		for primer in primer_list:
+			recieved = Primer.objects.get(pk=primer)
+			recieved.order_status = 'In Testing'
+			today = date.today()
+			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
+			recieved.save()		
+
+	#iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
+	if 'stock' in request.POST:
+		for primer in primer_list:
+			recieved = Primer.objects.get(pk=primer)
+			recieved.order_status = 'Stocked'
+			today = date.today()
+			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
+			recieved.save()			
+
+	#render the 'submit order' html page 
+	return render(request, 'order_recieved.html')
+
+
 	
 
 
