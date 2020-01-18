@@ -10,10 +10,10 @@
    <a class="active" href="{% url 'order_placed' %}">Primers on Order</a>
  </div> 
   <h1>Primer Database: Primers on Order</h1>
-  <p> Primer information for primers to be order:<br><br><br><br>
+  <p> Primer information for primers on order:<br><br><br><br>
   {% for p in ordered %}
     <table class="table2" style="table-layout: fixed; width: 100%">
-    <form action="{% url 'submit_order' %}" method="POST">
+    <form action="{% url 'order_recieved' %}" method="POST">
       <tr>
         <td>
           <strong>Primer ID</strong>
@@ -38,8 +38,8 @@
         </td>
     </table>
   {% endfor %}<br><br>   
-      <input class="p1" type="submit" name="ordered" value="Ordered">
-      <input class="p1" onclick="return confirm('Are you sure you wish to delete?');" type="submit" name="delete" value="Delete">
+      <input class="p1" type="submit" name="test" value="Recieved: Testing Required">
+      <input class="p1" type="submit" name="stock" value="Recieved: Testing Not Required">
     </form>  
 {% endblock %}
 

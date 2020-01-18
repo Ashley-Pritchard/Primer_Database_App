@@ -6,7 +6,8 @@
  <div class="topnav">
    <a class="active" href="{% url 'index' %}">Search Primers</a>
    <a class="active" href="{% url 'order' %}">Order Primer</a>
-   <a class="active" href="{% url 'ordered' %}">Primers on Order</a>
+   <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
+   <a class="active" href="{% url 'order_placed' %}">Primers on Order</a>
  </div> 
   <h1>Primer Database</h1>
   <p> Fill in the form below to order one or more <strong>new</strong> primers associated with a single amplicon. Fill in the amplicon information first, then complete the tables for one, two or three primers as appropriate. <br><br> To <strong>reorder</strong> a primer or to order an <strong>additional</strong> primer for an amplicon, please first use the <a class="active" href="{% url 'index' %}">search</a> function and then follow the appropriate links. </p><br>
