@@ -62,5 +62,7 @@ class Primer(models.Model):
 	archived_by_id = models.ForeignKey(Imported_By, related_name='related_secondary_imported_by', on_delete = models.SET_NULL, null=True, blank=True)
 	date_order_placed = models.CharField(max_length=20, null=True, blank=True)
 	date_order_recieved = models.CharField(max_length=20, null=True, blank=True)
+	date_testing_completed = models.CharField(max_length=20, null=True, blank=True)
+
 
 

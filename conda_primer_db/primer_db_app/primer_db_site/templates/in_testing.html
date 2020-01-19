@@ -12,36 +12,36 @@
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
  </div> 
   <h1>Primer Database: Primers on Order</h1>
-  <p> Primer information for primers to be order:<br><br><br><br>
-  {% for p in ordered %}
+  <p> Primer information for primers on order:<br><br><br><br>
+  {% for t in testing %}
     <table class="table2" style="table-layout: fixed; width: 100%">
-    <form action="{% url 'submit_order' %}" method="POST">
+    <form action="{% url 'tested' %}" method="POST">
       <tr>
         <td>
           <strong>Primer ID</strong>
         </td>
         <td>
-          {{ p.id }}
+          {{ t.id }}
         </td>
         <td>
           <strong>Amplicon Name</strong>:
         </td>
         <td>
-          {{ p.amplicon_id.amplicon_name }}
+          {{ t.amplicon_id.amplicon_name }}
         </td>
         <td>
           <strong>Imported By</strong>:
         </td>
         <td>
-          {{ p.imported_by_id.imported_by }}
+          {{ t.imported_by_id.imported_by }}
         </td>
         <td>
-          <input type="checkbox" name="primer" id="primer" value="{{ p.id }}">
+          <input type="checkbox" name="primer" id="primer" value="{{ t.id }}">
         </td>
     </table>
   {% endfor %}<br><br>   
-      <input class="p1" type="submit" name="ordered" value="Ordered">
-      <input class="p1" onclick="return confirm('Are you sure you wish to delete?');" type="submit" name="delete" value="Delete">
+      <input class="p1" type="submit" name="validated" value="Validated">
+      <input class="p1" type="submit" name="not" value="Not Validated">
     </form>  
 {% endblock %}
 

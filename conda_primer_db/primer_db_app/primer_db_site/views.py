@@ -731,6 +731,61 @@ def order_recieved(request):
 	#render the 'submit order' html page 
 	return render(request, 'order_recieved.html')
 
+#pulls the information of all primers with an order status of 'ordered' in response to the user clicking the 'primers on order' searchbar link
+def in_testing(request):
+
+	testing = Primer.objects.filter(order_status = "In Testing")
+
+	#provide context for the ordered html page 
+	context = {
+		"testing": testing
+	}
+
+	#render the in testing html page 
+	return render(request, 'in_testing.html', context=context)
+
+
+#allow users to update the status of a primer from having been requested to order placed with the company from the 'primers to be ordered' page  
+def tested(request):
+
+	#pull the selected primers for the status change based on the checkboxes selected on the 'primers to be ordered' html page
+	primer_list = request.POST.getlist('primer')
+	
+	#iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
+	if 'validated' in request.POST:
+		for primer in primer_list:
+			tested = Primer.objects.get(pk=primer)
+			tested.order_status = 'Stocked'
+			today = date.today()
+			tested.date_testing_completed = today.strftime("%d/%m/%Y")
+			tested.save()		
+
+	#iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
+	if 'not' in request.POST:
+		for primer in primer_list:
+			tested = Primer.objects.get(pk=primer)
+			tested.order_status = 'Failed Validation'
+			today = date.today()
+			tested.date_tesing_completed = today.strftime("%d/%m/%Y")
+			tested.save()			
+
+	#render the 'submit order' html page 
+	return render(request, 'tested.html')
+
+#pulls the information of all primers with an order status of 'ordered' in response to the user clicking the 'primers on order' searchbar link
+def failed(request):
+
+	failed = Primer.objects.filter(order_status = "Failed Validation")
+
+	#provide context for the ordered html page 
+	context = {
+		"failed": failed
+	}
+
+	#render the in testing html page 
+	return render(request, 'failed.html', context=context)
+
+
 
 	
 
