@@ -59,13 +59,30 @@ def submitted2(request):
 	#make changes to the amplicon table of the primer database 
 	amplicon = Amplicon()
 
-	#if the primer order did not state an amplicon name, create one using the other fields
-	if request.POST.get('amplicon') == "":
-		amplicon.amplicon_name = request.POST.get('set') + '_' + request.POST.get('analysis_type') + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + request.POST.get('ngs') + '_' + request.POST.get('version')
+	#create amplicon name using other fields POTENTIALLY NEED MORE INFO / FIELDS 
+	if request.POST.get('analysis_type') == 'Sanger':
+		amplicon.amplicon_name = request.POST.get('set') + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'NGS':
+		amplicon.amplicon_name = request.POST.get('set') + '_' + 'NGS' + '_' + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'Light Scanner':
+		amplicon.amplicon_name = 'LS' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'MLPA':
+		amplicon.amplicon_name = 'ML' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'Fluorescent':
+		amplicon.amplicon_name = 'GM' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'Long Range':
+		amplicon.amplicon_name = 'LR' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'RT-PCR':
+		amplicon.amplicon_name = 'RT' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'Taqman':
+		amplicon.amplicon_name = 'TQ' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'Pyrosequencing':
+		amplicon.amplicon_name = 'P' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'ARMS: Mutant':
+		amplicon.amplicon_name = 'ARMS_M' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+	elif request.POST.get('analysis_type') == 'ARMS: Normal':
+		amplicon.amplicon_name = 'ARMS_N' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
 
-	#if an amplicon name was stated, convert it to uppercase
-	else:
-		amplicon.amplicon_name = request.POST.get('amplicon').upper()
 
 	#set exon based on form submission
 	amplicon.exon = request.POST.get('exon')
@@ -150,154 +167,6 @@ def submitted(request):
 
 	return render(request, 'submitted.html')
 
-
-
-	#make changes to the primer table of the database 
-#	primer = Primer()
-
-	#set the sequence, direction , alt_name and comments from the primer order submission - convert the sequence and direction to uppercase
-#	primer.sequence = request.POST.get('seq').upper()
-#	primer.direction = request.POST.get('direction').upper()
-#	primer.alt_name = request.POST.get('alt_name')
-#	primer.comments = request.POST.get('comments')
-#
-#	#set the start and end genomic locations and ngs audit number based on primer order submission, if none were submitted set to None
-#	if request.POST.get('start') != "":
-#		primer.genomic_location_start = request.POST.get('start')
-#	else:
-#		primer.genomic_location_start = None
-#
-#	if request.POST.get('end') != "":
-#		primer.genomic_location_end = request.POST.get('end')
-#	else:
-#		primer.genomic_location_end = None
-#
-#	if request.POST.get('ngs') != "":
-#		primer.ngs_audit_number = request.POST.get('ngs')
-#	else:
-#		primer.ngs_audit_number = None
-#
-#	#pull todays date and set it as the date imported 
-#	today = date.today()
-#	primer.date_imported = today.strftime("%d/%m/%Y")
-#
-#	#set the primer status to order
-#	primer.order_status = "Ordered"
-#
-#	#select imported_by from database by filtering on what was input in the submission
-#	find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-#	for f in find_imp:
-#		primer.imported_by_id = f
-#
-#	#set the version if it was input in the submission, otherwise set as one
-#	if request.POST.get('version') == "":
-#		primer.version = 1
-#	else:
-#		primer.version = request.POST.get('version')
-#
-#	#set the resepctive amplicon to the new primer as the foreign key by selecting the amplicon that was most recently added 
-#	primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
-#
-#	#save to database 
-#	primer.save()
-#
-#	#if a second or third primer was submitted, repeat the above
-#	if request.POST.get('seq2') != "":
-#
-#		primer = Primer()
-#
-#		primer.sequence = request.POST.get('seq2').upper()
-#		primer.direction = request.POST.get('direction2').upper()
-#		primer.alt_name = request.POST.get('alt_name2')
-#
-#		if request.POST.get('start2') != "":
-#			primer.genomic_location_start = request.POST.get('start2')
-#		else:
-#			primer.genomic_location_start = None
-#
-#		if request.POST.get('end2') != "":
-#			primer.genomic_location_end = request.POST.get('end2')
-#		else:
-#			primer.genomic_location_end = None
-#
-#		if request.POST.get('ngs2') != "":
-#			primer.ngs_audit_number = request.POST.get('ngs2')
-#		else:
-#			primer.ngs_audit_number = None
-#
-#		today = date.today()
-#		primer.date_imported = today.strftime("%d/%m/%Y")
-#
-#		primer.order_status = "Ordered"
-#
-#		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-#
-#		for f in find_imp:
-#			primer.imported_by_id = f
-#
-#		if request.POST.get('version2') == "":
-#			primer.version = 1
-#		else:
-#			primer.version = request.POST.get('version2')
-#
-#		primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
-#
-#		primer.save()
-#
-#	if request.POST.get('seq3') != "":
-#
-#		primer = Primer()
-#
-#		primer.sequence = request.POST.get('seq3').upper()
-#		primer.direction = request.POST.get('direction3').upper()
-#		primer.alt_name = request.POST.get('alt_name3')
-#
-#		if request.POST.get('start3') != "":
-#			primer.genomic_location_start = request.POST.get('start3')
-#		else:
-#			primer.genomic_location_start = None
-#
-#		if request.POST.get('end3') != "":
-#			primer.genomic_location_end = request.POST.get('end3')
-#		else:
-#			primer.genomic_location_end = None
-#
-#		if request.POST.get('ngs3') != "":
-#			primer.ngs_audit_number = request.POST.get('ngs3')
-#		else:
-#			primer.ngs_audit_number = None
-#
-#		today = date.today()
-#		primer.date_imported = today.strftime("%d/%m/%Y")
-#
-#		primer.order_status = "Ordered"
-#
-#		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-#		for f in find_imp:
-#			primer.imported_by_id = f
-#
-#		if request.POST.get('version3') == "":
-#			primer.version = 1
-#		else:
-#			primer.version = request.POST.get('version3')
-#
-#		primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
-##
-#		primer.save()
-#	
-#	#render the submitted html page 
-	if request.POST.get('quit') == "Submit and Quit":
-		context = {
-			"num_primer":num_primer,
-			"alt_name":alt_name
-		}
-		return render(request, 'submitted.html', context=context)
-#	if request.POST.get('reload') == "Submit and Order More Primers":
-#		imp_by = Imported_By.objects.all()
-#		context = {
-#			"imp_by": imp_by
-#		}
-#		return render(request, 'order.html', context=context)
 
 def order(request):
 	return render(request, 'order.html')
