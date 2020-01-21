@@ -16,15 +16,6 @@
   <form action="{% url 'submitted' %}" method="POST">
   <strong><p>Amplicon (Required)</p></strong><br>
     <table>
-      </tr>
-      <tr>
-        <td>
-        Amplicon Name:
-        </td>
-        <td>
-        <input name="amplicon" type="text">
-        </td>
-      </tr>
     <tr>
       <td>
       Analysis Type (Required):
@@ -33,13 +24,15 @@
         <select name = "analysis_type" type = "text">
           <option value="NGS">NGS</option>
           <option value="Sanger">Sanger</option>
+          <option value="Light Scanner">Light Scanner</option>
           <option value="MLPA">MLPA</option>
-          <option value="Long-Range">Long Range</option>
+          <option value="Fluorescent">Fluorescent</option>
+          <option value="Long Range">Long Range</option>
           <option value="Taqman">Taqman</option>
           <option value="RT-PCR">RT-PCR</option>
-          <option value="Pyrosequencing">Pyrosequencing</option>
-          <option value="ARMS: Mutant">ARMS: Mutant</option>
-          <option value="ARMS: Normal">ARMS: Normal</option>
+          <option value="Pyrosquencing">Pyrosequencing</option>
+          <option value="ARMS_Mutant">ARMS: Mutant</option>
+          <option value="ARMS_Normal">ARMS: Normal</option>
         </td>
       </tr>
       <tr>
