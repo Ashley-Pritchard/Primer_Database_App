@@ -640,25 +640,29 @@ def order_placed(request):
 #allow users to update the status of a primer from having been requested to order placed with the company from the 'primers to be ordered' page  
 def order_recieved(request):
 
-	#pull the selected primers for the status change based on the checkboxes selected on the 'primers to be ordered' html page
+	#pull the selected primers for the status change based on the checkboxes selected on the 'primers to be ordered' html page. 
 	primer_list = request.POST.getlist('primer')
+	list_len = len(request.POST.getlist('primer'))
+	location_list = request.POST.getlist('location')
 	
 	#iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
 	if 'test' in request.POST:
-		for primer in primer_list:
-			recieved = Primer.objects.get(pk=primer)
+		for i in range(list_len):
+			recieved = Primer.objects.get(pk=primer_list[i])
 			recieved.order_status = 'In Testing'
 			today = date.today()
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
+			recieved.location = location_list[i]
 			recieved.save()		
 
 	#iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
 	if 'stock' in request.POST:
-		for primer in primer_list:
-			recieved = Primer.objects.get(pk=primer)
+		for i in range(list_len):
+			recieved = Primer.objects.get(pk=primer_list[i])
 			recieved.order_status = 'Stocked'
 			today = date.today()
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
+			recieved.location = location_list[i]
 			recieved.save()			
 
 	#render the 'submit order' html page 
