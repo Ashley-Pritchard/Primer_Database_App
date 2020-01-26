@@ -18,10 +18,13 @@ def index(request):
 
 	num_genes = Gene.objects.all().count()
 
+	imp_by = Imported_By.objects.all()
+
 	context = {
 		'num_primers': num_primers,
 		'num_amplicons': num_amplicons,
-		'num_genes': num_genes
+		'num_genes': num_genes,
+		'imp_by': imp_by
 	}
 
 	return render(request, 'index.html', context=context)
