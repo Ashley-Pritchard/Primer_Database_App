@@ -59,7 +59,10 @@
       Imported By:
           </td>
           <td colspan="4">
-      <input id="searchbox" name="imp_by_input" type="text"><br>
+      <select name="imp_by_input" type="text">
+        {% for i in imp_by %}
+          <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+        {% endfor %}
           </td>
           <td>
           </td>

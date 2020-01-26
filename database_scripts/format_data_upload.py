@@ -91,57 +91,57 @@ def imported_by():
 	name = []
 	for index, row in df_i.iterrows():
 		if 'ARIELE' in row[0]:
-			name.append('AR')
+			name.append('Ariele Rosseto')
 		elif 'BENITO' in row[0]:
-			name.append('BB')
+			name.append('Benito Banos-Pinero')
 		elif 'CNS' in row[0]:
-			name.append('CNS')
+			name.append('Caroline Sarton')
 		elif 'CAROLINE' in row[0]:
-			name.append('CNS')
+			name.append('Caroline Sarton')
 		elif 'CARL' in row[0]:
-			name.append('CF')
+			name.append('Carl Fratter')
 		elif 'CLAIRE HODGKISS' in row[0]:
-			name.append('CLHS')
+			name.append('Claire Hodgkiss')
 		elif 'CONRAD' in row[0]:
-			name.append('CS')
+			name.append('Conrad Smith')
 		elif 'ELIZABTH WOOD' in row[0]:
-			name.apend('EW')
+			name.apend('Elizabeth Wood')
 		elif 'ELIZABETH' in row[0]:
-			name.append('EW')
+			name.append('Elizabeth Wood')
 		elif 'EMILY' in row[0]:
-			name.append('EP')
+			name.append('Emily Packham')
 		elif 'HANNAH BOON' in row[0]:
-			name.append('HB')
+			name.append('Hannah Boon')
 		elif 'MATTEN' in row[0]:
-			name.append('HM')
+			name.append('Hannah Matten')
 		elif 'HELEN LORD' in row[0]:
-			name.append('HL')
+			name.append('Helen Lord')
 		elif 'JESS GABRIEL' in row[0]:
-			name.append('JEG')
+			name.append('Jess Gabriel')
 		elif 'JESSICA WOODLEY' in row[0]:
-			name.append('JW')
+			name.append('Jessica Woodley')
 		elif 'TAYLOR' in row[0]:
-			name.append('JMT')
+			name.append('John Taylor')
 		elif 'JULIE' in row[0]:
-			name.append('J')
+			name.append('Julie')
 		elif 'LIZZIE/MIKEB' in row[0]:
-			name.append('EW/MB')
+			name.append('Michael Bowman')
 		elif 'BOWMAN' in row[0]:
-			name.append('MB')
+			name.append('Michael Bowman')
 		elif 'OLDRIDGE' in row[0]:
-			name.append('MO')
+			name.append('Michael Oldridge')
 		elif 'WARE' in row[0]:
-			name.append('PW')
+			name.append('Pauline Ware')
 		elif 'SARAH REID' in row[0]:
-			name.append('SR')
+			name.append('Sarah Reid')
 		elif 'BEDENHAM' in row[0]:
-			name.append('TB')
+			name.append('Tina Bedenham')
 		elif 'LESTER' in row[0]:
-			name.append('TL')
+			name.append('Tracy Lester')
 		elif 'TREENA' in row[0]:
-			name.append('TC')
+			name.append('Treena Cranston')
 		elif 'LOUISE' in row[0]:
-			name.append('LIW')
+			name.append('Louise Williams')
 		else:
 			name.append(row[0])
 	df_i['imported_by'] = name	
@@ -282,57 +282,57 @@ def primer():
 	name = []
 	for index, row in df_p3.iterrows():
 		if 'ARIELE' in row[5]:
-			name.append('AR')
+			name.append('Ariele Rosseto')
 		elif 'BENITO' in row[5]:
-			name.append('BB')
+			name.append('Benito Banos-Pinero')
 		elif 'CNS' in row[5]:
-			name.append('CNS')
+			name.append('Caroline Sarton')
 		elif 'CAROLINE' in row[5]:
-			name.append('CNS')
+			name.append('Caroline Sarton')
 		elif 'CARL' in row[5]:
-			name.append('CF')
+			name.append('Carl Fratter')
 		elif 'CLAIRE HODGKISS' in row[5]:
-			name.append('CLHS')
+			name.append('Claire Hodgkiss')
 		elif 'CONRAD' in row[5]:
-			name.append('CS')
+			name.append('Conrad Smith')
 		elif 'ELIZABTH WOOD' in row[5]:
-			name.apend('EW')
+			name.apend('Elizabeth Wood')
 		elif 'ELIZABETH' in row[5]:
-			name.append('EW')
+			name.append('Elizabeth Wood')
 		elif 'EMILY' in row[5]:
-			name.append('EP')
+			name.append('Emily Packham')
 		elif 'HANNAH BOON' in row[5]:
-			name.append('HB')
+			name.append('Hannah Boon')
 		elif 'MATTEN' in row[5]:
-			name.append('HM')
+			name.append('Hannah Matten')
 		elif 'HELEN LORD' in row[5]:
-			name.append('HL')
+			name.append('Helen Lord')
 		elif 'JESS GABRIEL' in row[5]:
-			name.append('JEG')
+			name.append('Jess Gabriel')
 		elif 'JESSICA WOODLEY' in row[5]:
-			name.append('JW')
+			name.append('Jessica Woodley')
 		elif 'TAYLOR' in row[5]:
-			name.append('JMT')
+			name.append('John Taylor')
 		elif 'JULIE' in row[5]:
-			name.append('J')
+			name.append('Julie')
 		elif 'LIZZIE/MIKEB' in row[5]:
-			name.append('EW/MB')
+			name.append('Michael Bowman')
 		elif 'BOWMAN' in row[5]:
-			name.append('MB')
+			name.append('Michael Bowman')
 		elif 'OLDRIDGE' in row[5]:
-			name.append('MO')
+			name.append('Michael Oldridge')
 		elif 'WARE' in row[5]:
-			name.append('PW')
+			name.append('Pauline Ware')
 		elif 'SARAH REID' in row[5]:
-			name.append('SR')
+			name.append('Sarah Reid')
 		elif 'BEDENHAM' in row[5]:
-			name.append('TB')
+			name.append('Tina Bedenham')
 		elif 'LESTER' in row[5]:
-			name.append('TL')
+			name.append('Tracy Lester')
 		elif 'TREENA' in row[5]:
-			name.append('TC')
+			name.append('Trenna Cranston')
 		elif 'LOUISE' in row[5]:
-			name.append('LIW')
+			name.append('Louise Williams')
 		else:
 			name.append(row[5])
 	df_p3['imported_by'] = name
@@ -382,57 +382,57 @@ def primer():
 	name = []
 	for index, row in df_p3.iterrows():
 		if 'ARIELE' in str(row[6]):
-			name.append('AR')
+			name.append('Ariele Rosseto')
 		elif 'BENITO' in str(row[6]):
-			name.append('BB')
+			name.append('Benito Banos-Pinero')
 		elif 'CNS' in str(row[6]):
-			name.append('CNS')
+			name.append('Caroline Sarton')
 		elif 'CAROLINE' in str(row[6]):
-			name.append('CNS')
+			name.append('Caroline Sarton')
 		elif 'CARL' in str(row[6]):
-			name.append('CF')
+			name.append('Carl Fratter')
 		elif 'CLAIRE HODGKISS' in str(row[6]):
-			name.append('CLHS')
+			name.append('Claire Hodgkiss')
 		elif 'CONRAD' in str(row[6]):
-			name.append('CS')
+			name.append('Conrad Smith')
 		elif 'ELIZABTH WOOD' in str(row[6]):
-			name.apend('EW')
+			name.apend('Elizabeth Wood')
 		elif 'ELIZABETH' in str(row[6]):
-			name.append('EW')
+			name.append('Elizabeth Wood')
 		elif 'EMILY' in str(row[6]):
-			name.append('EP')
+			name.append('Emily Packham')
 		elif 'HANNAH BOON' in str(row[6]):
-			name.append('HB')
+			name.append('Hannah Boon')
 		elif 'MATTEN' in str(row[6]):
-			name.append('HM')
+			name.append('Hannah Matten')
 		elif 'HELEN LORD' in str(row[6]):
-			name.append('HL')
+			name.append('Helen Lord')
 		elif 'JESS GABRIEL' in str(row[6]):
-			name.append('JEG')
+			name.append('Jess Gabriel')
 		elif 'JESSICA WOODLEY' in str(row[6]):
-			name.append('JW')
+			name.append('Jessica Woodley')
 		elif 'TAYLOR' in str(row[6]):
-			name.append('JMT')
+			name.append('John Taylor')
 		elif 'JULIE' in str(row[6]):
-			name.append('J')
+			name.append('Julie')
 		elif 'LIZZIE/MIKEB' in str(row[6]):
-			name.append('EW/MB')
+			name.append('Michael Bowman')
 		elif 'BOWMAN' in str(row[6]):
-			name.append('MB')
+			name.append('Michael Bowman')
 		elif 'OLDRIDGE' in str(row[6]):
-			name.append('MO')
+			name.append('Michael Oldridge')
 		elif 'WARE' in str(row[6]):
-			name.append('PW')
+			name.append('Pauline Ware')
 		elif 'SARAH REID' in str(row[6]):
-			name.append('SR')
+			name.append('Sarah Reid')
 		elif 'BEDENHAM' in str(row[6]):
-			name.append('TB')
+			name.append('Tina Bedenham')
 		elif 'LESTER' in str(row[6]):
-			name.append('TL')
+			name.append('Tracy Lester')
 		elif 'TREENA' in str(row[6]):
-			name.append('TC')
+			name.append('Treena Cranston')
 		elif 'LOUISE' in str(row[6]):
-			name.append('LIW')
+			name.append('Louise Williams')
 		else:
 			name.append(row[6])
 	df_p3['archived_by'] = name
