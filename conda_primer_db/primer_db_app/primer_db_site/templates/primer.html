@@ -154,7 +154,8 @@
       {% if primer.order_status != 'Ordered' %}
       <p> To reorder this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
     <form action="{% url 'reorder_primer' %}" method="POST">  
-    <select name="imp_by" type="text">
+    <select name="imp_by" type="text" required=True>
+      <option value="">---</option>
       {% for i in imp_by %}
         <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
       {% endfor %}</select>
@@ -165,7 +166,8 @@
     <p> To archive this primer, please add a reason for archiving and then use the drop-down menu to select your initials before clicking the 'archive primer' button</p><br>
     <form action="{% url 'archive_primer' %}" method="POST">  
     Reason for Archiving: <input name="reason_archived" type="text"><br>
-    <select name="arc_by" type="text">
+    <select name="arc_by" type="text" required=True>
+      <option value="">---</option>
       {% for i in imp_by %}
         <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
       {% endfor %}</select>

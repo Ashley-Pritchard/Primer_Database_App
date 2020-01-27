@@ -20,7 +20,8 @@
         Imported by (initials): 
         </td>
         <td>
-        <select name="imp_by" type="text">
+        <select name="imp_by" type="text" required=True>
+          <option value="">---</option>
           {% for i in imp_by %}
             <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
           {% endfor %}
