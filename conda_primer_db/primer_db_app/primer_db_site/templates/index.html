@@ -60,6 +60,7 @@
           </td>
           <td colspan="4">
       <select name="imp_by_input" type="text">
+        <option value="">---</option>
         {% for i in imp_by %}
           <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
         {% endfor %}
