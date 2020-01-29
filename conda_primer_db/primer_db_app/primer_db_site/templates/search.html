@@ -16,37 +16,22 @@
   <table class="table2" style="table-layout: fixed; width: 100%">
     <tr>
       <th>
-        Gene
-      </th>
-      <th>
-        Direction
-      </th>
-      <th>
-        Start
-      </th>
-      <th>
-        End
-      </th>
-      <th>
         Primer ID
       </th>
       <th>
         Amplicon ID
       </th>
+      <th>
+        Direction
+      </th>
+      <th>
+        Location
+      </th>
+      <th>
+        Comments
+      </th>
       {% for primer in primer_search_results %}
     <tr>
-      <td>
-        {{ primer.amplicon_id.gene_id.gene_name }}
-      </td>
-      <td>
-        {{ primer.direction }}
-      </td>
-      <td>
-        {{ primer.genomic_location_start }}
-      </td>
-      <td>
-        {{ primer.genomic_location_end }}
-      </td>
       <td>
         <form class="search" id = selected_primer method = get action = {% url 'primer' %} > 
           <input type = "submit" default = None name = "selected_primer" value = "{{ primer.id }}" white-space: normal; word-wrap: break-word; width: 100%> 
@@ -56,6 +41,15 @@
         <form class="search" id = selected_amplicon method = get action = {% url 'amplicon' %} >
           <input type = "submit" default = None name = "selected_amplicon" value = "{{ primer.amplicon_id.amplicon_name }}" white-space: normal; word-wrap: break-word; width: 100%>
         </form>
+      </td>
+      <td>
+        {{ primer.direction }}
+      </td>
+      <td>
+        {{ primer.location }}
+      </td>
+      <td>
+        {{ primer.comments }}
       </td>
     </tr>
     {% endfor %}
