@@ -89,6 +89,7 @@ def imported_by():
 
 	#replace all names in the field with appropriate initials 
 	name = []
+	status = []
 	for index, row in df_i.iterrows():
 		if 'ARIELE' in row[0]:
 			name.append('Ariele Rosseto')
@@ -145,9 +146,19 @@ def imported_by():
 		else:
 			name.append(row[0])
 	df_i['imported_by'] = name	
+	
+	status = []
+	for index, row in df_i.iterrows():
+		if row[0] == 'Ariele Rosseto' or 'Elizabeth Wood' or 'Emily Packham' or 'Hannah Matten' or 'Jessica Woodley' or 'Julie' or 'Pauline Ware' or 'Sarah Reid':
+			status.append('ex')
+		else:
+			status.append('current')
+	df_i['status'] = status
 
 	#drop duplicate names
 	df_i = df_i.drop_duplicates(keep='first')
+
+	df_i['status'] = 
 
 	#created an imported_by_id for each unique record 
 	df_i['imported_by_id'] = df_i.groupby(['imported_by']).ngroup()	

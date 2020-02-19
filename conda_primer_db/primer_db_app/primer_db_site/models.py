@@ -34,6 +34,8 @@ class Primer_Set(models.Model):
 
 class Imported_By(models.Model):
 	imported_by = models.CharField(max_length=30)
+	choice = [("current", "current"), ("ex", "ex")]
+	status = models.CharField(max_length = 10, default = 'current', choices = choice)
 
 class Amplicon(models.Model):
 	amplicon_name = models.CharField(max_length=100)
@@ -55,8 +57,10 @@ class Primer(models.Model):
 	date_imported = models.CharField(max_length=20, null=True, blank=True)
 	amplicon_id = models.ForeignKey(Amplicon, on_delete = models.SET_NULL, null=True, blank=True)
 	version = models.IntegerField(blank=True, default='1')
-	choice = [("Stocked", "Stocked"), ("Ordered", "Ordered"), ("Order Placed", "Order Placed"), ("Recieved", "Recieved"), ("In Testing", "In Testing"), ("Failed Validation", "Failed Validation"), ("Archived", "Archived")]
-	order_status = models.CharField(max_length=50, default='Stocked', choices=choice)
+	choice_1 = [("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN"), ("None", "None")]
+	modification = models.CharField(max_length=10, default="None", choices=choice_1)
+	choice_2 = [("Stocked", "Stocked"), ("Ordered", "Ordered"), ("Order Placed", "Order Placed"), ("Recieved", "Recieved"), ("In Testing", "In Testing"), ("Failed Validation", "Failed Validation"), ("Archived", "Archived")]
+	order_status = models.CharField(max_length=50, default='Stocked', choices=choice_2)
 	reason_archived = models.CharField(max_length=1000, null=True, blank=True)
 	date_archived = models.CharField(max_length=20, null=True, blank=True)
 	archived_by_id = models.ForeignKey(Imported_By, related_name = 'archived_by', on_delete = models.SET_NULL, null=True, blank=True)

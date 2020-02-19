@@ -157,7 +157,9 @@
     <select name="imp_by" type="text" required=True>
       <option value="">---</option>
       {% for i in imp_by %}
-        <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+        {% if i.status == "current" %}
+          <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+        {% endif %}
       {% endfor %}</select>
     <button name="primer" value="{{ primer.id }}">Reorder Primer</button>
     </form><br>
@@ -169,7 +171,9 @@
     <select name="arc_by" type="text" required=True>
       <option value="">---</option>
       {% for i in imp_by %}
-        <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+        {% if i.status == "current" %}
+          <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+        {% endif %}
       {% endfor %}</select>
     <button name="archive" value="{{ primer.id }}">Archive Primer</button>
     </form>
