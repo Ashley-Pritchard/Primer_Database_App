@@ -80,7 +80,9 @@
         <select name="imp_by" type="text" required=True>
           <option value="">---</option>
           {% for i in imp_by %}
-            <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+            {% if i.status == "current" %}
+              <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+            {% endif %}
           {% endfor %}
         </td>
       </tr>
@@ -124,6 +126,20 @@
         </td>
         <td>
         <input name="end" type="number">
+        </td>
+      </tr>
+      <tr>
+        <td>
+        Modification:
+        </td>
+        <td>
+        <select name="modification" type="text">
+          <option value="None">None</option>
+          <option value="HEX">HEX</option>
+          <option value="6FAM">6FAM</otion>
+          <option value="5FAM">5FAM</otion>
+          <option value="TAM">TAM</otion>
+          <option value="BIOTIN">BIOTIN</otion>
         </td>
       </tr>
       <tr>

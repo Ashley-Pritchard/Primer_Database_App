@@ -123,6 +123,7 @@ def submitted(request):
 	direction = request.POST.getlist('direction')
 	start = request.POST.getlist('start')
 	end = request.POST.getlist('end')
+	modification = request.getlist('modification')
 	ngs = request.POST.getlist('ngs')
 	alt_name = request.POST.getlist('alt_name')
 	version = request.POST.getlist('version')
@@ -132,6 +133,7 @@ def submitted(request):
 		primer = Primer()
 		primer.sequence = seq[i].upper()
 		primer.direction = direction[i].upper()
+		primer.modification = modification[i]
 		primer.alt_name = alt_name[i]
 		primer.comments = comments[i]
 
@@ -481,6 +483,8 @@ def submitted_to_amplicon(request):
 	else:
 		primer.genomic_location_end = None
 
+	primer.modification = request.post.get('modification')
+
 	#alt name input by user stored as a new primer record in database 
 	primer.alt_name = request.POST.get('alt_name')
 
@@ -536,9 +540,14 @@ def reorder_primer(request):
 
 	#assign new primer record the same sequence, direction, alt name and ngs audit number as the primer record selected for reorder 
 	primer.sequence = reorder.sequence
+	primer.genomic_location_start = reorder.genomic_location_start
+	primer.genomic_location_end = reorder.genomic_location_end
+	primer.location = reorder.location
 	primer.direction = reorder.direction
+	primer.modification = reorder.modification
 	primer.alt_name = reorder.alt_name
 	primer.ngs_audit_number = reorder.ngs_audit_number
+	primer.comments = primer.comments
 
 	#imported_by input by user stored as new primer record in database 
 	find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
@@ -548,6 +557,7 @@ def reorder_primer(request):
 	#assign the date imported for the new primer record as todays date 
 	today = date.today()
 	primer.date_imported = today.strftime("%d/%m/%Y")
+	primer.date_order_placed = today.strftime("%d/%m/%Y")
 
 	#assign the order status of the new primer record to 'ordered'
 	primer.order_status = "Ordered"
