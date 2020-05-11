@@ -63,6 +63,7 @@ class Primer(models.Model):
 	order_status = models.CharField(max_length=50, default='Stocked', choices=choice_2)
 	reason_archived = models.CharField(max_length=1000, null=True, blank=True)
 	date_archived = models.CharField(max_length=20, null=True, blank=True)
+	reason_reordered = models.CharField(max_length=1000, null=True, blank=True)
 	archived_by_id = models.ForeignKey(Imported_By, related_name = 'archived_by', on_delete = models.SET_NULL, null=True, blank=True)
 	date_order_placed = models.CharField(max_length=20, null=True, blank=True)
 	date_order_recieved = models.CharField(max_length=20, null=True, blank=True)

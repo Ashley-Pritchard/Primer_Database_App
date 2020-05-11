@@ -154,6 +154,7 @@
       {% if primer.order_status != 'Ordered' %}
       <p> To reorder this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
     <form action="{% url 'reorder_primer' %}" method="POST">  
+    Reason for Reordering: <input name="reason_reordered" type="text"><br>
     <select name="imp_by" type="text" required=True>
       <option value="">---</option>
       {% for i in imp_by %}
