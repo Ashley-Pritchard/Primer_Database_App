@@ -6,6 +6,8 @@ from collections import Counter
 from datetime import date 
 import glob
 import collections
+import csv
+from django.http import HttpResponse
 
 
 #provides context for the index / search page 
@@ -123,7 +125,7 @@ def submitted(request):
 	direction = request.POST.getlist('direction')
 	start = request.POST.getlist('start')
 	end = request.POST.getlist('end')
-	modification = request.getlist('modification')
+	modification = request.POST.getlist('modification')
 	ngs = request.POST.getlist('ngs')
 	alt_name = request.POST.getlist('alt_name')
 	version = request.POST.getlist('version')
@@ -622,6 +624,19 @@ def submit_order(request):
 
 	#pull the selected primers for the status change based on the checkboxes selected on the 'primers to be ordered' html page
 	primer_list = request.POST.getlist('primer')
+
+	if 'csv' in request.POST:
+		response = HttpResponse(content_type='text/csv')
+		response['Content-Disposition'] = 'attachment; filename="order_information.csv"'
+
+		writer = csv.writer(response)
+		writer.writerow(['sequence', 'direction', 'start', 'end', 'modification', 'gene', 'analysis_type'])
+		for primer in primer_list:
+			export = Primer.objects.get(pk=primer)
+			writer.writerow([export.sequence, export.direction, export.genomic_location_start, export.genomic_location_end, export.modification, export.amplicon_id.gene_id.gene_name, export.amplicon_id.analysis_type_id.analysis_type])
+
+		return response
+
 	
 	#iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
 	if 'ordered' in request.POST:
