@@ -566,6 +566,9 @@ def reorder_primer(request):
 	primer.version = reorder.version
 	primer.amplicon_id = reorder.amplicon_id
 
+	#reason reordered input by user added to the primer record 
+	primer.reason_reordered = request.POST.get('reason_reordered')
+
 	#update the database 
 	primer.save()
 	
