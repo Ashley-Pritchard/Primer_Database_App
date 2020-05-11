@@ -14,20 +14,20 @@
   <h1>Primer Database: Primers on Order</h1>
   <p> Primer information for primers on order:<br><br><br><br>
   {% for t in testing %}
-    <table class="table2" style="table-layout: fixed; width: 100%">
+    <table class="table" style="table-layout: auto-fit; width: 100%; cellspacing: 20px">
     <form action="{% url 'tested' %}" method="POST">
       <tr>
         <td>
-          <strong>Primer ID</strong>
+          <strong>Amplicon ID</strong>:
         </td>
-        <td>
-          {{ t.id }}
-        </td>
-        <td>
-          <strong>Amplicon Name</strong>:
-        </td>
-        <td>
+        <td style="word-wrap: break-word">
           {{ t.amplicon_id.amplicon_name }}
+        </td>
+        <td>
+          <strong>Direction:</strong>
+        </td>
+        <td>
+          {{ t.direction }}
         </td>
         <td>
           <strong>Imported By</strong>:
@@ -35,7 +35,6 @@
         <td>
           {{ t.imported_by_id.imported_by }}
         </td>
-        <td>
         <td>
           <strong>Location</strong>:
         </td>

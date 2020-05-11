@@ -67,12 +67,11 @@ table.table2 {
 	width: 100%;
 	margin-left: auto;
 	margin-right: auto;
-	
 }
 
 table.table2 td {
 	padding: 10px 10px 10px 5px;
-	width: fixed
+	width: fixed;
 }
 
 table.table2 tr:nth-child(even) {

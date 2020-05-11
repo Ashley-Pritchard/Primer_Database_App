@@ -11,31 +11,28 @@
    <a class="active" href="{% url 'in_testing' %}">Primers in Testing</a>
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
  </div> 
-  <h1>Primer Database: Primers on Order</h1>
-  <p> Primer information for primers on order:<br><br><br><br>
+  <h1>Primer Database: Failed Validation</h1>
+  <p> Primer information for primers that have failed validation:<br><br><br><br>
   {% for t in failed %}
-    <table class="table2" style="table-layout: fixed; width: 100%">
+    <table class="table" style="table-layout: auto-fit; width: 100%">
       <tr>
         <td>
-          <strong>Primer ID</strong>
+          <strong>Amplicon ID</strong>:
         </td>
-        <td>
-          {{ t.id }}
-        </td>
-        <td>
-          <strong>Amplicon Name</strong>:
-        </td>
-        <td>
+        <td style="word-wrap: break-word">
           {{ t.amplicon_id.amplicon_name }}
+        </td>
+        <td>
+          <strong>Direction:</strong>
+        </td>
+        <td>
+          {{ t.direction }}
         </td>
         <td>
           <strong>Imported By</strong>:
         </td>
         <td>
           {{ t.imported_by_id.imported_by }}
-        </td>
-        <td>
-          <input type="checkbox" name="primer" id="primer" value="{{ t.id }}">
         </td>
     </table>
   {% endfor %}<br><br>    
