@@ -21,5 +21,6 @@ urlpatterns = [
     path('order_recieved/', views.order_recieved, name='order_recieved'),
     path('in_testing/', views.in_testing, name='in_testing'),
     path('tested/', views.tested, name='tested'),
-    path('failed/', views.failed, name='failed')
+    path('failed/', views.failed, name='failed'),
+    path('remove_failed/', views.remove_failed, name='remove_failed')
 ]

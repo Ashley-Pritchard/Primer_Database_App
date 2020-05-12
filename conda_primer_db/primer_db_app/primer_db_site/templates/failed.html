@@ -15,6 +15,7 @@
   <p> Primer information for primers that have failed validation:<br><br><br><br>
   {% for t in failed %}
     <table class="table" style="table-layout: auto-fit; width: 100%">
+    <form action="{% url 'remove_failed' %}" method="POST"> 
       <tr>
         <td>
           <strong>Amplicon ID</strong>:
@@ -40,8 +41,12 @@
         <td>
           {{ t.date_testing_completed }}
         </td>
+        <td>
+          <input type="checkbox" name="primer" id="primer" value="{{ t.id }}">
     </table>
-  {% endfor %}<br><br>    
+  {% endfor %}<br><br> 
+  <input class="p1" type="submit" value="Remove">   
+  </form>
 {% endblock %}
 
 
