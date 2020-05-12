@@ -426,10 +426,14 @@ def amplicon(request):
 	#pulls primer information for amplicon 
 	primer = amplicon.primer_set.all()
 
+	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu 
+	imp_by = Imported_By.objects.all()
+
 	#provide context for the amplicon html page 
 	context = {
 		'amplicon': amplicon,
-		'primer': primer
+		'primer': primer,
+		'imp_by':imp_by
 	}
 
 	#render the html page 
@@ -543,52 +547,50 @@ def submitted_to_amplicon(request):
 def reorder_primer(request):
 
 	#pull specific primer from the database 
-	reorder = Primer.objects.get(pk=request.POST.get('primer'))
+	reorder_list = request.POST.getlist('primer')
 
-	#make changes to the primer table of the database 
-	primer = Primer()
+	for i in reorder_list:
+		reorder = Primer.objects.get(pk=i)
 
-	#assign new primer record the same sequence, direction, alt name and ngs audit number as the primer record selected for reorder 
-	primer.sequence = reorder.sequence
-	primer.genomic_location_start = reorder.genomic_location_start
-	primer.genomic_location_end = reorder.genomic_location_end
-	primer.location = reorder.location
-	primer.direction = reorder.direction
-	primer.modification = reorder.modification
-	primer.alt_name = reorder.alt_name
-	primer.ngs_audit_number = reorder.ngs_audit_number
-	primer.comments = primer.comments
+		#make changes to the primer table of the database 
+		primer = Primer()
 
-	#imported_by input by user stored as new primer record in database 
-	find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-	for f in find_imp:
-		primer.imported_by_id = f
+		#assign new primer record the same sequence, direction, alt name and ngs audit number as the primer record selected for reorder 
+		primer.sequence = reorder.sequence
+		primer.genomic_location_start = reorder.genomic_location_start
+		primer.genomic_location_end = reorder.genomic_location_end
+		primer.location = reorder.location
+		primer.direction = reorder.direction
+		primer.modification = reorder.modification
+		primer.alt_name = reorder.alt_name
+		primer.ngs_audit_number = reorder.ngs_audit_number
+		primer.comments = primer.comments
 
-	#assign the date imported for the new primer record as todays date 
-	today = date.today()
-	primer.date_imported = today.strftime("%d/%m/%Y")
-	primer.date_order_placed = today.strftime("%d/%m/%Y")
+		#imported_by input by user stored as new primer record in database 
+		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+		for f in find_imp:
+			primer.imported_by_id = f
 
-	#assign the order status of the new primer record to 'ordered'
-	primer.order_status = "Ordered"
+		#assign the date imported for the new primer record as todays date 
+		today = date.today()
+		primer.date_imported = today.strftime("%d/%m/%Y")
+		primer.date_order_placed = today.strftime("%d/%m/%Y")
 
-	#assign the new primer record the same version number and amplicon id as the primer record selected for reorder 
-	primer.version = reorder.version
-	primer.amplicon_id = reorder.amplicon_id
+		#assign the order status of the new primer record to 'ordered'
+		primer.order_status = "Ordered"
 
-	#reason reordered input by user added to the primer record 
-	primer.reason_reordered = request.POST.get('reason_reordered')
+		#assign the new primer record the same version number and amplicon id as the primer record selected for reorder 
+		primer.version = reorder.version
+		primer.amplicon_id = reorder.amplicon_id
 
-	#update the database 
-	primer.save()
-	
-	#provide context for the 'submitted reorder primer' html page 
-	context = {
-		'reorder':reorder
-	}
+		#reason reordered input by user added to the primer record 
+		primer.reason_reordered = request.POST.get('reason_reordered')
+
+		#update the database 
+		primer.save()
 	
 	#render the 'submitted reorder primer' html page 
-	return render(request, 'submitted_reorder_primer.html', context=context)
+	return render(request, 'submitted_reorder_primer.html')
 
 
 #allow users to archive a primer currently recorded as 'stocked' from the primer search result html page 
