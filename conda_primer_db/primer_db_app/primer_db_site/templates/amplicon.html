@@ -18,6 +18,23 @@
   </form>
   {% for p in primer %}
     <table class="table2" style="table-layout: fixed; width: 100%">
+    <form action="{% url 'reorder_primer' %}" method="POST">  
+      <tr>
+        <td>
+            <strong>Primer:</strong>
+          <td>
+            {{ p.id }}
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+            <input type="checkbox" name="primer" id="primer" value="{{ p.id }}">
+          </td>
+      <tr>
       <tr>
         <td>
             <strong>Order Status:</strong>
@@ -157,6 +174,17 @@
       {% endif %}
     <p><strong>Comments:</strong> {{ p.comments }}</p><br><br><br>
   {% endfor %}  
+      <p> To reorder selected primer(s), please use the drop-down menu to select your initials and then click the 'Reorder Primer(s)' button</p><br>
+    Reason for Reordering: <input name="reason_reordered" type="text"><br>
+    <select name="imp_by" type="text" required=True>
+      <option value="">---</option>
+      {% for i in imp_by %}
+        {% if i.status == "current" %}
+          <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+        {% endif %}
+      {% endfor %}</select>
+    <input class="p1" type="submit" value="Reorder Primers(s)">
+    </form><br>
 {% endblock %}
 
 
