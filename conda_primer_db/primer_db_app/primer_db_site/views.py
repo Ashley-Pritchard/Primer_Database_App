@@ -734,7 +734,7 @@ def tested(request):
 			tested = Primer.objects.get(pk=primer)
 			tested.order_status = 'Failed Validation'
 			today = date.today()
-			tested.date_tesing_completed = today.strftime("%d/%m/%Y")
+			tested.date_testing_completed = today.strftime("%d/%m/%Y")
 			tested.save()			
 
 	#render the 'submit order' html page 
