@@ -125,6 +125,7 @@ def submitted(request):
 	direction = request.POST.getlist('direction')
 	start = request.POST.getlist('start')
 	end = request.POST.getlist('end')
+	m13 = request.POST.getlist('m13')
 	modification = request.POST.getlist('modification')
 	ngs = request.POST.getlist('ngs')
 	alt_name = request.POST.getlist('alt_name')
@@ -133,7 +134,14 @@ def submitted(request):
 
 	for i in range(num_primers):
 		primer = Primer()
-		primer.sequence = seq[i].upper()
+		if m13[i] == "no":
+			primer.sequence = seq[i].upper()
+		elif m13[i] == 'yes' and direction[i] == 'f':
+			primer.sequence = 'M13-F-' + seq[i].upper()
+		elif m13[i] == 'yes' and direction[i] == 'r':
+			primer.sequence = 'M13-R-' + seq[i].upper()
+		elif m13[i] == 'yes':
+			primer.sequence = 'M13-U-' + seq[i].upper()
 		primer.direction = direction[i].upper()
 		primer.modification = modification[i]
 		primer.alt_name = alt_name[i]
