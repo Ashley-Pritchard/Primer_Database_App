@@ -763,6 +763,20 @@ def failed(request):
 	#render the in testing html page 
 	return render(request, 'failed.html', context=context)
 
+#pulls the information of all primers with an order status of 'ordered' in response to the user clicking the 'primers on order' searchbar link
+def remove_failed(request):
+
+	#pull specific primer from the database 
+	remove_list = request.POST.getlist('primer')
+
+	for i in remove_list:
+		remove = Primer.objects.get(pk=i)
+		remove.order_status = 'Failed_Validation_Archived'
+		remove.save()
+
+	#render the in testing html page 
+	return render(request, 'remove_failed.html')
+
 
 
 	

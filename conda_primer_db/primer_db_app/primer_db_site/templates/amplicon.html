@@ -32,7 +32,9 @@
           <td>
           </td>
           <td>
+            {% if p.order_status == 'Stocked' or p.order_status == 'Archived' %}
             <input type="checkbox" name="primer" id="primer" value="{{ p.id }}">
+            {% endif %}
           </td>
       <tr>
       <tr>
@@ -174,7 +176,7 @@
       {% endif %}
     <p><strong>Comments:</strong> {{ p.comments }}</p><br><br><br>
   {% endfor %}  
-      <p> To reorder selected primer(s), please use the drop-down menu to select your initials and then click the 'Reorder Primer(s)' button</p><br>
+      <p> To <strong>reorder</strong> selected primer(s), please use the drop-down menu to select your initials and then click the 'Reorder Primer(s)' button</p><br>
     Reason for Reordering: <input name="reason_reordered" type="text"><br>
     <select name="imp_by" type="text" required=True>
       <option value="">---</option>
@@ -184,7 +186,7 @@
         {% endif %}
       {% endfor %}</select>
     <input class="p1" type="submit" value="Reorder Primers(s)">
-    </form><br>
+    </form>
 {% endblock %}
 
 

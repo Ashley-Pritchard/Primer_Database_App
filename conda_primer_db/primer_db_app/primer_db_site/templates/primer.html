@@ -151,8 +151,8 @@
       </table><br>
       {% endif %}
       <p><strong>Comments: </strong> {{ primer.comments }}</p><br>
-      {% if primer.order_status != 'Ordered' %}
-      <p> To reorder this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
+      {% if primer.order_status == 'Stocked' or primer.order_status == 'Archived' %}
+      <p> To <strong>reorder</strong> this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
     <form action="{% url 'reorder_primer' %}" method="POST">  
     Reason for Reordering: <input name="reason_reordered" type="text"><br>
     <select name="imp_by" type="text" required=True>
@@ -166,7 +166,7 @@
     </form><br>
      {% endif %}
     {% if primer.order_status == 'Stocked' %}
-    <p> To archive this primer, please add a reason for archiving and then use the drop-down menu to select your initials before clicking the 'archive primer' button</p><br>
+    <p> To <strong>archive</strong> this primer, please add a reason for archiving and then use the drop-down menu to select your initials before clicking the 'archive primer' button</p><br>
     <form action="{% url 'archive_primer' %}" method="POST">  
     Reason for Archiving: <input name="reason_archived" type="text"><br>
     <select name="arc_by" type="text" required=True>
