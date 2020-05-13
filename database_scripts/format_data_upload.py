@@ -1,4 +1,4 @@
-#Currenly, OMGL primer data is stored in a large excel workbook. This script reformats this excel data for upload to the new primer datbase, which has been developed as a django web app. The script converts the excel file into 7 seperate csv files for upload into the tables which make up the new primer database. The script also reformats the data within the excel file appropriately for upload.
+#Currenly, OMGL primer data is stored in a large excel workbook. This script cleans and reformats this excel data for upload to the new primer datbase, which has been developed as a django web app. The script converts the excel file into 7 seperate csv files for upload into the tables which make up the new primer database. 
 
 #import relevant libraries 
 import pandas as pd 
@@ -9,7 +9,22 @@ import sys
 #convert the current excel sheet used for primer storage into a pandas dataframe for downstream reference. 
 df = pd.read_csv('primer_database.csv')
 
-#as only made up of 4 fields, the analysis type csv was created manually and can be viewed in this github directory. Convert this to a pandas dataframe for downstream reference. 
+#create csv file of all potential analysis types for upload to the 'Analysis_Type' table of the primer database
+with open('analysis_type.csv', 'w', newline='') as file:
+	writer = csv.writer(file)
+	writer.writerow(["analysis_type_id", "analysis_type"])
+	writer.writerow([0, "NGS"])
+	writer.writerow([1, "Sanger"])
+	writer.writerow([3, "MLPA"])
+	writer.writerow([4, "Long Range"])
+	writer.writerow([5, "Taqman"])
+	writer.writerow([6, "RT-PCR"])
+	writer.writerow([7, "Pyrosequencing"])
+	writer.writerow([8, "ARMS: Mutant"])
+	writer.writerow([9, "ARMS: Normal"])
+	writer.writerow([10, "Light Scanner"])
+
+#store the analysis type csv as pandas dataframe for downstream reference
 df2 = pd.read_csv('analysis_type.csv')
 
 #create the csv file for upload to the 'Gene' table of the database
@@ -87,7 +102,7 @@ def imported_by():
 	#convert all names to uppercase
 	df_i['imported_by'] = df_i['imported_by'].str.upper()
 
-	#replace all names in the field with appropriate initials 
+	#replace all names in the field with appropriate full names from lab telephone directory
 	name = []
 	status = []
 	for index, row in df_i.iterrows():
@@ -147,6 +162,7 @@ def imported_by():
 			name.append(row[0])
 	df_i['imported_by'] = name	
 	
+	#add the status of the lab members 
 	status = []
 	for index, row in df_i.iterrows():
 		if row[0] == 'Ariele Rosseto' or 'Elizabeth Wood' or 'Emily Packham' or 'Hannah Matten' or 'Jessica Woodley' or 'Julie' or 'Pauline Ware' or 'Sarah Reid':
@@ -289,7 +305,7 @@ def primer():
 	#convert all names to uppercase
 	df_p3['imported_by'] = df_p3['imported_by'].str.upper()
 
-	#replace all names in the imported_by field with appropriate initials 
+	#replace all names in the imported_by field with appropriate full name from the lab telephone directory
 	name = []
 	for index, row in df_p3.iterrows():
 		if 'ARIELE' in row[5]:
@@ -389,7 +405,7 @@ def primer():
 	#convert names to uppercase
 	df_p3['archived_by'] = df_p3['archived_by'].str.upper()
 
-	#replace all names in the imported_by field with appropriate initials 
+	#replace all names in the imported_by field with appropriate full name from the lab telephone directory 
 	name = []
 	for index, row in df_p3.iterrows():
 		if 'ARIELE' in str(row[6]):
