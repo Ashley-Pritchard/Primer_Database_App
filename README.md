@@ -11,7 +11,7 @@ This repository contains the code for the development of 1) a primer database fo
 
 DESCRIPTION <br>
 
-Prior to this project, primer data for the OMGL lab was stored as an excel file. The 'database_scripts' directory contains the script that was developed to clean,reformat and export this data into a format that could be uploaded into the new django database. <br>
+Prior to this project, primer data for the OMGL lab was stored as an excel file. The 'database_script' directory contains the script that was developed to clean,reformat and export this data into a format that could be uploaded into the new django database. <br>
 The conda_primer_db directory contains the code for the django app, which follows the standard django format. <br>
 The primer database app has 6 pages that can be navigated to from the homepage:<br> 
 1) The 'search' page provides a means to search the database for primers and amplicons. Selected primers can also be reordered or archived from here.<br> 
