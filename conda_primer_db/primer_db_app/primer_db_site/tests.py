@@ -4,6 +4,9 @@ from primer_db_site.views import *
 from primer_db_site.models import *
 import json
 
+#unit tests 
+
+#url tests
 class TestUrls(SimpleTestCase):
 
 	def test_search_url_resolves(self):
@@ -78,6 +81,7 @@ class TestUrls(SimpleTestCase):
 		url = reverse('remove_failed')
 		self.assertEquals(resolve(url).func, remove_failed)
 
+#view tests
 class TestViews(TestCase):
 
 	def setUp(self):

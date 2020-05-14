@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 
-#generate the primer database 
+#create the tables of the primer database 
 
 class Analysis_Type(models.Model):
 	analysis_type = models.CharField(max_length=30)
