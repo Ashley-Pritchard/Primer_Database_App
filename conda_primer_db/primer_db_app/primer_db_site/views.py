@@ -294,7 +294,7 @@ def reorder_primer(request):
 		primer.amplicon_id = reorder.amplicon_id
 		primer.comments = primer.comments
 
-		#ammend the lab location to ""
+		#clear primer lab location
 		primer.location = ""
 
 		#assingn the 'imported_by' input selected by user to new primer record 
@@ -606,11 +606,11 @@ def submitted(request):
 		if m13[i] == "no":
 			primer.sequence = seq[i].upper()
 		elif m13[i] == 'yes' and direction[i] == 'f':
-			primer.sequence = 'M13-F-' + seq[i].upper()
+			primer.sequence = 'GTAAAACGACGGCCAGT' + seq[i].upper()
 		elif m13[i] == 'yes' and direction[i] == 'r':
-			primer.sequence = 'M13-R-' + seq[i].upper()
+			primer.sequence = 'CAGGAAACAGCTATGAC' + seq[i].upper()
 		elif m13[i] == 'yes':
-			primer.sequence = 'M13-U-' + seq[i].upper()
+			primer.sequence = 'M13-' + seq[i].upper()
 
 		#assgin user input to each field of the primer table
 		primer.direction = direction[i].upper()
@@ -698,10 +698,10 @@ def submit_order(request):
 
 		#write the relevant primer information to a csv file 
 		writer = csv.writer(response)
-		writer.writerow(['sequence', 'direction', 'start', 'end', 'modification', 'gene', 'analysis_type'])
+		writer.writerow(['name', 'sequence', 'direction', 'start', 'end'])
 		for primer in primer_list:
 			export = Primer.objects.get(pk=primer)
-			writer.writerow([export.sequence, export.direction, export.genomic_location_start, export.genomic_location_end, export.modification, export.amplicon_id.gene_id.gene_name, export.amplicon_id.analysis_type_id.analysis_type])
+			writer.writerow([export.amplicon_id.amplicon_name, export.sequence, export.direction, export.genomic_location_start, export.genomic_location_end])
 
 		#export the csv file
 		return response
