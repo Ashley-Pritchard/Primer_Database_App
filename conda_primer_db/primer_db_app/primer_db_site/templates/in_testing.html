@@ -24,6 +24,12 @@
           {{ t.amplicon_id.amplicon_name }}
         </td>
         <td>
+          <strong>Alt. Name</strong>:
+        </td>
+        <td style="word-wrap: break-word">
+          {{ t.alt_name }}
+        </td>
+        <td>
           <strong>Direction:</strong>
         </td>
         <td>
@@ -40,6 +46,12 @@
         </td>
         <td>
           {{ t.location }}
+        </td>
+        <td>
+          <strong>Comments</strong>:
+        </td>
+        <td>
+          {{ t.comments }}
         </td>
         <td>
           <input type="checkbox" name="primer" id="primer" value="{{ t.id }}">
