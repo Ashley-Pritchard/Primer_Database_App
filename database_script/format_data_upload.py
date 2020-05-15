@@ -172,9 +172,7 @@ def imported_by():
 	df_i['status'] = status
 
 	#drop duplicate names
-	df_i = df_i.drop_duplicates(keep='first')
-
-	df_i['status'] = 
+	df_i = df_i.drop_duplicates(keep='first') 
 
 	#created an imported_by_id for each unique record 
 	df_i['imported_by_id'] = df_i.groupby(['imported_by']).ngroup()	
@@ -273,7 +271,7 @@ df6 = pd.read_csv('amplicon.csv')
 def primer(): 
 
 	#forward and reverse primers stored as one 'amplicon' record - split as individual primers in new database - copy relevant columns into two dataframes for the forward and reverse primers, add appropriate direction and rename columns 
-	df_p1 = df[['F', 'F Location', 'Alt Name F', 'Amplicon_ID', 'Date Entered Service/Imported', 'Imported By', 'Fragment', 'Set', 'order_status', 'reason_archived', 'archived_by', 'date_archived', 'Genomic Loc 1', 'Genomic Loc 2', 'Comments']].copy()
+	df_p1 = df[['F', 'F Location', 'Alt Name F', 'Amplicon_ID', 'Date Entered Service/Imported', 'Imported By', 'Fragment', 'Set', 'Genomic Loc 1', 'Genomic Loc 2', 'Comments']].copy()
 
 	df_p1 = df_p1.rename(columns={'F': 'sequence', 'F Location': 'location', 'Alt Name F': 'alt_name', 'Amplicon_ID':'amplicon_name', 'Date Entered Service/Imported': 'date_imported', 'Imported By': 'imported_by', 'Genomic Loc 1': 'genomic_location_start', 'Genomic Loc 2': 'genomic_location_end', 'Comments': 'comments'})
 
@@ -281,7 +279,7 @@ def primer():
 
 	df_p1['direction'] = direction_F
 
-	df_p2 = df[['R', 'R Location', 'Alt Name R', 'Amplicon_ID', 'Date Entered Service/Imported', 'Imported By', 'Fragment', 'Set', 'order_status', 'reason_archived', 'archived_by', 'date_archived', 'Genomic Loc 1', 'Genomic Loc 2', 'Comments']].copy()
+	df_p2 = df[['R', 'R Location', 'Alt Name R', 'Amplicon_ID', 'Date Entered Service/Imported', 'Imported By', 'Fragment', 'Set', 'Genomic Loc 1', 'Genomic Loc 2', 'Comments']].copy()
 
 	df_p2 = df_p2.rename(columns={'R': 'sequence', 'R Location': 'location', 'Alt Name R': 'alt_name', 'Amplicon_ID':'amplicon_name', 'Date Entered Service/Imported': 'date_imported', 'Imported By': 'imported_by', 'Genomic Loc 1': 'genomic_location_start', 'Genomic Loc 2': 'genomic_location_end', 'Comments': 'comments'})
 
@@ -401,79 +399,6 @@ def primer():
 
 	#strip the v from the version number to store as int
 	df_p3['version'] = df_p3['version'].str.strip('v')
-
-	#convert names to uppercase
-	df_p3['archived_by'] = df_p3['archived_by'].str.upper()
-
-	#replace all names in the imported_by field with appropriate full name from the lab telephone directory 
-	name = []
-	for index, row in df_p3.iterrows():
-		if 'ARIELE' in str(row[6]):
-			name.append('Ariele Rosseto')
-		elif 'BENITO' in str(row[6]):
-			name.append('Benito Banos-Pinero')
-		elif 'CNS' in str(row[6]):
-			name.append('Caroline Sarton')
-		elif 'CAROLINE' in str(row[6]):
-			name.append('Caroline Sarton')
-		elif 'CARL' in str(row[6]):
-			name.append('Carl Fratter')
-		elif 'CLAIRE HODGKISS' in str(row[6]):
-			name.append('Claire Hodgkiss')
-		elif 'CONRAD' in str(row[6]):
-			name.append('Conrad Smith')
-		elif 'ELIZABTH WOOD' in str(row[6]):
-			name.apend('Elizabeth Wood')
-		elif 'ELIZABETH' in str(row[6]):
-			name.append('Elizabeth Wood')
-		elif 'EMILY' in str(row[6]):
-			name.append('Emily Packham')
-		elif 'HANNAH BOON' in str(row[6]):
-			name.append('Hannah Boon')
-		elif 'MATTEN' in str(row[6]):
-			name.append('Hannah Matten')
-		elif 'HELEN LORD' in str(row[6]):
-			name.append('Helen Lord')
-		elif 'JESS GABRIEL' in str(row[6]):
-			name.append('Jess Gabriel')
-		elif 'JESSICA WOODLEY' in str(row[6]):
-			name.append('Jessica Woodley')
-		elif 'TAYLOR' in str(row[6]):
-			name.append('John Taylor')
-		elif 'JULIE' in str(row[6]):
-			name.append('Julie')
-		elif 'LIZZIE/MIKEB' in str(row[6]):
-			name.append('Michael Bowman')
-		elif 'BOWMAN' in str(row[6]):
-			name.append('Michael Bowman')
-		elif 'OLDRIDGE' in str(row[6]):
-			name.append('Michael Oldridge')
-		elif 'WARE' in str(row[6]):
-			name.append('Pauline Ware')
-		elif 'SARAH REID' in str(row[6]):
-			name.append('Sarah Reid')
-		elif 'BEDENHAM' in str(row[6]):
-			name.append('Tina Bedenham')
-		elif 'LESTER' in str(row[6]):
-			name.append('Tracy Lester')
-		elif 'TREENA' in str(row[6]):
-			name.append('Treena Cranston')
-		elif 'LOUISE' in str(row[6]):
-			name.append('Louise Williams')
-		else:
-			name.append(row[6])
-	df_p3['archived_by'] = name
-
-	#create a dictionary to pull the appropriate archived_by_id for each record from the imported_by.csv file. Store these as a new column. 
-	archived_by_dict = dict(zip(df5.imported_by, df5.imported_by_id))
-	df_p3['archived_by_id'] = df_p3['archived_by'].map(imported_by_dict)
-
-	#standardise the date_archived field by replacing . and - with /
-	df_p3['date_archived'] = df_p3['date_archived'].replace(to_replace = '\.', value = '/', regex=True)
-	df_p3['date_archived'] = df_p3['date_archived'].replace(to_replace = '-', value = '/', regex=True)
-
-	#drop irrelevant column
-	df_p3 = df_p3.drop(columns = ['archived_by'])
 
 	#replace null values in genomic start and end locations with 0 values to prevent errors with database
 	df_p3['genomic_location_start'] = df_p3['genomic_location_start'].replace(np.nan, 0)

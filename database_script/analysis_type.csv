@@ -1,0 +1,11 @@
+analysis_type_id,analysis_type
+0,NGS
+1,Sanger
+3,MLPA
+4,Long Range
+5,Taqman
+6,RT-PCR
+7,Pyrosequencing
+8,ARMS: Mutant
+9,ARMS: Normal
+10,Light Scanner
