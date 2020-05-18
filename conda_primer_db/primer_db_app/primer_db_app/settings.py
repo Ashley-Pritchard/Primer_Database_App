@@ -20,11 +20,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+# need to create file when launching on server 
 with open('/home/ashley/Documents/primer_db_sk/secret_key.txt') as f:
 	SECRET_KEY = f.read().strip()
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
+
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
@@ -41,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 ]
 
+#comment out whitenoise before deploying to avoid errors
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -49,21 +52,22 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-#SESSION_COOKIE_SECURE = True
-#CSRF_COOKIE_SECURE = True
-#SECURE_HSTS_SECONDS = 31536000
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 31536000
 #SECURE_SSL_REDIRECT = True
-#SECURE_HSTS_PRELOAD = True
-#SECURE_REFERRER_POLICY = 'no-referrer'
-#SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SECURE_REFERRER_POLICY = 'no-referrer'
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 
 
 #20 minute session, starting from last activity (activity is any web activity
 #within the last 60 seconds
-#SESSION_EXPIRE_SECONDS = 1200
-#SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+SESSION_EXPIRE_SECONDS = 1200
+SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
 ###### OCCASIONALLY WILL NEED TO RUN
 ######"django-admin clearsessions" TO CLEAR OLD DATA###
 
