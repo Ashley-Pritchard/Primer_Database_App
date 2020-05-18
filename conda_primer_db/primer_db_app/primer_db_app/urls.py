@@ -16,10 +16,13 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
+from django.conf.urls import url
+from django.conf.urls.static import static
+from primer_db_app import settings
+from django.conf import settings
 
 #include the django admin url and the urls defined as part of the primer database site 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('primer_database/', include('primer_db_site.urls'))
-]
-
+    path('primer_database/', include('primer_db_site.urls')),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

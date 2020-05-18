@@ -26,7 +26,7 @@ with open('/home/ashley/Documents/primer_db_sk/secret_key.txt') as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '10.134.147.148']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -48,7 +48,24 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 ]
+
+#SESSION_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
+#SECURE_HSTS_SECONDS = 31536000
+#SECURE_SSL_REDIRECT = True
+#SECURE_HSTS_PRELOAD = True
+#SECURE_REFERRER_POLICY = 'no-referrer'
+#SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
+
+#20 minute session, starting from last activity (activity is any web activity
+#within the last 60 seconds
+#SESSION_EXPIRE_SECONDS = 1200
+#SESSION_EXPIRE_AFTER_LAST_ACTIVITY = True
+###### OCCASIONALLY WILL NEED TO RUN
+######"django-admin clearsessions" TO CLEAR OLD DATA###
 
 ROOT_URLCONF = 'primer_db_app.urls'
 

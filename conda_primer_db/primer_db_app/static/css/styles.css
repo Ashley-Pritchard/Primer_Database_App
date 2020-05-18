@@ -1,0 +1,101 @@
+/*The css file provides the base design and formatting of the html pages. */
+
+body {
+  background-color: #f4f4f4;
+  font-family: helvetica;
+  text-align: center;
+  color: #2c2c2c;
+  margin: 60px 30px 60px 30px;
+
+}
+
+.topnav {
+	overflow: hidden;
+	padding: 15px;
+	text-align: right;
+	width: 100%;
+}
+
+.topnav a {
+	color: #2c2c2c;
+	text-align: center;
+	padding: 14px 16px;
+	font-size: 17px;
+}
+
+h1 {
+	width: 100%;
+	background-color: #062f4f;
+	color: white;
+	padding: 10px 20px 10px 20px;
+	text-align: left;
+}
+
+
+p {
+	padding: 20px 5px 5px 5px;
+}
+
+p2 {
+	text-align: left;
+}
+
+table {
+	table-layout: fixed;
+	text-align: left;
+	width: 100%
+	
+}
+
+td {
+	padding: 10px 10px 10px 5px;
+	width: 100%
+}
+
+form {
+	text-align: center;
+	width: 100%
+}
+
+input.p1 {
+	width: auto
+}
+
+table.table2 {
+	table-layout: fixed;
+	text-align: left;
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+table.table2 td {
+	padding: 10px 10px 10px 5px;
+	width: fixed;
+}
+
+table.table2 tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+a {
+	color: #5d5c61
+}
+
+form.search {
+	text-align: left;
+	width:80%
+}
+
+input {
+	width: 100%;
+	word-wrap: break-word;
+	white-space: normal;
+}
+
+button {
+	border-color: black;
+	padding: 5px
+}
+
+
