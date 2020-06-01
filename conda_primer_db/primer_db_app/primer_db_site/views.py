@@ -409,7 +409,7 @@ def submitted_to_amplicon(request):
 		primer.genomic_location_end = None
 
 	#modification input by user stored as new primer record in the database
-	primer.modification = request.post.get('modification')
+	primer.modification = request.POST.get('modification')
 
 	#alt name input by user stored as a new primer record in database 
 	primer.alt_name = request.POST.get('alt_name')
