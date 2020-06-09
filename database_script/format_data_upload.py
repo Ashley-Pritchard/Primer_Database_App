@@ -385,6 +385,18 @@ def primer():
 	#convert sequence to uppercase
 	df_p3['sequence'] = df_p3['sequence'].str.upper()
 
+	#add M13 tag to front of appropriate sequences 
+	new_sequence = []
+	for index, row in df_p3.iterrows():
+		if 'M13' in str(row[2]) and 'R' in str(row[7]):
+			new_sequence.append('CAGGAAACAGCTATGAC' + str(row[0]))
+		elif 'M13' in str(row[2]) and 'F' in str(row[7]):
+			new_sequence.append('GTAAAACGACGGCCAGT' + str(row[0]))
+		else:
+			new_sequence.append(str(row[0]))
+
+	df_p3['sequence'] = new_sequence
+
 	#replace empty ngs numbers with 0 to prevent errors downstream 
 	df_p3['ngs_audit_number'] = df_p3['ngs_audit_number'].replace(np.nan, 0)
 
