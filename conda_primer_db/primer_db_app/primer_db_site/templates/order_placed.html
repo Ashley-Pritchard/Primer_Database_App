@@ -41,17 +41,11 @@
         <td>
           {{ p.imported_by_id.imported_by }}
         </td>
-	<td>
-	  <strong>Current Location:</strong>
-	</td>
-	<td>
-	  {{ p.location }}
-	</td>
         <td>
-          <stong>New Location:</strong>
+          <stong>Location:</strong>
         </td>
         <td>
-        <input type="text" name="location">
+        <input type="text" name="location" placeholder="{{ p.location }}">
 	</td>
         <td>
           <input type="checkbox" name="primer" id="primer" value="{{ p.id }}">
