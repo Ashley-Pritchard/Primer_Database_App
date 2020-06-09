@@ -12,7 +12,7 @@
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
  </div> 
   <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
-  <p> Primer information for amplicon {{ amplicon.amplicon_name }}:<br><br>
+  <p> The following page provides a record of all OMGL primers associated with amplicon {{ amplicon.amplicon_name }}. To <strong>reorder</strong> one or more of the below primers, select the box next to the primer and use the 'reorder' option at the bottom of the page. To order a <strong>new</strong> primer for this amplicon, use the button below:<br><br>
   <form action="{% url 'order_to_amplicon' %}" method="POST">
   <button name="amplicon" type="submit" value="{{ amplicon.id }}">Order New Primer for this Amplicon</button><br><br><br>
   </form>
