@@ -282,7 +282,7 @@ def reorder_primer(request):
 		#make changes to the primer table of the database 
 		primer = Primer()
 
-		#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id and comments as the primer record selected for reorder 
+		#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder 
 		primer.sequence = reorder.sequence
 		primer.genomic_location_start = reorder.genomic_location_start
 		primer.genomic_location_end = reorder.genomic_location_end
@@ -292,10 +292,8 @@ def reorder_primer(request):
 		primer.ngs_audit_number = reorder.ngs_audit_number
 		primer.version = reorder.version
 		primer.amplicon_id = reorder.amplicon_id
-		primer.comments = primer.comments
-
-		#clear primer lab location
-		primer.location = ""
+		primer.comments = reorder.comments
+		primer.location = reorder.location
 
 		#assingn the 'imported_by' input selected by user to new primer record 
 		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
