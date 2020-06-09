@@ -12,12 +12,12 @@
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
  </div> 
   <h1>Primer Database</h1>
-  <p> Fill in the form below to order a primer for amplicon {% for p in pulled %}{{ p.amplicon_name }}{% endfor %} </p>
+  <p> Fill in the form below to order a primer for amplicon {% for p in pulled %}{{ p.amplicon_name }}{% endfor %}. Required fields are marked with *. </p>
   <form action="{% url 'submitted_to_amplicon' %}" method="POST">
     <table>
       <tr>
         <td>
-        Imported by (initials): 
+        Imported by (initials): * 
         </td>
         <td>
         <select name="imp_by" type="text" required=True>
@@ -31,7 +31,7 @@
       </tr>
       <tr>
         <td>
-        Sequence (Required):
+        Sequence (Required): *
         </td>
         <td>
         <input name="seq" type="text" required>

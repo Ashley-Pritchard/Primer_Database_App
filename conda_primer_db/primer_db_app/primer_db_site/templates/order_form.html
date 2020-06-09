@@ -12,13 +12,13 @@
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
  </div> 
   <h1>Primer Database</h1>
-  <p> Fill in the amplicon information first, then complete the tables for each of your primers. <br><br>
+  <p> Fill in the amplicon information first, then complete the tables for each of your primers. Required fields are marked with *.<br><br>
   <form action="{% url 'submitted' %}" method="POST">
-  <strong><p>Amplicon (Required)</p></strong><br>
+  <strong><p>Amplicon</p></strong><br>
     <table>
     <tr>
       <td>
-      Analysis Type (Required):
+      Analysis Type: *
       </td>
       <td>
         <select name = "analysis_type" type = "text">
@@ -37,7 +37,7 @@
       </tr>
       <tr>
         <td>
-        Gene (Required):
+        Gene: *
         </td>
         <td>
         <input name="gene" type="text" required>
@@ -45,7 +45,7 @@
       </tr>
       <tr>
         <td>
-        Chromosome (Required):
+        Chromosome: *
         </td>
         <td>
         <input name="chr" type="text" required>
@@ -74,7 +74,7 @@
       </tr>
       <tr>
         <td>
-        Imported by (initials): 
+        Imported by (initials): * 
         </td>
         <td>
         <select name="imp_by" type="text" required=True>
@@ -92,7 +92,7 @@
     <table>
       <tr>
         <td>
-        Sequence (Required):
+        Sequence: *
         </td>
         <td>
         <input name="seq" type="text" required>
