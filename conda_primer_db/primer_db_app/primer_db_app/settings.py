@@ -28,9 +28,9 @@ with open('/srv/Primer_DB_Key/secret_key.txt') as f:
 DEBUG = False
 
 
-ALLOWED_HOSTS = ['127.0.0.1','localhost', '10.134.180.226']
+ALLOWED_HOSTS = ['127.0.0.1','localhost']
 
-SITE_URL ="http://10.134.180.22:8002/"
+SITE_URL =
 
 # Application definition
 INSTALLED_APPS = [
