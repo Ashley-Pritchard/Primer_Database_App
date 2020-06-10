@@ -757,9 +757,6 @@ def order_recieved(request):
 	#calculate how many primers have been selected from the length of the primer list
 	list_len = len(request.POST.getlist('primer'))
 
-	#the user can input a lab location for the primer, pull the location input as a list 
-	location_list = request.POST.getlist('location')
-	
 	#if 'testing required' is clicked - iterate through the list of primers selected, update the order status to 'in testing', assign the 'date_order_placed' as todays date and save changes to the database
 	if 'test' in request.POST:
 		for i in range(list_len):
@@ -767,7 +764,6 @@ def order_recieved(request):
 			recieved.order_status = 'In Testing'
 			today = date.today()
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
-			recieved.location = location_list[i]
 			recieved.save()		
 
 	#if 'testing not required' is clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_order_placed' as todays date and save changes to the database
@@ -777,11 +773,41 @@ def order_recieved(request):
 			recieved.order_status = 'Stocked'
 			today = date.today()
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
-			recieved.location = location_list[i]
 			recieved.save()			
 
+	#provide context of submitted primers for the order_recieved html page 
+	location_list = []
+	for i in range(list_len):
+		location_list.append(Primer.objects.get(pk=primer_list[i]))
+
+	context = {
+		"location_list":location_list
+	} 
+
 	#render the 'submit order' html page from the templates directory 
-	return render(request, 'order_recieved.html')
+	return render(request, 'order_recieved.html', context=context)
+
+
+
+
+
+#for primers submitted as recieved, update the location information
+def location_updated(request):
+
+	#pull lists of submitted primers and locations 
+	primer = request.POST.getlist('primer')
+	location_list = request.POST.getlist('location')
+	list_len = len(request.POST.getlist('location'))
+
+	#update the location info for primers locations were submitted for 
+	for i in range(list_len):
+		update = Primer.objects.get(pk=primer[i])
+		if location_list[i] != "":
+			update.location = location_list[i]
+		update.save()
+
+	#render the 'location_updated' html page from the templates directory
+	return render(request, 'location_updated.html')
 
 
 

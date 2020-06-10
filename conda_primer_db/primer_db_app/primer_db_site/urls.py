@@ -19,6 +19,7 @@ urlpatterns = [
     path('submit_order/', views.submit_order, name='submit_order'),
     path('order_placed/', views.order_placed, name='order_placed'),
     path('order_recieved/', views.order_recieved, name='order_recieved'),
+    path('location_updated/', views.location_updated, name='location_updated'),
     path('in_testing/', views.in_testing, name='in_testing'),
     path('tested/', views.tested, name='tested'),
     path('failed/', views.failed, name='failed'),

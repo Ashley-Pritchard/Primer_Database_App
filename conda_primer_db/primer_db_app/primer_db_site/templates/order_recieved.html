@@ -12,7 +12,46 @@
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
  </div> 
   <h1>Primer Database</h1><br><br><br>
-  <p><strong> Thank you - the status of selected primer(s) have been updated. </strong></p><br>
+  <p>Please update location information:<br><br>
+  {% for p in location_list %}
+    <table class="table" style="table-layout: auto-fit; width: 100%">
+    <form action="{% url 'location_updated' %}" method="POST">
+      <tr>
+        <td>
+          <strong>Amplicon ID</strong>:
+        </td>
+        <td style="word-wrap: break-word">
+          {{ p.amplicon_id.amplicon_name }}
+        </td>
+        <td>
+          <strong>Alt. Name</strong>:
+        </td>
+        <td style="word-wrap: break-word">
+          {{ p.alt_name }}
+        </td>
+        <td> 
+          <strong>Direction</strong>:
+        </td>
+        <td>
+          {{ p.direction }}
+        </td>
+        <td>
+          <strong>Imported By</strong>:
+        </td>
+        <td>
+          {{ p.imported_by_id.imported_by }}
+        </td>
+        <td>
+          <strong>Location</strong>
+        </td>
+        <td>
+        <input type="text" name="location" placeholder="{{ p.location }}">
+        <input type="hidden" id="primer" name="primer" value="{{ p.id }}">
+        </td>
+      </table>
+    {% endfor %}<br><br>
+      <input class=p1 type="submit" value="Submit">
+      </form>
 {% endblock %}
  
 
