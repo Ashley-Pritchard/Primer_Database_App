@@ -656,10 +656,13 @@ def submitted(request):
 		#save changes to the database
 		primer.save()
 
-	#render the submitted html page from the templates directory
-	return render(request, 'submitted.html')
+	if 'quit' in request.POST:
+		#render the submitted html page from the templates directory if they choose to quit
+		return render(request, 'submitted.html')
 
-
+	if 'reload' in request.POST:
+		#render the order.html page from the templates directory if they choose to order more primers
+		return render(request, 'order.html')
 
 
 ## Primers to be Ordered Page ##
