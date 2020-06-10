@@ -32,7 +32,7 @@
           <td>
           </td>
           <td>
-            {% if p.order_status == 'Stocked' or p.order_status == 'Archived' %}
+            {% if p.order_status == 'Stocked' %}
             <input type="checkbox" name="primer" id="primer" value="{{ p.id }}">
             {% endif %}
           </td>

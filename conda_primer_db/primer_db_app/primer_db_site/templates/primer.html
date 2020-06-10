@@ -151,7 +151,7 @@
       </table><br>
       {% endif %}
       <p><strong>Comments: </strong> {{ primer.comments }}</p><br>
-      {% if primer.order_status == 'Stocked' or primer.order_status == 'Archived' %}
+      {% if primer.order_status == 'Stocked' %}
       <p> To <strong>reorder</strong> this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
     <form action="{% url 'reorder_primer' %}" method="POST">  
     Reason for Reordering: <input name="reason_reordered" type="text"><br>
