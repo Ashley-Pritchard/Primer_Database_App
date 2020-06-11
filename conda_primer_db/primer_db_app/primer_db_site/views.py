@@ -701,10 +701,10 @@ def submit_order(request):
 
 		#write the relevant primer information to a csv file 
 		writer = csv.writer(response)
-		writer.writerow(['name', 'sequence', 'location'])
+		writer.writerow(['name', 'sequence', 'location', 'reason_for_order'])
 		for primer in primer_list:
 			export = Primer.objects.get(pk=primer)
-			writer.writerow([export.amplicon_id.amplicon_name, export.sequence, export.location])
+			writer.writerow([export.amplicon_id.amplicon_name, export.sequence, export.location, export.reason_ordered])
 
 		#export the csv file
 		return response
