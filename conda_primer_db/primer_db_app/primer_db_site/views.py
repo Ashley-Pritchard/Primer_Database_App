@@ -843,7 +843,7 @@ def tested(request):
 	#pull the selected primers based on the checkboxes selected on the 'in testing' page
 	primer_list = request.POST.getlist('primer')
 	
-	#if 'validated' clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_order_placed' as todays date and save changes to database
+	#if 'validated' clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_testing_completed' as todays date and save changes to database
 	if 'validated' in request.POST:
 		for primer in primer_list:
 			tested = Primer.objects.get(pk=primer)
@@ -852,7 +852,7 @@ def tested(request):
 			tested.date_testing_completed = today.strftime("%d/%m/%Y")
 			tested.save()		
 
-	#if 'not validated' selected, iterate through the list of primers selected, update the order status to 'failed validation', assign the 'date_order_placed' as todays date and save changes to database 
+	#if 'not validated' selected, iterate through the list of primers selected, update the order status to 'failed validation', assign the 'date_testing_completed' as todays date and save changes to database 
 	if 'not' in request.POST:
 		for primer in primer_list:
 			tested = Primer.objects.get(pk=primer)
@@ -861,7 +861,7 @@ def tested(request):
 			tested.date_testing_completed = today.strftime("%d/%m/%Y")
 			tested.save()			
 
-	#render the 'submit order' html page from the templates directory
+	#render the 'tested' html page from the templates directory
 	return render(request, 'tested.html')
 
 
@@ -893,14 +893,74 @@ def failed(request):
 def remove_failed(request):
 
 	#pull selected primer(s) from the database 
-	remove_list = request.POST.getlist('primer')
+	update_list = request.POST.getlist('primer')
 
-	#iterate through primer list, update order status and save changes to database 
-	for i in remove_list:
-		remove = Primer.objects.get(pk=i)
-		remove.order_status = 'Failed_Validation_Archived'
-		remove.save()
+	#if choose to discard primer
+	if 'discard' in request.POST: 
+		#iterate through primer list, update order status and save changes to database 
+		for i in update_list:
+			update = Primer.objects.get(pk=i)
+			update.order_status = 'Failed_Validation_Archived'
+			update.save()
+
+	#if choose to retest primer 
+	if 'retest' in request.POST:
+		#iterate through primer list, update order status and save changes to database
+		for i in update_list:
+			update = Primer.objects.get(pk=i)
+			update.order_status = "Retesting"
+			update.save()
 
 	#render the remove failed html page from templates directory 
 	return render(request, 'remove_failed.html')
 
+
+
+
+
+##Retesting Page##
+
+
+#takes user cliking on the 'primers in retesting' searchbar link as request and pulls the information of all primers with an order status of 'retesting'
+def retesting(request):
+
+	#pull primers with an order status of retesting
+	testing = Primer.objects.filter(order_status = "Retesting")
+
+	#provide context for the retesting html page 
+	context = {
+		"testing": testing
+	}
+
+	#render the retesting html page from the templates directory 
+	return render(request, 'retesting.html', context=context)
+
+
+
+
+#from the 'retesting' page, allows users to update the status of a primer from retesting to either stocked or failed testing archived - takes user selecting primers and clicking validated or not validated as request:
+def retested(request):
+	
+	#pull the selected primers based on the checkbox selected on the retesting page
+	primer_list = request.POST.getlist('primer')
+
+	#if 'validated' clicked - iterate through the list of primers selected, update the order status to stocked, assign the 'date retesting completed' as todays date and save the changes to the database 
+	if 'validated' in request.POST:
+		for primer in primer_list:
+			tested = Primer.objects.get(pk=primer)
+			tested.order_status = 'Stocked'
+			today = date.today()
+			tested.date_retesting_completed = today.strftime("%d/%m/%Y")
+			tested.save()
+
+	#if 'not validated' clicked - iterate through the list of primers selected, update the order status to 'failed validation archived', assign the 'date retesting completed' as todays date and save to database 
+	if 'not validated' in request.POST:
+		for primer in primer_list:
+			tested = Primer.objects.get(pk=primer)
+			tested.order_status = 'Failed_Validation_Archived'
+			today = date.today()
+			tested.date_retesting_completed = today.strftime("%d/%m/%Y")
+			tested.save()
+
+	#render the  'tested' html page from the templates directory 
+	return render(request, 'tested.html')

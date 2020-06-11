@@ -23,5 +23,7 @@ urlpatterns = [
     path('in_testing/', views.in_testing, name='in_testing'),
     path('tested/', views.tested, name='tested'),
     path('failed/', views.failed, name='failed'),
-    path('remove_failed/', views.remove_failed, name='remove_failed')
+    path('remove_failed/', views.remove_failed, name='remove_failed'),
+    path('retesting/', views.retesting, name='retesting'),
+    path('retested/', views.retested, name='retested')
 ]

@@ -68,6 +68,6 @@ class Primer(models.Model):
 	date_order_placed = models.CharField(max_length=20, null=True, blank=True)
 	date_order_recieved = models.CharField(max_length=20, null=True, blank=True)
 	date_testing_completed = models.CharField(max_length=20, null=True, blank=True)
-
-
-
+	date_retesting_completed = models.CharField(max_length=20, null=True, blank=True)
+	choice_3 = [("Repeat order", "Repeat order"), ("New gene / version", "New gene / version"), ("NGS confirmation", "NGS confirmation"), ("Scientist R&D", "Scientist - R&D"), ("Other", "Other"), ("None", "None")]
+	reason_for_order = models.CharField(max_length=100, default='None', choices=choice_3)

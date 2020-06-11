@@ -10,6 +10,7 @@
    <a class="active" href="{% url 'order_placed' %}">Primers on Order</a>
    <a class="active" href="{% url 'in_testing' %}">Primers in Testing</a>
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
+   <a class="active" href="{% url 'retesting' %}">Primers in Retesting</a>
  </div> 
   <h1>Primer Database: Failed Validation</h1>
   <p> Primer information for primers that have failed validation:<br><br><br><br>
@@ -58,7 +59,8 @@
           <input type="checkbox" name="primer" id="primer" value="{{ t.id }}">
     </table>
   {% endfor %}<br><br> 
-  <input class="p1" type="submit" value="Remove">   
+  <input class="p1" type="submit" name="discard" value="Discard">   
+  <input class="p1" type="submit" name="retest" value="Retest">
   </form>
 {% endblock %}
 

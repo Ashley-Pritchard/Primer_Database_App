@@ -1,0 +1,67 @@
+<! html page to display the primers that have been ordered !>
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Search Primers</a>
+   <a class="active" href="{% url 'order' %}">Order Primer</a>
+   <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
+   <a class="active" href="{% url 'order_placed' %}">Primers on Order</a>
+   <a class="active" href="{% url 'in_testing' %}">Primers in Testing</a>
+   <a class="active" href="{% url 'failed' %}">Failed Validation</a>
+   <a class="active" href="{% url 'retesting' %}">Primers in Retesting</a>
+ </div> 
+  <h1>Primer Database: Primers in Retesting</h1>
+  <p> Primer information for primers in retesting:<br><br><br><br>
+  {% for t in testing %}
+    <table class="table" style="table-layout: auto-fit; width: 100%; cellspacing: 20px">
+    <form action="{% url 'retested' %}" method="POST">
+      <tr>
+        <td>
+          <strong>Amplicon ID</strong>:
+        </td>
+        <td style="word-wrap: break-word">
+          {{ t.amplicon_id.amplicon_name }}
+        </td>
+        <td>
+          <strong>Sequence</strong>:
+        </td>
+        <td style="word-wrap: break-word">
+          {{ t.sequence }}
+        </td>
+        <td>
+          <strong>Direction:</strong>
+        </td>
+        <td>
+          {{ t.direction }}
+        </td>
+        <td>
+          <strong>Imported By</strong>:
+        </td>
+        <td>
+          {{ t.imported_by_id.imported_by }}
+        </td>
+        <td>
+          <strong>Location</strong>:
+        </td>
+        <td>
+          {{ t.location }}
+        </td>
+        <td>
+          <strong>Comments</strong>:
+        </td>
+        <td>
+          {{ t.comments }}
+        </td>
+        <td>
+          <input type="checkbox" name="primer" id="primer" value="{{ t.id }}">
+        </td>
+    </table>
+  {% endfor %}<br><br>   
+      <input class="p1" type="submit" name="validated" value="Validated">
+      <input class="p1" type="submit" name="not" value="Not Validated">
+    </form>  
+{% endblock %}
+
+
