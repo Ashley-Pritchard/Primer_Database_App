@@ -155,14 +155,22 @@
       {% if primer.order_status == 'Stocked' %}
       <p> To <strong>reorder</strong> this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
     <form action="{% url 'reorder_primer' %}" method="POST">  
-    Reason for Reordering: <input name="reason_reordered" type="text"><br>
+    Reason for Reorder: 
+    <select name="reason_reordered" type="text" required=True>
+      <option value="">---</option>
+      <option value="Repeat order">Repeat order</option>
+      <option value="New gene / version">New gene / version</option>
+      <option value="NGS confirmation">NGS confirmation</option>
+      <option value="Scientist - R&D">Scientist - R&D</option>
+      <option value="Other">Other</option></select>&nbsp;&nbsp;&nbsp;&nbsp;
+    Reordered By:
     <select name="imp_by" type="text" required=True>
       <option value="">---</option>
       {% for i in imp_by %}
         {% if i.status == "current" %}
           <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
         {% endif %}
-      {% endfor %}</select>
+      {% endfor %}</select>&nbsp;&nbsp;&nbsp;&nbsp;
     <button name="primer" value="{{ primer.id }}">Reorder Primer</button>
     </form><br>
      {% endif %}

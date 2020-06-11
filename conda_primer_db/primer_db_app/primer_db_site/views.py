@@ -309,7 +309,7 @@ def reorder_primer(request):
 		primer.order_status = "Ordered"
 
 		#add reason reordered input by user to the primer record 
-		primer.reason_reordered = request.POST.get('reason_reordered')
+		primer.reason_ordered = request.POST.get('reason_reordered')
 
 		#update the database 
 		primer.save()
@@ -593,6 +593,7 @@ def submitted(request):
 	alt_name = request.POST.getlist('alt_name')
 	version = request.POST.getlist('version')
 	comments = request.POST.getlist('comments')
+	reason = request.POST.getlist('reason')
 
 	#loop through the number or primers submitted 
 	for i in range(num_primers):
@@ -615,6 +616,7 @@ def submitted(request):
 		primer.modification = modification[i]
 		primer.alt_name = alt_name[i]
 		primer.comments = comments[i]
+		primer.reason_ordered = reason[i]
 
 		#if genomic start or end location and ngs number is blank, assign 'None', otherwise assign user input
 		if start[i] != "":
