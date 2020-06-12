@@ -45,6 +45,7 @@ class Amplicon(models.Model):
 	primer_set_id = models.ForeignKey(Primer_Set, on_delete = models.SET_NULL, null=True, blank=True)
 
 class Primer(models.Model):
+	name = models.TextField(max_length=150, default="Unnamed")
 	sequence = models.TextField(max_length=150)
 	genomic_location_start = models.IntegerField(null=True, blank=True)
 	genomic_location_end = models.IntegerField(null=True, blank=True)

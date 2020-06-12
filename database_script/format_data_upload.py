@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import csv
 import sys
+import re
 
 #convert the current excel sheet used for primer storage into a pandas dataframe for downstream reference. 
 df = pd.read_csv('primer_database.csv')
@@ -106,17 +107,17 @@ def imported_by():
 	name = []
 	status = []
 	for index, row in df_i.iterrows():
-		if 'ARIELE' in row[0]:
+		if 'ARIELE' in row[0] or row[0] == 'AR':
 			name.append('Ariele Rosseto')
-		elif 'BENITO' in row[0]:
+		elif 'BENITO' in row[0] or row[0] == 'BB':
 			name.append('Benito Banos-Pinero')
-		elif 'CNS' in row[0]:
+		elif 'CNS' in row[0] or row[0] == 'CS':
 			name.append('Caroline Sarton')
 		elif 'CAROLINE' in row[0]:
 			name.append('Caroline Sarton')
 		elif 'CARL' in row[0]:
 			name.append('Carl Fratter')
-		elif 'CLAIRE HODGKISS' in row[0]:
+		elif 'CLAIRE HODGKISS' in row[0] or 'CLHS' in row[0]:
 			name.append('Claire Hodgkiss')
 		elif 'CONRAD' in row[0]:
 			name.append('Conrad Smith')
@@ -124,19 +125,19 @@ def imported_by():
 			name.apend('Elizabeth Wood')
 		elif 'ELIZABETH' in row[0]:
 			name.append('Elizabeth Wood')
-		elif 'EMILY' in row[0]:
+		elif 'EMILY' in row[0] or row[0] == 'EP' or row[0] == 'EP ':
 			name.append('Emily Packham')
-		elif 'HANNAH BOON' in row[0]:
+		elif 'HANNAH BOON' in row[0] or row[0] == 'HB':
 			name.append('Hannah Boon')
 		elif 'MATTEN' in row[0]:
 			name.append('Hannah Matten')
 		elif 'HELEN LORD' in row[0]:
 			name.append('Helen Lord')
-		elif 'JESS GABRIEL' in row[0]:
+		elif 'JESS GABRIEL' in row[0] or row[0] == 'JG':
 			name.append('Jess Gabriel')
 		elif 'JESSICA WOODLEY' in row[0]:
 			name.append('Jessica Woodley')
-		elif 'TAYLOR' in row[0]:
+		elif 'TAYLOR' in row[0] or 'JMT' in row[0]:
 			name.append('John Taylor')
 		elif 'JULIE' in row[0]:
 			name.append('Julie')
@@ -144,13 +145,13 @@ def imported_by():
 			name.append('Michael Bowman')
 		elif 'BOWMAN' in row[0]:
 			name.append('Michael Bowman')
-		elif 'OLDRIDGE' in row[0]:
+		elif 'OLDRIDGE' in row[0] or row[0] == 'MO':
 			name.append('Michael Oldridge')
-		elif 'WARE' in row[0]:
+		elif 'WARE' in row[0] or row[0] == 'PW' or row[0] == 'PW ':
 			name.append('Pauline Ware')
 		elif 'SARAH REID' in row[0]:
 			name.append('Sarah Reid')
-		elif 'BEDENHAM' in row[0]:
+		elif 'BEDENHAM' in row[0] or row[0] == 'TB':
 			name.append('Tina Bedenham')
 		elif 'LESTER' in row[0]:
 			name.append('Tracy Lester')
@@ -158,6 +159,22 @@ def imported_by():
 			name.append('Treena Cranston')
 		elif 'LOUISE' in row[0]:
 			name.append('Louise Williams')
+		elif row[0] == 'EPP':
+			name.append('Evgenia Petrides')
+		elif row[0] == 'JPW':
+			name.append('Jonathan Williams')
+		elif row[0] == 'KS':
+			name.append('Kate Sergeant')
+		elif 'JAW' in row[0]:
+			name.append('Jennifer Whitfield')
+		elif row[0] == 'JH':
+			name.append('Jesse Hayesmoore')
+		elif row[0] == 'HDS':
+			name.append('Helen Sage')
+		elif row[0] == 'TEL':
+			name.append('Teresa Lamb')
+		elif 'ALJ' in row[0] or 'AJL' in row[0]:
+			name.append('Anjali Llyod-Jani')
 		else:
 			name.append(row[0])
 	df_i['imported_by'] = name	
@@ -165,7 +182,7 @@ def imported_by():
 	#add the status of the lab members 
 	status = []
 	for index, row in df_i.iterrows():
-		if row[0] == 'Ariele Rosseto' or 'Elizabeth Wood' or 'Emily Packham' or 'Hannah Matten' or 'Jessica Woodley' or 'Julie' or 'Pauline Ware' or 'Sarah Reid':
+		if row[0] == 'Ariele Rosseto' or row[0] == 'Elizabeth Wood' or row[0] == 'Emily Packham' or row[0] == 'Jessica Woodley' or row[0] == 'Julie' or row[0] == 'Sarah Reid' or row[0] == 'SC' or row[0] == 'MS' or row[0] == 'Jonathan Williams' or row[0] == 'DU' or row[0] == 'AF' or row[0] == 'EW' or row[0]== 'BDD' or row[0] == 'LW' or row[0] == 'BM'or row[0] == 'SR' or row[0] == 'BDD ' or row[0] == 'JW' or row[0] == 'WITOLD':
 			status.append('ex')
 		else:
 			status.append('current')
@@ -305,18 +322,19 @@ def primer():
 
 	#replace all names in the imported_by field with appropriate full name from the lab telephone directory
 	name = []
+	status = []
 	for index, row in df_p3.iterrows():
-		if 'ARIELE' in row[5]:
+		if 'ARIELE' in row[5] or row[5] == 'AR':
 			name.append('Ariele Rosseto')
-		elif 'BENITO' in row[5]:
+		elif 'BENITO' in row[5] or row[5] == 'BB':
 			name.append('Benito Banos-Pinero')
-		elif 'CNS' in row[5]:
+		elif 'CNS' in row[5] or row[5] == 'CS':
 			name.append('Caroline Sarton')
 		elif 'CAROLINE' in row[5]:
 			name.append('Caroline Sarton')
 		elif 'CARL' in row[5]:
 			name.append('Carl Fratter')
-		elif 'CLAIRE HODGKISS' in row[5]:
+		elif 'CLAIRE HODGKISS' in row[5] or 'CLHS' in row[5]:
 			name.append('Claire Hodgkiss')
 		elif 'CONRAD' in row[5]:
 			name.append('Conrad Smith')
@@ -324,19 +342,19 @@ def primer():
 			name.apend('Elizabeth Wood')
 		elif 'ELIZABETH' in row[5]:
 			name.append('Elizabeth Wood')
-		elif 'EMILY' in row[5]:
+		elif 'EMILY' in row[5] or row[5] == 'EP' or row[5] == 'EP ':
 			name.append('Emily Packham')
-		elif 'HANNAH BOON' in row[5]:
+		elif 'HANNAH BOON' in row[5] or row[5] == 'HB':
 			name.append('Hannah Boon')
 		elif 'MATTEN' in row[5]:
 			name.append('Hannah Matten')
 		elif 'HELEN LORD' in row[5]:
 			name.append('Helen Lord')
-		elif 'JESS GABRIEL' in row[5]:
+		elif 'JESS GABRIEL' in row[5] or row[5] == 'JG':
 			name.append('Jess Gabriel')
 		elif 'JESSICA WOODLEY' in row[5]:
 			name.append('Jessica Woodley')
-		elif 'TAYLOR' in row[5]:
+		elif 'TAYLOR' in row[5] or 'JMT' in row[5]:
 			name.append('John Taylor')
 		elif 'JULIE' in row[5]:
 			name.append('Julie')
@@ -344,23 +362,39 @@ def primer():
 			name.append('Michael Bowman')
 		elif 'BOWMAN' in row[5]:
 			name.append('Michael Bowman')
-		elif 'OLDRIDGE' in row[5]:
+		elif 'OLDRIDGE' in row[5] or row[5] == 'MO':
 			name.append('Michael Oldridge')
-		elif 'WARE' in row[5]:
+		elif 'WARE' in row[5] or row[5] == 'PW' or row[5] == 'PW ':
 			name.append('Pauline Ware')
 		elif 'SARAH REID' in row[5]:
 			name.append('Sarah Reid')
-		elif 'BEDENHAM' in row[5]:
+		elif 'BEDENHAM' in row[5] or row[5] == 'TB':
 			name.append('Tina Bedenham')
 		elif 'LESTER' in row[5]:
 			name.append('Tracy Lester')
 		elif 'TREENA' in row[5]:
-			name.append('Trenna Cranston')
+			name.append('Treena Cranston')
 		elif 'LOUISE' in row[5]:
 			name.append('Louise Williams')
+		elif row[5] == 'EPP':
+			name.append('Evgenia Petrides')
+		elif row[5] == 'JPW':
+			name.append('Jonathan Williams')
+		elif row[5] == 'KS':
+			name.append('Kate Sergeant')
+		elif 'JAW' in row[5]:
+			name.append('Jennifer Whitfield')
+		elif row[5] == 'JH':
+			name.append('Jesse Hayesmoore')
+		elif row[5] == 'HDS':
+			name.append('Helen Sage')
+		elif row[5] == 'TEL':
+			name.append('Teresa Lamb')
+		elif 'ALJ' in row[5] or 'AJL' in row[5]:
+			name.append('Anjali Llyod-Jani')
 		else:
 			name.append(row[5])
-	df_p3['imported_by'] = name
+	df_p3['imported_by'] = name	
 
 	#create a dictionary to pull the appropriate imported_by_id for each record from the imported_by.csv file. Store these as a new column
 	imported_by_dict = dict(zip(df5.imported_by, df5.imported_by_id))
@@ -376,7 +410,7 @@ def primer():
 	df_p3['ngs_audit_number'] = ngs_audit_number	
 
 	#drop irrelevant columns
-	df_p3 = df_p3.drop(columns = ['amplicon_name', 'imported_by', 'Fragment', 'Set'])
+	df_p3 = df_p3.drop(columns = ['imported_by', 'Fragment', 'Set'])
 
 	#standardise the date format by replacing . and - with /
 	df_p3['date_imported'] = df_p3['date_imported'].replace(to_replace = '\.', value = '/', regex=True)
@@ -384,14 +418,14 @@ def primer():
 
 	#convert sequence to uppercase
 	df_p3['sequence'] = df_p3['sequence'].str.upper()
-
+	
 	#add M13 tag to front of appropriate sequences 
 	new_sequence = []
 	for index, row in df_p3.iterrows():
 		if 'M13' in str(row[2]) and 'R' in str(row[7]):
-			new_sequence.append('CAGGAAACAGCTATGAC' + str(row[0]))
+			new_sequence.append('CAGGAAACAGCTATGAC' + str(row[0])) 
 		elif 'M13' in str(row[2]) and 'F' in str(row[7]):
-			new_sequence.append('GTAAAACGACGGCCAGT' + str(row[0]))
+			new_sequence.append('GTAAAACGACGGCCAGT' + str(row[0])) 
 		else:
 			new_sequence.append(str(row[0]))
 
@@ -412,9 +446,27 @@ def primer():
 	#strip the v from the version number to store as int
 	df_p3['version'] = df_p3['version'].str.strip('v')
 
+	#create a primer name for each record 
+	primer_name = []
+	for index, row in df_p3.iterrows():
+		primer_name.append(str(row[3]) + '_' + str(row[8]) + '___v' + str(row[12]))
+	df_p3['name'] = primer_name
+
+	#drop irrelevant columns
+	df_p3 = df_p3.drop(columns = ['amplicon_name'])
+
 	#replace null values in genomic start and end locations with 0 values to prevent errors with database
 	df_p3['genomic_location_start'] = df_p3['genomic_location_start'].replace(np.nan, 0)
 	df_p3['genomic_location_end'] = df_p3['genomic_location_end'].replace(np.nan, 0)
+
+	#add m13 modification column 
+	m13 = []
+	for index, row in df_p3.iterrows():
+		if 'M13' in str(row[2]):
+			m13.append('M13')
+		else:
+			m13.append('None')
+	df_p3['modification'] = m13
 	
 	#create a primer id for each unique record
 	df_p3['primer_id'] = df_p3.groupby(['sequence', 'location', 'direction', 'amplicon_id']).ngroup()

@@ -224,7 +224,7 @@ def primer(request):
 
 	#pull information for the primer selected by the user from the database 
 	primer_input = request.GET.get('selected_primer', None)
-	primer = Primer.objects.get(id=primer_input)
+	primer = Primer.objects.get(name=primer_input)
 
 	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu 
 	imp_by = Imported_By.objects.all()
