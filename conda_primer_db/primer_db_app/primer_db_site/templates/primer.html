@@ -12,13 +12,16 @@
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
    <a class="active" href="{% url 'retesting' %}">Primers in Retesting</a>
  </div> 
-  <h1>Primer Database: {{ primer }}</h1><br><br>  
+  <h1>Primer Database: {{ primer.0.name }}</h1><br><br>
+  <p>The following page provides the record of primer {{ primer.0.name }}. To reorder or archive this primer, <strong>select the box</strong> next to the current primer record and use the 'reorder' or 'archive' options at the bottom of the page.</p><br><br>
+  {% for p in primer %}  
   <table class="table2" style="table-layout: fixed; width: 100%">
+  <form action="{% url 'reorder_archive_primer' %}" method="POST">
         <tr>
           <td>
               <strong>Order Status:</strong>
             <td>
-              {{ primer.order_status }}
+              {{ p.order_status }}
             </td>
             <td>
             </td>
@@ -27,101 +30,104 @@
             <td>
             </td>
             <td>
+            {% if p.order_status == 'Stocked' %}
+            <input type="checkbox" name="primer" id="primer" value="{{ p.id }}">
+            {% endif %}
             </td>
           <tr>
             <td>
             <strong>Analysis</strong>:
           </td>
           <td>
-            {{ primer.amplicon_id.analysis_type_id.analysis_type }}
+            {{ p.amplicon_id.analysis_type_id.analysis_type }}
           </td>
           <td>
             <strong>Gene</strong>:
           </td>
           <td>
-            {{ primer.amplicon_id.gene_id.gene_name }}
+            {{ p.amplicon_id.gene_id.gene_name }}
           </td>
           <td>
             <strong>Chromosome</strong>:
           </td>
           <td>
-            {{ primer.amplicon_id.gene_id.chromosome }}
+            {{ p.amplicon_id.gene_id.chromosome }}
           </td>
         <tr>
           <td>
             <strong>Exon</strong>:
           </td>
           <td>
-            {{ primer.amplicon_id.exon }}
+            {{ p.amplicon_id.exon }}
           </td>
           <td>
             <strong>Direction</strong>:
           </td>
           <td>
-            {{ primer.direction }}
+            {{ p.direction }}
           </td>
           <td>
             <strong>Genomic Start</strong>:
           </td>
           <td>
-            {{ primer.genomic_location_start }}
+            {{ p.genomic_location_start }}
           </td>
         <tr>
           <td>
             <strong>Genomic End</strong>:
           </td>
           <td>
-            {{ primer.genomic_location_end }}
+            {{ p.genomic_location_end }}
           </td>
           <td>
             <strong>Sequence</strong>:
           </td>
           <td style="word-wrap: break-word">
-            {{ primer.sequence }}
+            {{ p.sequence }}
           </td>
           <td>
             <strong>Location</strong>:
           </td>
           <td>
-            {{ primer.location }}
+            {{ p.location }}
           </td>
         <tr>
           <td>
             <strong>Set</strong>:
           </td>
           <td>
-            {{ primer.amplicon_id.primer_set_id.primer_set }}
+            {{ p.amplicon_id.primer_set_id.primer_set }}
           </td>
           <td>
             <strong>NGS Audit Number</strong>:
           </td>
           <td>
-            {{ primer.ngs_audit_number }}
+            {{ p.ngs_audit_number }}
           </td>
           <td>
             <strong>Imported By</strong>:
           </td>
           <td>
-            {{ primer.imported_by_id.imported_by }}
+            {{ p.imported_by_id.imported_by }}
           </td>
         <tr>
           <td>
             <strong>Date Imported</strong>:
           </td>
           <td>
-            {{ primer.date_imported }}
+            {{ p.date_imported }}
           </td>
           <td>
             <strong>Amplicon Name</strong>:
           </td>
           <td>
-            {{ primer.amplicon_id.amplicon_name }}
+            {{ p.amplicon_id.amplicon_name }}
           </td>
           <td>
             <strong>Alternative Name</strong>:
           </td>
           <td>
-            {{ primer.alt_name }}
+            {{ p.alt_name }}
           </td>
         </tr>
         <tr>
@@ -129,65 +135,56 @@
             <strong>Version:</strong>
           </td>
           <td>
-            {{ primer.version }}
+            {{ p.version }}
           </td>
-          {% if primer.order_status == "Archived" %}
+          {% if p.order_status == "Archived" %}
           <td>
           <strong>Archived By:</strong>
           </td>
           <td>
-          {{ primer.archived_by_id.imported_by }}
+          {{ p.archived_by_id.imported_by }}
           </td>
           <td>
           <strong>Date Archived:</strong>
           </td>
           <td>
-          {{ primer.date_archived }}
+          {{ p.date_archived }}
           </td>
         </tr>
       </table><br>
-      <p><strong>Reason Archived: </strong> {{ primer.reason_archived }}</p><br>
+      <p><strong>Reason Archived: </strong> {{ p.reason_archived }}</p><br>
       {% else %}
         </tr>
       </table><br>
       {% endif %}
-      <p><strong>Comments: </strong> {{ primer.comments }}</p><br>
-      {% if primer.order_status == 'Stocked' %}
-      <p> To <strong>reorder</strong> this primer, please use the drop-down menu to select your initials and then click the 'Reorder Primer' button</p><br>
-    <form action="{% url 'reorder_primer' %}" method="POST">  
+      <p><strong>Comments: </strong> {{ p.comments }}</p><br>{% endfor %}
+      {% for p in primer %}
+      {% if p.order_status == 'Stocked' %}
+      <p> To <strong>reorder</strong> or <strong>archive</strong> this primer, please use the drop-down menu to select your name:
+    <select name="imp_by" type="text" required=True>
+      <option value"">---</option>
+      {% for i in imp_by %}
+        {% if i.status == "current" %}
+          <option value="{{ i.imported_by }}">{{ i.imported_by }}</option>
+        {% endif %}
+      {% endfor %}</select><br>
+    <p> To <strong>reorder</strong> this primer, select reason from drop down and click 'Reorder Primer':<br>
     Reason for Reorder: 
-    <select name="reason_reordered" type="text" required=True>
+    <select name="reason_reordered" type="text">
       <option value="">---</option>
       <option value="Repeat order">Repeat order</option>
       <option value="New gene / version">New gene / version</option>
       <option value="NGS confirmation">NGS confirmation</option>
       <option value="Scientist - R&D">Scientist - R&D</option>
       <option value="Other">Other</option></select>&nbsp;&nbsp;&nbsp;&nbsp;
-    Reordered By:
-    <select name="imp_by" type="text" required=True>
-      <option value="">---</option>
-      {% for i in imp_by %}
-        {% if i.status == "current" %}
-          <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
-        {% endif %}
-      {% endfor %}</select>&nbsp;&nbsp;&nbsp;&nbsp;
-    <button name="primer" value="{{ primer.id }}">Reorder Primer</button>
-    </form><br>
+    <input class="p1" type="submit" name="reorder" value="Reorder Primer">
      {% endif %}
-    {% if primer.order_status == 'Stocked' %}
-    <p> To <strong>archive</strong> this primer, please add a reason for archiving and then use the drop-down menu to select your initials before clicking the 'archive primer' button</p><br>
-    <form action="{% url 'archive_primer' %}" method="POST">  
+   {% if p.order_status == 'Stocked' %}
+    <p> To <strong>archive</strong> this primer, please add a reason for archiving and then click 'Archive Primer':</p><br>
     Reason for Archiving: <input name="reason_archived" type="text"><br>
-    <select name="arc_by" type="text" required=True>
-      <option value="">---</option>
-      {% for i in imp_by %}
-        {% if i.status == "current" %}
-          <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
-        {% endif %}
-      {% endfor %}</select>
-    <button name="archive" value="{{ primer.id }}">Archive Primer</button>
+    <input class="p1" type="submit" name="archive" value="Archive Primer(s)">
     </form>
-    {% endif %}
+    {% endif %}{% endfor %}
 {% endblock %}
 
 

@@ -224,7 +224,7 @@ def primer(request):
 
 	#pull information for the primer selected by the user from the database 
 	primer_input = request.GET.get('selected_primer', None)
-	primer = Primer.objects.get(name=primer_input)
+	primer = Primer.objects.filter(name=primer_input)
 
 	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu 
 	imp_by = Imported_By.objects.all()
@@ -269,92 +269,91 @@ def amplicon(request):
 
 
 
-#from both the primer and amplicon search result pages, the user can reorder a primer - function takes input of the user clicking 'reorder primer' as request. 
-def reorder_primer(request):
+#from both the primer and amplicon search result pages, the user can reorder a primer - function takes input of the user clicking 'reorder primer' as request. Users can also archive a primer from the primer search result page - function takes input of the user clicking 'archive primer' as request. 
+def reorder_archive_primer(request):
 
-	#user can select single primer to reorder from primer page or one or more primers from the amplicon page - pull specific primer(s) from the database 
-	reorder_list = request.POST.getlist('primer')
+	#if user selects 'reorder primer'
+	if 'reorder' in request.POST:
 
-	#loop through list of primers 
-	for i in reorder_list:
-		reorder = Primer.objects.get(pk=i)
+		#user can select single primer to reorder from primer page or one or more primers from the amplicon page - pull specific primer(s) from the database 
+		reorder_list = request.POST.getlist('primer')
 
-		#make changes to the primer table of the database 
-		primer = Primer()
+		#loop through list of primers 
+		for i in reorder_list:
+			reorder = Primer.objects.get(pk=i)
 
-		#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder 
-		primer.sequence = reorder.sequence
-		primer.genomic_location_start = reorder.genomic_location_start
-		primer.genomic_location_end = reorder.genomic_location_end
-		primer.direction = reorder.direction
-		primer.modification = reorder.modification
-		primer.alt_name = reorder.alt_name
-		primer.ngs_audit_number = reorder.ngs_audit_number
-		primer.version = reorder.version
-		primer.amplicon_id = reorder.amplicon_id
-		primer.comments = reorder.comments
-		primer.location = reorder.location
+			#make changes to the primer table of the database 
+			primer = Primer()
 
-		#assingn the 'imported_by' input selected by user to new primer record 
-		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-		for f in find_imp:
-			primer.imported_by_id = f
+			#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder 
+			primer.name = reorder.name
+			primer.sequence = reorder.sequence
+			primer.genomic_location_start = reorder.genomic_location_start
+			primer.genomic_location_end = reorder.genomic_location_end
+			primer.direction = reorder.direction
+			primer.modification = reorder.modification
+			primer.alt_name = reorder.alt_name
+			primer.ngs_audit_number = reorder.ngs_audit_number
+			primer.version = reorder.version
+			primer.amplicon_id = reorder.amplicon_id
+			primer.comments = reorder.comments
+			primer.location = reorder.location
 
-		#assign the 'date imported' to the new primer record as todays date 
-		today = date.today()
-		primer.date_imported = today.strftime("%d/%m/%Y")
-		primer.date_order_placed = today.strftime("%d/%m/%Y")
+			#assingn the 'imported_by' input selected by user to new primer record 
+			find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+			for f in find_imp:
+				primer.imported_by_id = f
 
-		#assign the order status of the new primer record to 'ordered'
-		primer.order_status = "Ordered"
+			#assign the 'date imported' to the new primer record as todays date 
+			today = date.today()
+			primer.date_imported = today.strftime("%d/%m/%Y")
+			primer.date_order_placed = today.strftime("%d/%m/%Y")
 
-		#add reason reordered input by user to the primer record 
-		primer.reason_ordered = request.POST.get('reason_reordered')
+			#assign the order status of the new primer record to 'ordered'
+			primer.order_status = "Ordered"
 
-		#update the database 
-		primer.save()
+			#add reason reordered input by user to the primer record 
+			primer.reason_ordered = request.POST.get('reason_reordered')
+
+			#update the database 
+			primer.save()
 	
-	#render the 'submitted reorder primer' html page from the templates directory 
-	return render(request, 'submitted_reorder_primer.html')
+		#render the 'submitted reorder primer' html page from the templates directory 
+		return render(request, 'submitted_reorder_primer.html')
 
+	#if user selects 'archive primer'
+	if 'archive' in request.POST:
 
+		#user can select primer(s) to archive from primer page - pull specific primer(s) from the database
+		archive_list = request.POST.getlist('primer')
 
+		#loop through primers 
+		for i in archive_list:
+			archive = Primer.objects.get(pk=i)
 
+			#ammend the order status of the primer to archived 
+			archive.order_status = 'Archived'
 
-#from the primer search results page, users can archive primers - function takes input of user clicking 'archive primer' as request 
-def archive_primer(request):
+			#ammend the lab location to ""
+			archive.location = ""
 
-	#pull the primer for archiving 
-	archive = Primer.objects.get(pk=request.POST.get('archive'))
+			#assign the 'archived by' input selected by user to the primer record 
+			find_arc = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+			for f in find_arc:
+				archive.archived_by_id = f
 
-	#ammend the order status of the primer to archived 
-	archive.order_status = 'Archived'
+			#assign the 'date archived' to the primer record as todays date 
+			today = date.today()
+			archive.date_archived = today.strftime("%d/%m/%Y")
 
-	#ammend the lab location to ""
-	archive.location = ""
+			#add reason archived input by user to the primer record 
+			archive.reason_archived = request.POST.get('reason_archived')
 
-	#assign the 'archived by' input selected by user to the primer record 
-	find_arc = Imported_By.objects.filter(imported_by=request.POST.get('arc_by'))
-	for f in find_arc:
-		archive.archived_by = f
-
-	#assign the 'date archived' to the primer record as todays date 
-	today = date.today()
-	archive.date_archived = today.strftime("%d/%m/%Y")
-
-	#add reason archived input by user to the primer record 
-	archive.reason_archived = request.POST.get('reason_archived')
-
-	#update the database 
-	archive.save()
-	
-	#provide context for the archive primer html page 
-	context = {
-		'archive':archive
-	}
-	
-	#render the archive primer html page from the templates directory
-	return render(request, 'archive_primer.html', context=context)
+			#update the database 
+			archive.save()
+		
+		#render the archive primer html page from the templates directory
+		return render(request, 'archive_primer.html')
 
 
 
@@ -440,6 +439,9 @@ def submitted_to_amplicon(request):
 	amp = Amplicon.objects.filter(pk=request.POST.get('amplicon'))
 	for a in amp:
 		primer.amplicon_id = a
+	
+	#create primer name from component parts
+	primer.name = primer.amplicon_id.amplicon_name + '_' + primer.direction + '_' + primer.modification + '__v' + primer.version
 
 	#database updated with new primer record 
 	primer.save()
@@ -525,27 +527,27 @@ def submit_new_amplicon(request):
 
 	#create amplicon name using field input 
 	if request.POST.get('analysis_type') == 'Sanger':
-		amplicon.amplicon_name = request.POST.get('set') + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = request.POST.get('set') + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'NGS':
-		amplicon.amplicon_name = request.POST.get('set') + '_' + 'NGS' + '_' + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = request.POST.get('set') + '_' + 'NGS' + '_' + '_' + '_' + '_'
 	elif request.POST.get('analysis_type') == 'Light Scanner':
-		amplicon.amplicon_name = 'LS' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'LS' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'MLPA':
-		amplicon.amplicon_name = 'ML' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'ML' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'Fluorescent':
-		amplicon.amplicon_name = 'GM' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'GM' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'Long Range':
-		amplicon.amplicon_name = 'LR' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'LR' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'RT-PCR':
-		amplicon.amplicon_name = 'RT' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'RT' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'Taqman':
-		amplicon.amplicon_name = 'TQ' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'TQ' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'Pyrosequencing':
-		amplicon.amplicon_name = 'P' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'P' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'ARMS: Mutant':
-		amplicon.amplicon_name = 'ARMS_M' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'ARMS_M' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'ARMS: Normal':
-		amplicon.amplicon_name = 'ARMS_N' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon') + '_' + '_' + '_' + request.POST.get('direction') + '_' + '_' + '_' + request.POST.get('version')
+		amplicon.amplicon_name = 'ARMS_N' + '_' + request.POST.get('gene') + '_' + request.POST.get('exon')
 
 
 	#set exon based on form submission
@@ -655,6 +657,9 @@ def submitted(request):
 		#assign the amplicon id to the most recent object, as uploaded from function 2 (submit_new_amplicon)
 		primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
 
+		#create primer name from component parts 
+		primer.name = primer.amplicon_id.amplicon_name + '_' + primer.direction + '_' + primer.modification + '__v' + primer.version
+
 		#save changes to the database
 		primer.save()
 
@@ -704,7 +709,7 @@ def submit_order(request):
 		writer.writerow(['name', 'sequence', 'location', 'reason_for_order'])
 		for primer in primer_list:
 			export = Primer.objects.get(pk=primer)
-			writer.writerow([export.amplicon_id.amplicon_name, export.sequence, export.location, export.reason_ordered])
+			writer.writerow([export.name, export.sequence, export.location, export.reason_ordered])
 
 		#export the csv file
 		return response

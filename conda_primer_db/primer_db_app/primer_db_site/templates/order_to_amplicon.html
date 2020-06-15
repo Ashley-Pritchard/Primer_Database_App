@@ -10,7 +10,7 @@
    <a class="active" href="{% url 'order_placed' %}">Primers on Order</a>
    <a class="active" href="{% url 'in_testing' %}">Primers in Testing</a>
    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
-   <a class="active" href="{% url 'retesting' %}>Primers in Retesting</a>
+   <a class="active" href="{% url 'retesting' %}">Primers in Retesting</a>
  </div> 
   <h1>Primer Database</h1>
   <p> Fill in the form below to order a primer for amplicon {% for p in pulled %}{{ p.amplicon_name }}{% endfor %}. Required fields are marked with *. </p>
@@ -110,6 +110,3 @@
   <button name="amplicon" value="{% for p in pulled %}{{ p.id }}{% endfor %}">Submit</button>       
   </form>
 {% endblock %}
- 
-
-
