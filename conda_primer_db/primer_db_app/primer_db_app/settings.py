@@ -30,7 +30,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1','localhost']
 
-SITE_URL =
+SITE_URL =""
 
 # Application definition
 INSTALLED_APPS = [
