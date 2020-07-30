@@ -27,7 +27,6 @@ with open('/srv/Primer_DB_Key/secret_key.txt') as f:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-
 ALLOWED_HOSTS = ['127.0.0.1','localhost', '']
 
 SITE_URL =""
@@ -56,7 +55,7 @@ MIDDLEWARE = [
 ]
 
 #SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
 SECURE_HSTS_SECONDS = 31536000
 #SECURE_SSL_REDIRECT = True
 SECURE_HSTS_PRELOAD = True
