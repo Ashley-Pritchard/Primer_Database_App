@@ -278,48 +278,57 @@ def reorder_archive_primer(request):
 		#user can select single primer to reorder from primer page or one or more primers from the amplicon page - pull specific primer(s) from the database 
 		reorder_list = request.POST.getlist('primer')
 
-		#loop through list of primers 
-		for i in reorder_list:
-			reorder = Primer.objects.get(pk=i)
+		#check a primer was selected 
+		if len(reorder_list) != 0:
 
-			#make changes to the primer table of the database 
-			primer = Primer()
+			#loop through list of primers 
+			for i in reorder_list:
+				reorder = Primer.objects.get(pk=i)
 
-			#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder 
-			primer.name = reorder.name
-			primer.sequence = reorder.sequence
-			primer.genomic_location_start = reorder.genomic_location_start
-			primer.genomic_location_end = reorder.genomic_location_end
-			primer.direction = reorder.direction
-			primer.modification = reorder.modification
-			primer.alt_name = reorder.alt_name
-			primer.ngs_audit_number = reorder.ngs_audit_number
-			primer.version = reorder.version
-			primer.amplicon_id = reorder.amplicon_id
-			primer.comments = reorder.comments
-			primer.location = reorder.location
+				#make changes to the primer table of the database 
+				primer = Primer()
 
-			#assingn the 'imported_by' input selected by user to new primer record 
-			find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-			for f in find_imp:
-				primer.imported_by_id = f
+				#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder 
+				primer.name = reorder.name
+				primer.sequence = reorder.sequence
+				primer.genomic_location_start = reorder.genomic_location_start
+				primer.genomic_location_end = reorder.genomic_location_end
+				primer.direction = reorder.direction
+				primer.modification = reorder.modification
+				primer.alt_name = reorder.alt_name
+				primer.ngs_audit_number = reorder.ngs_audit_number
+				primer.version = reorder.version
+				primer.amplicon_id = reorder.amplicon_id
+				primer.comments = reorder.comments
+				primer.location = reorder.location
 
-			#assign the 'date imported' to the new primer record as todays date 
-			today = date.today()
-			primer.date_imported = today.strftime("%d/%m/%Y")
-			primer.date_order_placed = today.strftime("%d/%m/%Y")
+				#assingn the 'imported_by' input selected by user to new primer record 
+				find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+				for f in find_imp:
+					primer.imported_by_id = f
 
-			#assign the order status of the new primer record to 'ordered'
-			primer.order_status = "Ordered"
+				#assign the 'date imported' to the new primer record as todays date 
+				today = date.today()
+				primer.date_imported = today.strftime("%d/%m/%Y")
+				primer.date_order_placed = today.strftime("%d/%m/%Y")
 
-			#add reason reordered input by user to the primer record 
-			primer.reason_ordered = request.POST.get('reason_reordered')
+				#assign the order status of the new primer record to 'ordered'
+				primer.order_status = "Ordered"
 
-			#update the database 
-			primer.save()
+				#add reason reordered input by user to the primer record 
+				primer.reason_ordered = request.POST.get('reason_reordered')
+
+				#update the database 
+				primer.save()
 	
-		#render the 'submitted reorder primer' html page from the templates directory 
-		return render(request, 'submitted_reorder_primer.html')
+			#render the 'submitted reorder primer' html page from the templates directory 
+			return render(request, 'submitted_reorder_primer.html')
+
+		#if primer was not selected 
+		else:
+
+			#render the 'warning' html page from the templates directory 
+			return render(request, 'warning.html')
 
 	#if user selects 'archive primer'
 	if 'archive' in request.POST:
@@ -327,34 +336,42 @@ def reorder_archive_primer(request):
 		#user can select primer(s) to archive from primer page - pull specific primer(s) from the database
 		archive_list = request.POST.getlist('primer')
 
-		#loop through primers 
-		for i in archive_list:
-			archive = Primer.objects.get(pk=i)
+		#check primer was selected
+		if len(archive_list) != 0:
 
-			#ammend the order status of the primer to archived 
-			archive.order_status = 'Archived'
+			#loop through primers 
+			for i in archive_list:
+				archive = Primer.objects.get(pk=i)
 
-			#ammend the lab location to ""
-			archive.location = ""
+				#ammend the order status of the primer to archived 
+				archive.order_status = 'Archived'
 
-			#assign the 'archived by' input selected by user to the primer record 
-			find_arc = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-			for f in find_arc:
-				archive.archived_by_id = f
+				#ammend the lab location to ""
+				archive.location = ""
 
-			#assign the 'date archived' to the primer record as todays date 
-			today = date.today()
-			archive.date_archived = today.strftime("%d/%m/%Y")
+				#assign the 'archived by' input selected by user to the primer record 
+				find_arc = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
+				for f in find_arc:
+					archive.archived_by_id = f
 
-			#add reason archived input by user to the primer record 
-			archive.reason_archived = request.POST.get('reason_archived')
+				#assign the 'date archived' to the primer record as todays date 
+				today = date.today()
+				archive.date_archived = today.strftime("%d/%m/%Y")
 
-			#update the database 
-			archive.save()
+				#add reason archived input by user to the primer record 
+				archive.reason_archived = request.POST.get('reason_archived')
+
+				#update the database 
+				archive.save()
 		
-		#render the archive primer html page from the templates directory
-		return render(request, 'archive_primer.html')
+			#render the archive primer html page from the templates directory
+			return render(request, 'archive_primer.html')
 
+		#if no primer was selected 
+		else:
+
+			#render the 'warning' html page from the templates directory
+			return render(request, 'warning.html')
 
 
 

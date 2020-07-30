@@ -43,13 +43,13 @@ p2 {
 table {
 	table-layout: fixed;
 	text-align: left;
-	width: 100%
-	
+	width: 100%;
 }
 
 td {
 	padding: 10px 10px 10px 5px;
-	width: 100%
+	width: 100%;
+	word-wrap: break-word;
 }
 
 form {

@@ -1,0 +1,20 @@
+<! html page to confirm that a primer has been reordered !>
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+ <div class="topnav">
+   <a class="active" href="{% url 'index' %}">Search Primers</a>
+   <a class="active" href="{% url 'order' %}">Order Primer</a>
+   <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
+   <a class="active" href="{% url 'order_placed' %}">Primers on Order</a>
+   <a class="active" href="{% url 'in_testing' %}">Primers in Testing</a>
+   <a class="active" href="{% url 'failed' %}">Failed Validation</a>
+   <a class="active" href="{% url 'retesting' %}">Primers in Retesting</a>
+ </div> 
+  <h1>Primer Database</h1><br><br><br>
+  <p><strong> WARNING - No primer has been selected - no reorder has been saved. </strong></p><br>
+{% endblock %}
+ 
+
+
