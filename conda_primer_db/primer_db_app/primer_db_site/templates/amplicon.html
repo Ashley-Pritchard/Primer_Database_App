@@ -13,10 +13,7 @@
    <a class="active" href="{% url 'retesting' %}">Primers in Retesting</a>
  </div> 
   <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
-  <p> The following page provides a record of all OMGL primers associated with amplicon {{ amplicon.amplicon_name }}. To <strong>reorder</strong> one or more of the below primers, select the box next to the primer and use the 'reorder' option at the bottom of the page. To order a <strong>new</strong> primer for this amplicon, use the button below:<br><br>
-  <form action="{% url 'order_to_amplicon' %}" method="POST">
-  <button name="amplicon" type="submit" value="{{ amplicon.id }}">Order New Primer for this Amplicon</button><br><br><br>
-  </form>
+  <p> The following page provides a record of all OMGL primers associated with amplicon {{ amplicon.amplicon_name }}. To <strong>reorder</strong> one or more of the below primers, <strong>select the box</strong> next to the primer and use the 'reorder' option at the bottom of the page. To order a <strong>new version</strong> of a primer for this amplicon, select the 'order new version' option at the bottom of the page:<br><br><br>
   {% for p in primer %}
     <table class="table2" style="table-layout: fixed; width: 100%">
     <form action="{% url 'reorder_archive_primer' %}" method="POST">  
@@ -170,7 +167,7 @@
           </td>
         </tr>
       </table><br>
-      <p><strong>Reason Archived: </strong> {{ p.reason_archived }}</p><br>
+      <p><strong>Reason Archived: </strong> {{ p.reason_archived }}</p>
       {% else %}
         </tr>
       </table><br>
@@ -196,6 +193,10 @@
       {% endfor %}</select>&nbsp;&nbsp;&nbsp;&nbsp;
     <input class="p1" type="submit" name="reorder" value="Reorder Primer(s)">
     </form>
+  <br><br><br><br><p>To <strong>order a new version</strong> of a primer for this amplicon, please use the button below:</p>
+  <form action="{% url 'order_to_amplicon' %}" method="POST">
+  <button name="amplicon" type="submit" value="{{ amplicon.id }}">Order New Version</button>
+  </form>
 {% endblock %}
 
 
