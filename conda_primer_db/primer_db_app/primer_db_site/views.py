@@ -679,7 +679,7 @@ def submitted(request):
 		primer.amplicon_id = Amplicon.objects.all().order_by('-id')[0]
 
 		#create primer name from component parts 
-		primer.name = primer.amplicon_id.amplicon_name + '_' + primer.direction + '_' + primer.modification + '__v' + primer.version
+		primer.name = primer.amplicon_id.amplicon_name + '_' + primer.direction + '_' + primer.modification + '__v' + str(primer.version)
 
 		#save changes to the database
 		primer.save()

@@ -253,6 +253,7 @@ td, th {
     vertical-align: top;
     padding: 8px;
     font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    word-wrap: break-word;
 }
 
 th {
