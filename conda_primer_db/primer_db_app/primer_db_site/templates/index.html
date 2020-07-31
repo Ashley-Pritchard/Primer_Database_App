@@ -28,21 +28,13 @@
           <td>
           </td>
           <td>
-      Genomic Location:
-          </td>
-          <td colspan="4">
-      <input id="searchbox" name="gen_loc_input" type="text"><br>
-          <td>
-        </tr>
-        <tr>
-          <td>
-          </td>
-          <td>
       Gene:
           </td>
           <td colspan="4">
       <input id="searchbox" name="gene_input" type="text"><br>
-          </td>
+          <td>
+        </tr>
+        <tr>
           <td>
           </td>
           <td>
@@ -51,29 +43,6 @@
           <td colspan="4">
       <input id="searchbox" name="chr_input" type="text"><br>
           </td>
-        </tr>
-        <tr>
-          <td>
-          </td>
-          <td>
-      Imported By:
-          </td>
-          <td colspan="4">
-      <select name="imp_by_input" type="text">
-        <option value="">---</option>
-        {% for i in imp_by %}
-          <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
-        {% endfor %}
-          </td>
-          <td>
-          </td>
-          <td>
-      Date Imported:
-          </td>
-          <td colspan="4">
-      <input id="searchbox" name="date_input" type="text"><br>
-          </td>
-        <tr>
           <td>
           </td>
           <td>
@@ -86,6 +55,8 @@
         <option value="Sanger">Sanger</option>
         <option value="Other">Other</option>
           </td>
+        </tr>
+        <tr>
           <td>
           </td>
           <td>
@@ -98,6 +69,14 @@
         <option value="B">B</option>
         <option value="C">C</option>
         <option value="Other">Other</option>
+          </td>
+          <td>
+          </td>
+          <td>
+      Alt Name:
+          </td>
+          <td colspan="4">
+      <input id="searchbox" name="alt_input" type="text"><br>
           </td>
         </tr>
       </table><br><br>

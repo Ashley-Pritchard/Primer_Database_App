@@ -46,13 +46,11 @@ def search(request):
 
 	#assign each of the user search inputs to variables 
 	amp_id_input = request.GET.get('amp_id_input', None)
-	gen_loc_input = request.GET.get('gen_loc_input', None)
 	analysis_input = request.GET.get('analysis_input', None)
 	set_input = request.GET.get('set_input', None)
 	gene_input = request.GET.get('gene_input', None).upper()
 	chr_input = request.GET.get('chr_input', None).upper()
-	imp_by_input = request.GET.get('imp_by_input', None).upper()
-	date_input = request.GET.get('date_input', None)
+	alt_input = request.GET.get('alt_input', None)
 
 	#provide a count of how many fields the user completed 
 	completed_fields = 0
@@ -70,16 +68,6 @@ def search(request):
 	else:
 		amp_id_query = ""
 		primer_amp =""	
-
-	#if user completed the gene location fields, pull primers with a gene location between the specified start and end. As primers are stored in both directions, check both ways and concatenate the final results. As above, if the field was completed, add 1 to the completed fields variable, otherwise set the query to ""
-	if gen_loc_input !="":
-		completed_fields +=1
-		gen_loc_fw_query = Primer.objects.filter(genomic_location_start__lte=gen_loc_input, genomic_location_end__gte=gen_loc_input)
-		gen_loc_rev_query = Primer.objects.filter(genomic_location_start__gte=gen_loc_input, genomic_location_end__lte=gen_loc_input)
-		gen_loc_query = list(chain(gen_loc_fw_query, gen_loc_rev_query))
-
-	else: 
-		gen_loc_query = ""
 
 	#if user completed the analysis input field, add 1 to the completed field varibale and pull resepctive primers 
 	if analysis_input !="":
@@ -143,26 +131,13 @@ def search(request):
 		chr_query = ""
 		primer_chr = ""
 
-	#same process as for the analysis field input above is repeated for 'imported by' input
-	if imp_by_input !="":
+	#if user completed the alt name field, add 1 to the completed field variable and pull respective primers
+	if alt_input !="":
 		completed_fields +=1
-		imp_by_query = Imported_By.objects.filter(imported_by=imp_by_input)
-
-		primer_imp_by = []
-		for i in imp_by_query:
-			primer_imp_by.append(i.primer_set.all())
+		primer_alt = Primer.objects.filter(alt_name__icontains=alt_input)
 
 	else:
-		imp_by_query = ""
-		primer_imp_by = ""
-
-	#if date input field was completed by user, add 1 to the completed field varibale and pull primers - primers can be pulled directly as date is stored in the primer table of the database
-	if date_input !="":
-		completed_fields +=1
-		date_query = Primer.objects.filter(date_imported=date_input)
-
-	else: 
-		date_query = ""
+		primer_alt = ""
 
 	#create an empty list and append all primers pulled from the database based on user input above
 	primer_search = []
@@ -171,9 +146,6 @@ def search(request):
 	for a in primer_amp:
 		for x in a:
 			primer_search.append(x)
-
-	for g in gen_loc_query:
-		primer_search.append(g)
 
 	for a in primer_analysis:
 		for x in a:
@@ -191,12 +163,8 @@ def search(request):
 		for x in c:
 			primer_search.append(x)
 
-	for i in primer_imp_by:
-		for x in i:
-			primer_search.append(x)
-
-	for d in date_query:
-		primer_search.append(d)
+	for a in primer_alt:
+		primer_search.append(a)
 
 	#provide a count for each primer occurance 
 	occurence_count = collections.Counter(primer_search)
