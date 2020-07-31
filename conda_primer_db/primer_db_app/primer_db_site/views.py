@@ -60,8 +60,11 @@ def search(request):
 	#if user completed amplicon id field, add 1 to the completed field variable and pull respective primers
 	if amp_id_input !="":
 		completed_fields +=1
-		amp_id_query = Amplicon.objects.get(amplicon_name=amp_id_input)
-		primer_amp = amp_id_query.primer_set.all()
+		amp_id_query = Amplicon.objects.filter(amplicon_name__icontains=amp_id_input)
+
+		primer_amp = []
+		for a in amp_id_query:
+			primer_amp.append(a.primer_set.all())
 	
 	#if amplicon id field was not completed, set variables to "" to prevent errors of it not being assigned when set as context below
 	else:
@@ -166,7 +169,8 @@ def search(request):
 
 	#append primers to list - two for loops are required for those with input 2 foreign keys away from the primer table 
 	for a in primer_amp:
-		primer_search.append(a)
+		for x in a:
+			primer_search.append(x)
 
 	for g in gen_loc_query:
 		primer_search.append(g)
