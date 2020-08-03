@@ -71,3 +71,5 @@ class Primer(models.Model):
 	date_retesting_completed = models.CharField(max_length=20, null=True, blank=True)
 	choice_3 = [("Repeat order", "Repeat order"), ("New gene / version", "New gene / version"), ("NGS confirmation", "NGS confirmation"), ("Scientist R&D", "Scientist - R&D"), ("Other", "Other"), ("None", "None")]
 	reason_ordered = models.CharField(max_length=100, default='None', choices=choice_3)
+	choice_4 = [("GTAAAACGACGGCCAGT", "GTAAAACGACGGCCAGT"), ("CAGGAAACAGCTATGAC", "CAGGAAACAGCTATGAC"), ("", "")]
+	m13_tag = models.CharField(max_length=20, default="", choices=choice_4)

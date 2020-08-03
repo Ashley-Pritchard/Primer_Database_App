@@ -592,22 +592,21 @@ def submitted(request):
 		#make changes to the primer table of the database 
 		primer = Primer()
 
-		#if requested, add m13 tag to the beginning of the sequence input
-		if m13[i] == "no":
-			primer.sequence = seq[i].upper()
-		elif m13[i] == 'yes' and direction[i] == 'f':
-			primer.sequence = 'GTAAAACGACGGCCAGT' + seq[i].upper()
-		elif m13[i] == 'yes' and direction[i] == 'r':
-			primer.sequence = 'CAGGAAACAGCTATGAC' + seq[i].upper()
-		elif m13[i] == 'yes':
-			primer.sequence = 'M13-' + seq[i].upper()
-
 		#assgin user input to each field of the primer table
+		primer.sequence = seq[i].upper()
 		primer.direction = direction[i].upper()
 		primer.modification = modification[i]
 		primer.alt_name = alt_name[i]
 		primer.comments = comments[i]
 		primer.reason_ordered = reason[i]
+
+		#if requested, add m13 tag as either forward or reverse 
+		if m13[i] == "no":
+			primer.m13_tag = ""
+		elif m13[i] == "yes" and direction[i] == "f":
+			primer.m13_tag = "GATAAACGACGGCCAGT"
+		elif m13[i] == "yes" and direction[i] == "r":
+			primer.m13_tag = "CAGGAAACAGCTATGAC"
 
 		#if genomic start or end location and ngs number is blank, assign 'None', otherwise assign user input
 		if start[i] != "":
@@ -698,7 +697,7 @@ def submit_order(request):
 		writer.writerow(['name', 'sequence', 'location', 'reason_for_order'])
 		for primer in primer_list:
 			export = Primer.objects.get(pk=primer)
-			writer.writerow([export.name, export.sequence, export.location, export.reason_ordered])
+			writer.writerow([export.name, export.m13_tag + export.sequence, export.location, export.reason_ordered])
 
 		#export the csv file
 		return response
