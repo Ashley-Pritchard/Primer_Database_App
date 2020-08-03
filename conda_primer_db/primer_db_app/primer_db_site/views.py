@@ -175,6 +175,9 @@ def search(request):
 		if count == completed_fields:
 			primer_search_results.append(primer)
 
+	#order results alphabetically
+	primer_search_results.sort(key=lambda x: x.name)
+
 	#provide a count of the number of returned primers for the html page 
 	num_primers = len(primer_search_results)
 	
