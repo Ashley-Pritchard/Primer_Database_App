@@ -11,56 +11,60 @@
     <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
     <a class="active" href="{% url 'order_placed' %}">Primers on Order</a>
     <a class="active" href="{% url 'in_testing_sanger' %}">Primers in Testing: Sanger</a>
-    <a class="active" href="{% url 'in_testing_non_sanger' %}"> Primers in Testing: Non-Sanger</a>
+    <a class="active" href="{% url 'in_testing_non_sanger' %}">Primers in Testing: Non-Sanger</a>
     <a class="active" href="{% url 'failed' %}">Failed Validation</a>
     <a class="active" href="{% url 'retesting' %}">Primers in Retesting</a>
   </div>
-</div><br><br>
-  <h1>Primer Database: Primers to be Ordered</h1>
-  <p> Primer information for primers to be order:<br><br><br><br>
-  {% for p in ordered %}
-    <table class="table" style="table-layout: auto-fit; width: 100%">
-    <form action="{% url 'submit_order' %}" method="POST">
-      <tr>
+</div><br><br> 
+  <h1>Primer Database: Primers in Testing - Sanger</h1>
+  <p> Primer information for primers in testing:<br><br><br><br>
+  {% for t in testing %}
+    <table class="table" style="table-layout: auto-fit; width: 100%; cellspacing: 20px">
+    <form action="{% url 'tested' %}" method="POST">
       <tr>
         <td>
           <strong>Primer ID</strong>:
         </td>
         <td style="word-wrap: break-word">
-          {{ p.name }}
+          {{ t.name }}
         </td>
         <td>
-          <strong>Alt. Name</strong>:
+          <strong>Sequence</strong>:
         </td>
         <td style="word-wrap: break-word">
-          {{ p.alt_name }}
+          {{ t.sequence }}
         </td>
         <td>
           <strong>Direction:</strong>
         </td>
         <td>
-          {{ p.direction }}
+          {{ t.direction }}
         </td>
-	<td>
-	  <strong>Modification:</strong>
-	</td>
-	<td>
-	  {{ p.modification }}
-	</td>
         <td>
           <strong>Imported By</strong>:
         </td>
         <td>
-          {{ p.imported_by_id.imported_by }}
+          {{ t.imported_by_id.imported_by }}
         </td>
         <td>
-          <input type="checkbox" name="primer" id="primer" value="{{ p.id }}" checked="checked">
+          <strong>Location</strong>:
+        </td>
+        <td>
+          {{ t.location }}
+        </td>
+        <td>
+          <strong>Comments</strong>:
+        </td>
+        <td>
+          {{ t.comments }}
+        </td>
+        <td>
+          <input type="checkbox" name="primer" id="primer" value="{{ t.id }}" checked="checked">
         </td>
     </table>
   {% endfor %}<br><br>   
-      <input class="p1" type="submit" name="csv" value="Download Order Information">
-      <input class="p1" type="submit" name="ordered" value="Ordered">
-      <input class="p1" onclick="return confirm('Are you sure you wish to delete?');" type="submit" name="delete" value="Delete">
+      <input class="p1" type="submit" name="validated" value="Validated">
+      <input class="p1" type="submit" name="not" value="Not Validated">
     </form>  
 {% endblock %}
 

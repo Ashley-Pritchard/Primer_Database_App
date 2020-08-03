@@ -9,6 +9,56 @@ body {
 
 }
 
+/*dropdown button*/
+.dropbtn {
+	background-color: #f4f4f4;
+	color:#062f4f;
+	padding: 16px;
+	font-size: 16px;
+}
+
+/*the container <div> - needed to position the dropdown content*/
+.dropdown {
+	position: relative;
+	display: inline-block;
+	float: right;
+	padding:16px;
+}
+
+/*dropdown content*/
+.dropdown-content {
+	display: none;
+	position: absolute;
+	background-color: #f1f1f1;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	z-index: 1;
+}
+
+/*links inside the dropdown*/
+.dropdown-content a {
+	color: black;
+	padding: 12px 16px;
+	text-decoration: none;
+	display: block;
+	text-align: left;
+}
+
+/*change color of dropdown links on hover*/
+.dropdown-content a:hover {
+	background-color: #ddd;
+}
+
+/*show the dropdown menu on hover*/
+.dropdown:hover .dropdown-content {
+	display:block;
+}
+
+/*change the background color of the dropdown button when the dropdown content in shown*/
+.dropdown:hover .dropbtn {
+	background-color: #8c8c8c;
+}
+
 .topnav {
 	overflow: hidden;
 	padding: 15px;

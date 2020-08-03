@@ -814,20 +814,36 @@ def location_updated(request):
 ## In Testing Page ##
 
 
-#takes user clicking the 'in testing' searchbar link as request and pulls the information of all primers with an order status of 'in testing' 
-def in_testing(request):
+#takes user clicking the 'in testing:sanger' searchbar link as request and pulls the information of all sanger primers with an order status of 'in testing' 
+def in_testing_sanger(request):
 
-	#pull primers with order status of in testing
-	testing = Primer.objects.filter(order_status = "In Testing")
+	#pull primers with order status of in testing and analysis type of sanger
+	testing = Primer.objects.filter(order_status = "In Testing", amplicon_id__analysis_type_id = 1)
 
-	#provide context for the in testing html page 
+	#provide context for the in testing: sanger html page 
 	context = {
 		"testing": testing
 	}
 
-	#render the in testing html page from the templates directory
-	return render(request, 'in_testing.html', context=context)
+	#render the in testing: sanger html page from the templates directory
+	return render(request, 'in_testing_sanger.html', context=context)
 
+
+
+
+#takes user clicking the 'in testing: non sanger' searchbar link as request and pulls information of all non sanger primers in testin
+def in_testing_non_sanger(request):
+
+	#pulls primers with order status of in testing and analysis type of non-sanger
+	testing = Primer.objects.filter(order_status = "In Testing").exclude(amplicon_id__analysis_type_id = 1)
+
+	#provide context for the in testing: non-sanger html page 
+	context = {
+		"testing": testing
+	}
+
+	#return the in testing: non sanger html page from the templates directory
+	return render(request, 'in_testing_non_sanger.html', context=context)
 
 
 
