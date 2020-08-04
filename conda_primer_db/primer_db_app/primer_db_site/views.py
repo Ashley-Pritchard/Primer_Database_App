@@ -758,16 +758,25 @@ def order_recieved(request):
 	#calculate how many primers have been selected from the length of the primer list
 	list_len = len(request.POST.getlist('primer'))
 
-	#if 'testing required' is clicked - iterate through the list of primers selected, update the order status to 'in testing', assign the 'date_order_placed' as todays date and save changes to the database
-	if 'test' in request.POST:
+	#if 'testing required sanger' is clicked - iterate through the list of primers selected, update the order status to 'in testing sanger', assign the 'date_order_received' as todays date and save changes to the database
+	if 'test_sanger' in request.POST:
 		for i in range(list_len):
 			recieved = Primer.objects.get(pk=primer_list[i])
-			recieved.order_status = 'In Testing'
+			recieved.order_status = 'In Testing Sanger'
 			today = date.today()
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
 			recieved.save()		
 
-	#if 'testing not required' is clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_order_placed' as todays date and save changes to the database
+	#if 'testing required non sanger' is clicked - iterate through the list of primers selected, update the order to 'in testing non sanger',assign the 'date order received' as todays date and save changes to the database
+	if 'test_non_sanger' in request.POST:
+		for i in range(list_len):
+			recieved = Primer.objects.get(pk=primer_list[i])
+			recieved.order_status = 'In Testing Non-Sanger'
+			today = date.today()
+			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
+			recieved.save()
+
+	#if 'testing not required' is clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_order_received' as todays date and save changes to the database
 	if 'stock' in request.POST:
 		for i in range(list_len):
 			recieved = Primer.objects.get(pk=primer_list[i])
@@ -821,7 +830,7 @@ def location_updated(request):
 def in_testing_sanger(request):
 
 	#pull primers with order status of in testing and analysis type of sanger
-	testing = Primer.objects.filter(order_status = "In Testing", amplicon_id__analysis_type_id = 1)
+	testing = Primer.objects.filter(order_status = "In Testing Sanger")
 
 	#provide context for the in testing: sanger html page 
 	context = {
@@ -838,7 +847,7 @@ def in_testing_sanger(request):
 def in_testing_non_sanger(request):
 
 	#pulls primers with order status of in testing and analysis type of non-sanger
-	testing = Primer.objects.filter(order_status = "In Testing").exclude(amplicon_id__analysis_type_id = 1)
+	testing = Primer.objects.filter(order_status = "In Testing Non-Sanger")
 
 	#provide context for the in testing: non-sanger html page 
 	context = {

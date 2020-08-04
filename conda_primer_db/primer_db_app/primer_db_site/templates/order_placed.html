@@ -29,25 +29,13 @@
           {{ p.name }}
         </td>
         <td>
-          <strong>Alt. Name</strong>:
-        </td>
-        <td style="word-wrap: break-word">
-          {{ p.alt_name }}
-        </td>
-        <td>
-          <strong>Direction:</strong>
-        </td>
-        <td>
-          {{ p.direction }}
-        </td>
-        <td>
           <strong>Reason Ordered:</strong>
         </td>
         <td>
           {{ p.reason_ordered }}
         </td>
         <td>
-          <strong>Imported By</strong>:
+          <strong>Requested By</strong>:
         </td>
         <td>
           {{ p.imported_by_id.imported_by }}
@@ -57,8 +45,9 @@
         </td>
     </table>
   {% endfor %}<br><br>   
-      <input class="p1" type="submit" name="test" value="Recieved: Testing Required">
-      <input class="p1" type="submit" name="stock" value="Recieved: Testing Not Required">
+      <input class="p1" type="submit" name="test_sanger" value="Testing Required: Sanger">
+      <input class="p1" type="submit" name="test_non_sanger" value="Testing Required: Non-Sanger">
+      <input class="p1" type="submit" name="stock" value="Testing Not Required">
     </form>  
 {% endblock %}
 
