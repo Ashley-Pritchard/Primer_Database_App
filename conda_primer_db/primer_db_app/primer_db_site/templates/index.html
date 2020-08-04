@@ -15,7 +15,7 @@
     <a class="active" href="{% url 'retesting' %}">Primers in Testing</a>
   </div>
 </div><br><br> 
-  <h1>Primer Database</h1><br>
+  <h1>Primer Database: Search and Reorders</h1><br>
   <p>Welcome to the Primer Database for the OUH Molecular Genetics Laboratory. We currently have <strong>{{ num_primers }}</strong> primers covering <strong>{{ num_amplicons }}</strong> amplicons and <strong>{{ num_genes }}</strong> genes. Fill in one or more boxes in the form below to search for primers: </p><br>
   <div>
     <form class="SearchForm" method="get" action="{% url 'search' %}">
