@@ -30,28 +30,16 @@
           {{ p.name }}
         </td>
         <td>
-          <strong>Alt. Name</strong>:
-        </td>
-        <td style="word-wrap: break-word">
-          {{ p.alt_name }}
-        </td>
-        <td>
-          <strong>Direction:</strong>
-        </td>
-        <td>
-          {{ p.direction }}
-        </td>
-	<td>
-	  <strong>Modification:</strong>
-	</td>
-	<td>
-	  {{ p.modification }}
-	</td>
-        <td>
-          <strong>Imported By</strong>:
+          <strong>Requested By</strong>:
         </td>
         <td>
           {{ p.imported_by_id.imported_by }}
+        </td>
+        <td>
+          <strong>Comments:</strong>
+        </td>
+        <td>
+          {{ p.comments }}
         </td>
         <td>
           <input type="checkbox" name="primer" id="primer" value="{{ p.id }}" checked="checked">
