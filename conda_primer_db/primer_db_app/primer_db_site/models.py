@@ -73,3 +73,4 @@ class Primer(models.Model):
 	reason_ordered = models.CharField(max_length=100, default='None', choices=choice_3)
 	choice_4 = [("GTAAAACGACGGCCAGT", "GTAAAACGACGGCCAGT"), ("CAGGAAACAGCTATGAC", "CAGGAAACAGCTATGAC"), ("", "")]
 	m13_tag = models.CharField(max_length=20, default="", choices=choice_4)
+	worksheet_number = models.CharField(max_length=1000, null=True, blank=True)

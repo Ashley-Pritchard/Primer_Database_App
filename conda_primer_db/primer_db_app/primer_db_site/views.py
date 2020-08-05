@@ -863,9 +863,52 @@ def in_testing_non_sanger(request):
 #from the 'in testing' page, allows users to update the status of a primer from in testing to either stocked or failed validation - takes user selecting primers and clicking 'validated' or 'not validated' as request   
 def tested(request):
 
+	#pull all primers from 'in testing' page 
+	all_primer_list = request.POST.getlist('all_primers')
+
+	#pull worksheet info from free text field for all primers 
+	worksheet_list = request.POST.getlist('worksheet')
+
 	#pull the selected primers based on the checkboxes selected on the 'in testing' page
 	primer_list = request.POST.getlist('primer')
-	
+
+	#update any changes to the worksheet number
+	list_len = len(worksheet_list)
+	for i in range(list_len):
+		update = Primer.objects.get(pk=all_primer_list[i])
+		if worksheet_list[i] != "":
+			update.worksheet_number = worksheet_list[i]
+		update.save()
+
+	#if save was selcted
+	if 'save' in request.POST:
+		check_status = Primer.objects.get(pk=all_primer_list[0])
+		if check_status.order_status == 'In Testing Sanger':
+
+			#pull primers with order status of in testing sanger
+			testing = Primer.objects.filter(order_status = "In Testing Sanger")
+
+			#provide context for the in testing html page
+			context = {
+				"testing": testing
+			}
+
+			#render the in testing sanger html page from the templates directory
+			return render(request, 'in_testing_sanger.html', context=context)
+
+		else:
+
+			#pull primers with order status of in testing non sanger
+			testing = Primer.objects.filter(order_status = "In Testing Non-Sanger")
+
+			#provide context for the in testing html page
+			context = {
+				"testing": testing
+			}
+
+			#render the in testing non sanger html page from the templates directory
+			return render(request, 'in_testing_non_sanger.html', context=context)
+
 	#if 'validated' clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_testing_completed' as todays date and save changes to database
 	if 'validated' in request.POST:
 		for primer in primer_list:

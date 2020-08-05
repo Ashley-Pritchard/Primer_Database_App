@@ -29,18 +29,6 @@
           {{ t.name }}
         </td>
         <td>
-          <strong>Sequence</strong>:
-        </td>
-        <td style="word-wrap: break-word">
-          {{ t.sequence }}
-        </td>
-        <td>
-          <strong>Direction:</strong>
-        </td>
-        <td>
-          {{ t.direction }}
-        </td>
-        <td>
           <strong>Requested By</strong>:
         </td>
         <td>
@@ -59,10 +47,18 @@
           {{ t.comments }}
         </td>
         <td>
+          <strong>Worksheet</strong>:
+        </td>
+        <td>
+          <input name="worksheet" type="text" value="{{ t.worksheet_number }}"><br>
+          <input type="hidden" id="all_primers" name="all_primers" value="{{ t.id }}">
+        </td>
+        <td>
           <input type="checkbox" name="primer" id="primer" value="{{ t.id }}" checked="checked">
         </td>
     </table>
-  {% endfor %}<br><br>   
+  {% endfor %}<br><br>
+      <input class="p1" type="submit" name="save" value="Save changes">  
       <input class="p1" type="submit" name="export" value="Export Name and Sequence">
       <input class="p1" type="submit" name="validated" value="Validated">
       <input class="p1" type="submit" name="not" value="Not Validated">
