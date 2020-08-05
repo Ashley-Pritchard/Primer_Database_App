@@ -884,6 +884,21 @@ def tested(request):
 			tested.date_testing_completed = today.strftime("%d/%m/%Y")
 			tested.save()			
 
+	#if 'export name and sequence' selected, download a csv file with resepctive information
+	if 'export' in request.POST:
+		response = HttpResponse(content_type='text/csv')
+		response['Content-Disposition'] = 'attachment; filename="primer_testing.csv"'
+
+		#write information to csv file
+		writer = csv.writer(response)
+		writer.writerow(['name', 'sequence'])
+		for primer in primer_list:
+			export = Primer.objects.get(pk=primer)
+			writer.writerow([export.name, export.m13_tag + export.sequence])
+
+		#export the csv file 
+		return response
+
 	#render the 'tested' html page from the templates directory
 	return render(request, 'tested.html')
 

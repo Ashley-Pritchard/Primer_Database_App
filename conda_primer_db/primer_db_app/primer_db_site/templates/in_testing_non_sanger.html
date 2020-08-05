@@ -41,7 +41,7 @@
           {{ t.direction }}
         </td>
         <td>
-          <strong>Imported By</strong>:
+          <strong>Requested By</strong>:
         </td>
         <td>
           {{ t.imported_by_id.imported_by }}
@@ -63,6 +63,7 @@
         </td>
     </table>
   {% endfor %}<br><br>   
+      <input class="p1" type="submit" name="export" value="Export Name and Sequence">
       <input class="p1" type="submit" name="validated" value="Validated">
       <input class="p1" type="submit" name="not" value="Not Validated">
     </form>  
