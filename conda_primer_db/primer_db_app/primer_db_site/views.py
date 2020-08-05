@@ -1021,9 +1021,36 @@ def retesting(request):
 
 #from the 'retesting' page, allows users to update the status of a primer from retesting to either stocked or failed testing archived - takes user selecting primers and clicking validated or not validated as request:
 def retested(request):
-	
+
+	#pull all primers from 'restesting' page
+	all_primer_list = request.POST.getlist('all_primers')
+
+	#pull worksheet info from freetext field fo all primers
+	worksheet_list = request.POST.getlist('worksheet')
+
 	#pull the selected primers based on the checkbox selected on the retesting page
 	primer_list = request.POST.getlist('primer')
+
+	#update any changes made to the worklist field
+	list_len = len(worksheet_list)
+	for i in range(list_len):
+		update = Primer.objects.get(pk=all_primer_list[i])
+		if worksheet_list[i] != "":
+			update.worksheet_number = worksheet_list[i]
+		update.save()
+
+	#if 'save' was selected, reload the page
+	if 'save' in request.POST:
+		#pull primers with order status of retesting
+		testing = Primer.objects.filter(order_status = "Retesting")
+
+		#provide context for the retesting html page
+		context = {
+			"testing": testing
+		}
+
+		#render the retesting html page from the templates directory
+		return render(request, 'retesting.html', context=context)
 
 	#if 'validated' clicked - iterate through the list of primers selected, update the order status to stocked, assign the 'date retesting completed' as todays date and save the changes to the database 
 	if 'validated' in request.POST:

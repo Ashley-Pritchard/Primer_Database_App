@@ -41,16 +41,10 @@
           {{ t.direction }}
         </td>
         <td>
-          <strong>Imported By</strong>:
+          <strong>Requested By</strong>:
         </td>
         <td>
           {{ t.imported_by_id.imported_by }}
-        </td>
-        <td>
-          <strong>Location</strong>:
-        </td>
-        <td>
-          {{ t.location }}
         </td>
         <td>
           <strong>Comments</strong>:
@@ -59,12 +53,20 @@
           {{ t.comments }}
         </td>
         <td>
+          <strong>Worksheet</strong>:
+        </td>
+        <td>
+          <input name="worksheet" type="text" value="{{ t.worksheet_number }}"><br>
+          <input type="hidden" id="all_primers" name="all_primers" value="{{ t.id }}">
+        </td>
+        <td>
           <input type="checkbox" name="primer" id="primer" value="{{ t.id }}" checked="checked">
         </td>
     </table>
   {% endfor %}<br><br>   
+      <input class="p1" type="submit" name="save" value="Save changes">
       <input class="p1" type="submit" name="validated" value="Validated">
-      <input class="p1" type="submit" name="not" value="Not Validated">
+      <input class="p1" type="submit" name="not" value="Discard">
     </form>  
 {% endblock %}
 
