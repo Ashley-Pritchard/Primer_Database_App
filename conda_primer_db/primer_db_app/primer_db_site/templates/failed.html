@@ -29,19 +29,13 @@
           {{ t.name }}
         </td>
         <td>
-          <strong>Alt. Name</strong>:
-        </td>
-        <td style="word-wrap: break-word">
-          {{ t.alt_name }}
-        </td>
-        <td>
           <strong>Direction</strong>:
         </td>
         <td>
           {{ t.direction }}
         </td>
         <td>
-          <strong>Imported By</strong>:
+          <strong>Requested By</strong>:
         </td>
         <td>
           {{ t.imported_by_id.imported_by }}
@@ -54,10 +48,10 @@
           {{ t.location }}
         </td>
         <td>
-          <strong>Date</strong>:
+          <strong>Worksheet</strong>:
         </td>
         <td>
-          {{ t.date_testing_completed }}
+          {{ t.worksheet_number }}
         </td>
         <td>
           <input type="checkbox" name="primer" id="primer" value="{{ t.id }}" checked="checked">
