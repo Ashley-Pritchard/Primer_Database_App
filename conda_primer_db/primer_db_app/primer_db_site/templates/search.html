@@ -17,14 +17,14 @@
   </div>
 </div><br><br> 
   <h1>Primer Database: Search Results</h1>
-  <p>Your search returned <strong>{{ num_primers }}</strong> primer(s). Click on either the Primer or Amplicon ID for full information about individual primers or primer sets respectively. <br><br></p>
+  <p>Your search returned <strong>{{ num_primers }}</strong> primer(s). Click on the Amplicon ID for full information about individual primers or primer sets. <br><br></p>
   <table class="table2" style="table-layout: fixed; width: 100%">
     <tr>
       <th>
-        Primer ID
+        Amplicon ID
       </th>
       <th>
-        Amplicon ID
+        Primer ID
       </th>
       <th>
         Alt. Name
@@ -38,14 +38,12 @@
       {% for primer in primer_search_results %}
     <tr>
       <td>
-        <form class="search" id = selected_primer method = get action = {% url 'primer' %} > 
-          <input type = "submit" default = None name = "selected_primer" value = "{{ primer.name }}" white-space: normal; word-wrap: break-word; width: 100%> 
-        </form>
-      </td>
-      <td>
         <form class="search" id = selected_amplicon method = get action = {% url 'amplicon' %} >
           <input type = "submit" default = None name = "selected_amplicon" value = "{{ primer.amplicon_id.amplicon_name }}" white-space: normal; word-wrap: break-word; width: 100%>
         </form>
+      </td>
+      <td>
+        {{ primer.name }}
       </td>
       <td>
         {{ primer.alt_name }}

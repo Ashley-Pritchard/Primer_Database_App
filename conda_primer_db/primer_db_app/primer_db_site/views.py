@@ -194,29 +194,6 @@ def search(request):
 
 
 
-#from the search results page, takes user clicking on specific primer as request and pulls respective primer information 
-def primer(request):
-
-	#pull information for the primer selected by the user from the database 
-	primer_input = request.GET.get('selected_primer', None)
-	primer = Primer.objects.filter(name=primer_input)
-
-	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu 
-	imp_by = Imported_By.objects.all()
-
-	#provide appropriate context for the primer html page 
-	context = {
-		'primer':primer,
-		'imp_by':imp_by
-	}
-
-	#render the primer html page from the templates directory
-	return render(request, 'primer.html', context=context)
-
-
-
-
-
 #from the search results page, takes user clicking on specific amplicon as request and pulls respective primer information for those matching the amplicon id 
 def amplicon(request):
 
@@ -351,106 +328,7 @@ def reorder_archive_primer(request):
 
 
 
-#function allows user to order a primer for an exisiting amplicon from the amplicon search results page - takes user clicking 'order new primer for amplicon' as request and opens a form to submit a new primer 
-def order_to_amplicon(request): 
-
-	#pull the specific amplicon from the database
-	pulled = Amplicon.objects.filter(pk=request.POST.get('amplicon'))
-
-	#pull imported_by information for drop down menu 
-	imp_by = Imported_By.objects.all()
-
-	#provide context for the 'order to amplicon' html page 
-	context = {
-	'pulled':pulled,
-        'imp_by':imp_by
-	}
-
-	#render 'order to amplicon' html page from templates directory 
-	return render(request, 'order_to_amplicon.html', context=context)
-
-
-
-
-
-#order submission of a primer for an exisiting amplicon - request from the 'order to amplicon' html page 
-def submitted_to_amplicon(request):
-
-	#make changes to the primer table of the database 
-	primer = Primer()
-
-	#sequence input by user converted to uppercase and stored as new primer record in database 
-	primer.sequence = request.POST.get('seq').upper()
-
-	#direction input by user converted to uppercase and stored as new primer record in database
-	primer.direction = request.POST.get('direction').upper()
-
-	#if genomic start location input by user - input stored as new primer record in database, otherwise stored as None 
-	if request.POST.get('start') != "":
-		primer.genomic_location_start = request.POST.get('start')
-	else:
-		primer.genomic_location_start = None
-
-	#if genomic end location input by user - input stored as new primer record in database, otherwise stored as None 
-	if request.POST.get('end') != "":
-		primer.genomic_location_end = request.POST.get('end')
-	else:
-		primer.genomic_location_end = None
-
-	#modification input by user stored as new primer record in the database
-	primer.modification = request.POST.get('modification')
-
-	#alt name input by user stored as a new primer record in database 
-	primer.alt_name = request.POST.get('alt_name')
-
-	#if ngs audit number input by user - input stored as a new primer record in database, otherwise stored as None 
-	if request.POST.get('ngs') != "":
-		primer.ngs_audit_number = request.POST.get('ngs')
-	else:
-		primer.ngs_audit_number = None
-
-	#assign the date imported for the new primer record as todays date 
-	today = date.today()
-	primer.date_imported = today.strftime("%d/%m/%Y")
-
-	#assign the order status of the new primer record to 'ordered'
-	primer.order_status = "Ordered"
-
-	#imported_by input selected by user stored as new primer record in database 
-	find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-	for f in find_imp:
-		primer.imported_by_id = f
-
-	#if version input by user - input stored as new primer record in database, otherwise stored as 1 
-	if request.POST.get('version') == "":
-		primer.version = 1
-	else:
-		primer.version = request.POST.get('version')
-
-	#amplicon id for new primer record assigned to selected primer 
-	amp = Amplicon.objects.filter(pk=request.POST.get('amplicon'))
-	for a in amp:
-		primer.amplicon_id = a
-	
-	#create primer name from component parts
-	primer.name = primer.amplicon_id.amplicon_name + '_' + primer.direction + '_' + primer.modification + '__v' + primer.version
-
-	#database updated with new primer record 
-	primer.save()
-	
-	#context for the 'submitted to amplicon' html page 
-	context = {
-		'amp':amp
-	}
-	
-	#render the 'submitted to amplicon' html page from templates directory
-	return render(request, 'submitted_to_amplicon.html', context=context)
-
-
-
-
-
-## Order Primer Page ## 
+##Order Primer Page ## 
 
 
 #provides context for the order page - takes request from users clicking on the 'order primer' option of the searchbar 
