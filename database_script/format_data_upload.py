@@ -246,7 +246,7 @@ def amplicon():
 		elif 'C' in row[3]:
 			primer_set.append('C')
 		else:
-			primer_set.append('Other')
+			primer_set.append('O')
 	df_a['primer_set'] = primer_set
 
 	#create a dictionary to pull the appropriate primer_set_id for each record from the primer_set.csv file. Store these as a new column
@@ -262,17 +262,24 @@ def amplicon():
 			exon.append(row[1])
 	df_a['exon'] = exon
 
+	#create amplicon name 
+	amplicon_name = []
+	for index, row in df_a.iterrows():
+		if 'NGS' in row[3]:
+			amplicon_name.append(row[7] + '_' + row[2] + '_NGS-' + row[1])
+		else:
+			amplicon_name.append(row[7] + '_' + row[2] + '-' + row[1])
+
+	df_a['amplicon_name'] = amplicon_name
+
 	#drop irrelevant columns
 	df_a = df_a.drop(columns = ['Fragment', 'Gene', 'Set', 'analysis_type', 'primer_set'])
 
 	#drop duplicate records
-	df_a = df_a.drop_duplicates(keep='first')
+	df_a = df_a.drop_duplicates(subset=['amplicon_name'], keep='first')
 
 	#create an amplicon_id for each unique record 
-	df_a['amplicon_id'] = df.groupby(['Amplicon_ID']).ngroup()
-
-	#rename the amplicon_name column 
-	df_a = df_a.rename(columns={'Amplicon_ID': 'amplicon_name'})
+	df_a['amplicon_id'] = df_a.groupby(['amplicon_name']).ngroup()
 
 	#save as csv
 	df_a.to_csv('amplicon.csv', sep=',')
@@ -288,24 +295,24 @@ df6 = pd.read_csv('amplicon.csv')
 def primer(): 
 
 	#forward and reverse primers stored as one 'amplicon' record - split as individual primers in new database - copy relevant columns into two dataframes for the forward and reverse primers, add appropriate direction and rename columns 
-	df_p1 = df[['F', 'F Location', 'Alt Name F', 'Amplicon_ID', 'Date Entered Service/Imported', 'Imported By', 'Fragment', 'Set', 'Genomic Loc 1', 'Genomic Loc 2', 'Comments']].copy()
+	df_p1 = df[['F', 'F Location', 'Alt Name F', 'Amplicon_ID', 'Date Entered Service/Imported', 'Imported By', 'Fragment', 'Set', 'Genomic Loc 1', 'Genomic Loc 2', 'Comments', 'Gene']].copy()
 
-	df_p1 = df_p1.rename(columns={'F': 'sequence', 'F Location': 'location', 'Alt Name F': 'alt_name', 'Amplicon_ID':'amplicon_name', 'Date Entered Service/Imported': 'date_imported', 'Imported By': 'imported_by', 'Genomic Loc 1': 'genomic_location_start', 'Genomic Loc 2': 'genomic_location_end', 'Comments': 'comments'})
+	df_p1 = df_p1.rename(columns={'F': 'sequence', 'F Location': 'location', 'Alt Name F': 'alt_name', 'Amplicon_ID':'amplicon_name', 'Date Entered Service/Imported': 'date_imported', 'Imported By': 'imported_by', 'Genomic Loc 1': 'genomic_location_start', 'Genomic Loc 2': 'genomic_location_end', 'Comments': 'comments', 'Gene':'gene'})
 
 	direction_F = 'F'
 
 	df_p1['direction'] = direction_F
 
-	df_p2 = df[['R', 'R Location', 'Alt Name R', 'Amplicon_ID', 'Date Entered Service/Imported', 'Imported By', 'Fragment', 'Set', 'Genomic Loc 1', 'Genomic Loc 2', 'Comments']].copy()
+	df_p2 = df[['R', 'R Location', 'Alt Name R', 'Amplicon_ID', 'Date Entered Service/Imported', 'Imported By', 'Fragment', 'Set', 'Genomic Loc 1', 'Genomic Loc 2', 'Comments', 'Gene']].copy()
 
-	df_p2 = df_p2.rename(columns={'R': 'sequence', 'R Location': 'location', 'Alt Name R': 'alt_name', 'Amplicon_ID':'amplicon_name', 'Date Entered Service/Imported': 'date_imported', 'Imported By': 'imported_by', 'Genomic Loc 1': 'genomic_location_start', 'Genomic Loc 2': 'genomic_location_end', 'Comments': 'comments'})
+	df_p2 = df_p2.rename(columns={'R': 'sequence', 'R Location': 'location', 'Alt Name R': 'alt_name', 'Amplicon_ID':'amplicon_name', 'Date Entered Service/Imported': 'date_imported', 'Imported By': 'imported_by', 'Genomic Loc 1': 'genomic_location_start', 'Genomic Loc 2': 'genomic_location_end', 'Comments': 'comments', 'Gene': 'gene'})
 
 	direction_R = 'R'
 
 	df_p2['direction'] = direction_R
 
 	#concatentate the two dataframes
-	df_p3 = pd.concat([df_p1, df_p2])
+	df_p3 = pd.concat([df_p1, df_p2]).reset_index(drop=True)
 
 	#empty sequence fields contain space - replace with nan to prevent downstream errors
 	df_p3['sequence'] = df_p3['sequence'].replace(' ', np.nan)
@@ -314,7 +321,7 @@ def primer():
 	df_p3 = df_p3.dropna(subset=['sequence'])
 
 	#create a dictionary to pull the appropriate amplicon_id for each record from the amplicon.csv file. Store these as a new column
-	amplicon_dict = dict(zip(df6.amplicon_name, df6.amplicon_id))
+	amplicon_dict = dict(zip(df6.Amplicon_ID, df6.amplicon_id))
 	df_p3['amplicon_id'] = df_p3['amplicon_name'].map(amplicon_dict)
 
 	#convert all names to uppercase
@@ -410,7 +417,7 @@ def primer():
 	df_p3['ngs_audit_number'] = ngs_audit_number	
 
 	#drop irrelevant columns
-	df_p3 = df_p3.drop(columns = ['imported_by', 'Fragment', 'Set'])
+	df_p3 = df_p3.drop(columns = ['imported_by'])
 
 	#standardise the date format by replacing . and - with /
 	df_p3['date_imported'] = df_p3['date_imported'].replace(to_replace = '\.', value = '/', regex=True)
@@ -419,17 +426,17 @@ def primer():
 	#convert sequence to uppercase
 	df_p3['sequence'] = df_p3['sequence'].str.upper()
 	
-	#add M13 tag to front of appropriate sequences 
-	new_sequence = []
+	#add M13 tag column
+	m13_tag = []
 	for index, row in df_p3.iterrows():
-		if 'M13' in str(row[2]) and 'R' in str(row[7]):
-			new_sequence.append('CAGGAAACAGCTATGAC' + str(row[0])) 
-		elif 'M13' in str(row[2]) and 'F' in str(row[7]):
-			new_sequence.append('GTAAAACGACGGCCAGT' + str(row[0])) 
+		if 'M13' in str(row[2]) and 'R' in str(row[11]):
+			m13_tag.append('CAGGAAACAGCTATGAC') 
+		elif 'M13' in str(row[2]) and 'F' in str(row[11]):
+			m13_tag.append('GTAAAACGACGGCCAGT') 
 		else:
-			new_sequence.append(str(row[0]))
+			m13_tag.append('None')
 
-	df_p3['sequence'] = new_sequence
+	df_p3['m13_tag'] = m13_tag
 
 	#replace empty ngs numbers with 0 to prevent errors downstream 
 	df_p3['ngs_audit_number'] = df_p3['ngs_audit_number'].replace(np.nan, 0)
@@ -449,7 +456,21 @@ def primer():
 	#create a primer name for each record 
 	primer_name = []
 	for index, row in df_p3.iterrows():
-		primer_name.append(str(row[3]) + '_' + str(row[8]) + '___v' + str(row[12]))
+		if 'NGS' in row[6] and 'A' in row[6]:
+			primer_name.append('A_' + str(row[10]) +'_NGS-' + str(row[14]) + '___' + str(row[11]) + '___v' + str(row[16]))
+		elif 'NGS' in row[6] and 'B' in row[6]:
+			primer_name.append('B_' + str(row[10]) + '_NGS-' + str(row[14]) + '___' + str(row[11]) + '___v' + str(row[16]))
+		elif 'A' in row[6]:
+			primer_name.append('A_' + str(row[10]) + '-' + str(row[5]) + '___' + str(row[11]) + '___v' + str(row[16]))
+		elif 'B' in row[6]:
+			primer_name.append('B_' + str(row[10]) + '-' + str(row[5]) + '___' + str(row[11]) + '___v' + str(row[16]))
+		elif 'C' in row[6]:
+			primer_name.append('C_' + str(row[10]) + '-' + str(row[5]) + '___' + str(row[11]) + '___v' + str(row[16]))
+		elif 'O' in row[6]:
+			primer_name.append('O_' + str(row[10]) + '-' + str(row[5]) + '___' + str(row[11]) + '___v' + str(row[16]))
+		else:
+			primer_name.append(str(row[6]) + '_' + str(row[10]) + '-' + str(row[5]) + '___' + str(row[11]) + '___v' + str(row[16]))
+
 	df_p3['name'] = primer_name
 
 	#drop irrelevant columns
@@ -458,18 +479,9 @@ def primer():
 	#replace null values in genomic start and end locations with 0 values to prevent errors with database
 	df_p3['genomic_location_start'] = df_p3['genomic_location_start'].replace(np.nan, 0)
 	df_p3['genomic_location_end'] = df_p3['genomic_location_end'].replace(np.nan, 0)
-
-	#add m13 modification column 
-	m13 = []
-	for index, row in df_p3.iterrows():
-		if 'M13' in str(row[2]):
-			m13.append('M13')
-		else:
-			m13.append('None')
-	df_p3['modification'] = m13
 	
-	#create a primer id for each unique record
-	df_p3['primer_id'] = df_p3.groupby(['sequence', 'location', 'direction', 'amplicon_id']).ngroup()
+	#drop duplicate records
+	df_p3 = df_p3.drop_duplicates(keep='first')
 
 	#save as csv
 	df_p3.to_csv('primer.csv', sep=',')
