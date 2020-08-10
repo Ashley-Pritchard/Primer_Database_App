@@ -19,6 +19,7 @@
   <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
   <p> The following page provides a record of all OMGL primers associated with amplicon {{ amplicon.amplicon_name }}. To <strong>reorder</strong> one or more of the below primers, <strong>select the box</strong> next to the primer and use the 'reorder' option at the bottom of the page.<br><br><br>
   {% for p in primer %}
+    {% if p.order_status == "Stocked" %}
     <table class="table2" style="table-layout: fixed; width: 100%">
     <form action="{% url 'reorder_archive_primer' %}" method="POST">  
       <tr>
@@ -34,9 +35,7 @@
           <td>
           </td>
           <td>
-            {% if p.order_status == 'Stocked' %}
             <input type="checkbox" name="primer" id="primer" value="{{ p.id }}">
-            {% endif %}
           </td>
       <tr>
       <tr>
@@ -156,28 +155,11 @@
         <td>
           {{ p.version }}
           </td>
-          {% if p.order_status == "Archived" %}
-          <td>
-          <strong>Archived By:</strong>
-          </td>
-          <td>
-          {{ p.archived_by_id.imported_by }}
-          </td>
-          <td>
-          <strong>Date Archived:</strong>
-          </td>
-          <td>
-          {{ p.date_archived }}
-          </td>
         </tr>
       </table><br>
-      <p><strong>Reason Archived: </strong> {{ p.reason_archived }}</p>
-      {% else %}
-        </tr>
-      </table><br>
-      {% endif %}
     <p><strong>Comments:</strong> {{ p.comments }}</p><br><br><br>
-  {% endfor %}  
+   {% endif %} 
+ {% endfor %}
       <p> To <strong>reorder</strong> selected primer(s), please use the drop-down menu to select your initials and then click the 'Reorder Primer(s)' button</p><br>
     Reason for Reorder: 
     <select name="reason_reordered" type="text" required=True>
