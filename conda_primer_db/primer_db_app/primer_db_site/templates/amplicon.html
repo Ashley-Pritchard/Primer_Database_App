@@ -6,22 +6,22 @@
 <div class="dropdown">
   <button class="dropbtn">Menu</button>
   <div class="dropdown-content">
-    <a class="active" href="{% url 'index' %}">Search Primers</a>
-    <a class="active" href="{% url 'order' %}">Order Primer</a>
-    <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
-    <a class="active" href="{% url 'order_placed' %}">Primers on Order</a>
-    <a class="active" href="{% url 'in_testing_sanger' %}">Primers in Testing: Sanger</a>
-    <a class="active" href="{% url 'in_testing_non_sanger' %}">Primers in Testing: Non-Sanger</a>
-    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
-    <a class="active" href="{% url 'retesting' %}">Primers in Retesting</a>
+   <a class="active" href="{% url 'index' %}">Primer Search and Reorders</a>
+   <a class="active" href="{% url 'order' %}">New Primer Form</a>
+   <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
+   <a class="active" href="{% url 'order_placed' %}">Ordered Primers</a>
+   <a class="active" href="{% url 'in_testing_sanger' %}">Primers in Testing: Sanger</a>
+   <a class="active" href="{% url 'in_testing_non_sanger' %}">Primers in Testing: Non-Sanger</a>
+   <a class="active" href="{% url 'failed' %}">Failed Validation</a>
+   <a class="active" href="{% url 'retesting' %}">Retesting</a>
   </div>
 </div><br><br> 
   <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
   <p> The following page provides a record of all OMGL primers associated with amplicon {{ amplicon.amplicon_name }}. To <strong>reorder</strong> one or more of the below primers, <strong>select the box</strong> next to the primer and use the 'reorder' option at the bottom of the page.<br><br><br>
   {% for p in primer %}
-    {% if p.order_status == "Stocked" %}
+    {% if p.order_status == 'Stocked' %}
     <table class="table2" style="table-layout: fixed; width: 100%">
-    <form action="{% url 'reorder_archive_primer' %}" method="POST">  
+    <form action="{% url 'reorder_archive_primer' %}" method="POST" id="order">  
       <tr>
         <td>
             <strong>Primer:</strong>
@@ -35,7 +35,7 @@
           <td>
           </td>
           <td>
-            <input type="checkbox" name="primer" id="primer" value="{{ p.id }}">
+            <input type="checkbox" name="primer" id="primer" value="{{ p.id }}" class="order_select">
           </td>
       <tr>
       <tr>
@@ -157,18 +157,18 @@
           </td>
         </tr>
       </table><br>
-    <p><strong>Comments:</strong> {{ p.comments }}</p><br><br><br>
-   {% endif %} 
- {% endfor %}
-      <p> To <strong>reorder</strong> selected primer(s), please use the drop-down menu to select your initials and then click the 'Reorder Primer(s)' button</p><br>
-    Reason for Reorder: 
-    <select name="reason_reordered" type="text" required=True>
-      <option value="">---</option>
-      <option value="Repeat order">Repeat order</option>
-      <option value="New gene / version">New gene / version</option>
-      <option value="NGS confirmation">NGS confirmation</option>
-      <option value="Scientist - R&D">Scientist - R&D</option>
-      <option value="Other">Other</option></select>&nbsp;&nbsp;&nbsp;&nbsp;
+    <p><strong>Comments:</strong> {{ p.comments }}</p><br><br>
+    {% endif %}
+  {% endfor %}  
+      <p> To <strong>reorder</strong> selected primer(s), please use the drop-down menu to select your initials and then click the 'Reorder Primer(s)' button</p>
+      Reason for Reorder:
+      <select name="reason_reordered" type="text" required=True>
+        <option value="">---</option>
+        <option value="Repeat order">Repeat order</option>
+        <option value="New gene / version">New gene / version</option>
+        <option value="NGS confirmation">NGS confirmation</otion>
+        <option value="Scientist - R&D">Scientist - R&D</otion>
+        <option value="Other">Other</otion></select>&nbsp;&nbsp;&nbsp;&nbsp;
     Reordered By:
     <select name="imp_by" type="text" required=True>
       <option value="">---</option>
@@ -177,8 +177,164 @@
           <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
         {% endif %}
       {% endfor %}</select>&nbsp;&nbsp;&nbsp;&nbsp;
-    <input class="p1" type="submit" name="reorder" value="Reorder Primer(s)">
-    </form>
+    <input class="p1" type="submit" name = "reorder" value="Reorder Primer(s)"><br><br>
+    </form><br><br>
+
+<button onclick="myFunction()">Click to Show / Hide Ordered and Archived Primers</button><br>
+
+<div id="myDIV">
+  {% for p in primer %}
+    {% if p.order_status != 'Stocked' %}
+    <br><br><table class="table2" style="table-layout: fixed; width: 100%">
+      <tr>
+        <td>
+            <strong>Primer:</strong>
+          <td>
+            {{ p.name }}
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+      <tr>
+      <tr>
+        <td>
+            <strong>Order Status:</strong>
+          <td>
+            {{ p.order_status }}
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+      <tr>
+        <td>
+          <strong>Analysis</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.analysis_type_id.analysis_type }}
+        </td>
+        <td>
+          <strong>Gene</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.gene_id.gene_name }}
+        </td>
+        <td>
+          <strong>Chromosome</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.gene_id.chromosome }}
+        </td>
+      <tr>
+        <td>
+          <strong>Exon</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.exon }}
+        </td>
+        <td>
+          <strong>Direction</strong>:
+        </td>
+        <td>
+          {{ p.direction }}
+        </td>
+        <td>
+          <strong>Start</strong>:
+        </td>
+        <td>
+          {{ p.genomic_location_start }}
+        </td>
+      <tr>
+        <td>
+          <strong>End</strong>:
+        </td>
+        <td>
+          {{ p.genomic_location_end }}
+        </td>
+        <td>
+          <strong>Set</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.primer_set_id.primer_set }}
+        </td>
+        <td>
+          <strong>Location</strong>:
+        </td>
+        <td>
+          {{ p.location }}
+        </td>
+      <tr>
+        <td>
+          <strong>Sequence</strong>:
+        </td>
+        <td style="word-wrap: break-word">
+          {{ p.sequence }}
+        </td>
+        <td>
+          <strong>NGS Audit Number</strong>:
+        </td>
+        <td>
+          {{ p.ngs_audit_number }}
+        </td>
+        <td>
+          <strong>Imported By</strong>:
+        </td>
+        <td>
+          {{ p.imported_by_id.imported_by }}
+        </td>
+      <tr>
+        <td>
+          <strong>Date Imported</strong>:
+        </td>
+        <td>
+          {{ p.date_imported }}
+        </td>
+        <td>
+          <strong>Amplicon Name</strong>:
+        </td>
+        <td>
+          {{ p.amplicon_id.amplicon_name }}
+        </td>
+        <td>
+          <strong>Alternative Name</strong>:
+        </td>
+        <td>
+          {{ p.alt_name }}
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <strong>Version:</strong>
+        </td>
+        <td>
+          {{ p.version }}
+          </td>
+        </tr>
+      </table><br>
+    <p><strong>Comments:</strong> {{ p.comments }}</p><br><br>
+    {% endif %}
+  {% endfor %}  
+</div>
+
+<script>
+function myFunction() {
+  var x = document.getElementById("myDIV");
+  if (x.style.display === "none") {
+    x.style.display = "block";
+  } else {
+    x.style.display = "none";
+  }
+}
+</script>
 {% endblock %}
 
 
