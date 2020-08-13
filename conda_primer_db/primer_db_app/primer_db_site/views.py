@@ -544,6 +544,7 @@ def submitted(request):
 		primer.alt_name = alt_name[i]
 		primer.comments = comments[i]
 		primer.reason_ordered = reason[i]
+		primer.version = version
 		primer.name = str(new_primer) + '__v' + str(version)
 
 		#if requested, add m13 tag as either forward or reverse 
@@ -584,27 +585,27 @@ def submitted(request):
 
 		#assign the amplicon id
 		if request.POST.get('analysis_type') == 'Sanger':
-			amplicon_name == request.POST.get('set') + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if request.POST.get('analysis_type') == 'NGS':
-			amplicon_name == request.POST.get('set') + '_' + request.POST.get('gene') + '_NGS-' + request.POST.get('ngs')
-		if request.POST.get('analysis_type') == 'Light Scanner':
-			amplicon_name == 'LS_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if request.POST.get('analysis_type') == 'MLPA':
-			amplicon_name == 'ML_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if request.POST.get('analysis_type') == 'Fluorescent':
-			amplicon_name == 'GM_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if request.POST.get('analysis_type') == 'Long Range':
-			amplicon_name == 'LR_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if request.POST.get('analysis_type') == 'RT-PCR':
-			amplicon_name == 'RT_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if request.POST.get('analysis_type') == 'Taqman':
-			amplicon_name == 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if amplicon_name == 'Pyrosequencing':
-			amplicon_name == 'P_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if amplicon_name == 'ARMS: Mutant':
-			amplicon_name == 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		if amplicon_name == 'ARMS: Normal':
-			amplicon_name == 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+			amplicon_name = request.POST.get('set') + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif request.POST.get('analysis_type') == 'NGS':
+			amplicon_name = request.POST.get('set') + '_' + request.POST.get('gene') + '_NGS-' + request.POST.get('ngs')
+		elif request.POST.get('analysis_type') == 'Light Scanner':
+			amplicon_name = 'LS_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif request.POST.get('analysis_type') == 'MLPA':
+			amplicon_name = 'ML_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif request.POST.get('analysis_type') == 'Fluorescent':
+			amplicon_name = 'GM_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif request.POST.get('analysis_type') == 'Long Range':
+			amplicon_name = 'LR_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif request.POST.get('analysis_type') == 'RT-PCR':
+			amplicon_name = 'RT_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif request.POST.get('analysis_type') == 'Taqman':
+			amplicon_name = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif amplicon_name == 'Pyrosequencing':
+			amplicon_name = 'P_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif amplicon_name == 'ARMS: Mutant':
+			amplicon_name = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif amplicon_name == 'ARMS: Normal':
+			amplicon_name = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 
 		find_amp = Amplicon.objects.get(amplicon_name = amplicon_name)
 		primer.amplicon_id = find_amp
