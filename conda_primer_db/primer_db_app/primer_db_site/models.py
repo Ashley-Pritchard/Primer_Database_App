@@ -58,8 +58,8 @@ class Primer(models.Model):
 	date_imported = models.CharField(max_length=20, null=True, blank=True)
 	amplicon_id = models.ForeignKey(Amplicon, on_delete = models.SET_NULL, null=True, blank=True)
 	version = models.IntegerField(blank=True, default='1')
-	choice_1 = [("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN"), ("None", "None")]
-	modification = models.CharField(max_length=10, default="None", choices=choice_1)
+	choice_1 = [("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN"), ("", "")]
+	modification = models.CharField(max_length=10, default="", choices=choice_1)
 	choice_2 = [("Stocked", "Stocked"), ("Ordered", "Ordered"), ("Order Placed", "Order Placed"), ("Recieved", "Recieved"), ("In Testing Sanger", "In Testing Sanger"), ("In Testing Non-Sanger", "In Testing Non-Sanger"), ("Failed Validation", "Failed Validation"), ("Archived", "Archived")]
 	order_status = models.CharField(max_length=50, default='Stocked', choices=choice_2)
 	reason_archived = models.CharField(max_length=1000, null=True, blank=True)
