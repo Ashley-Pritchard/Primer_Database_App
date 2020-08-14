@@ -469,7 +469,8 @@ def submitted(request):
 	start = request.POST.getlist('start')
 	end = request.POST.getlist('end')
 	m13 = request.POST.getlist('m13')
-	modification = request.POST.getlist('modification')
+	mod_3 = request.POST.getlist('3_modification')
+	mod_5 = request.POST.getlist('5_modification')
 	ngs = request.POST.getlist('ngs')
 	alt_name = request.POST.getlist('alt_name')
 	comments = request.POST.getlist('comments')
@@ -484,29 +485,33 @@ def submitted(request):
 	#loop through the number or primers submitted 
 	for i in range(num_primers):
 
+		#add 3' and 5' prefix to modification for naming 
+		modification_3 = '3\'' + mod_3[i]
+		modification_5 = '5\'' + mod_5[i]
+
 		#check if a version of the primer already exists
 		if request.POST.get('analysis_type') == 'Sanger':
-			new_primer = request.POST.get('set') + '_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = request.POST.get('set') + '_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'NGS':
-			new_primer = request.POST.get('set') + '_' + request.POST.get('gene') + '_NGS-' + request.POST.get('ngs') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = request.POST.get('set') + '_' + request.POST.get('gene') + '_NGS-' + request.POST.get('ngs') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'Light Scanner':
-			new_primer = 'LS_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = 'LS_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'MLPA':
-			new_primer = 'ML_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = 'ML_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif requet.POST.get('analysis_type') == 'Fluorescent':
-			new_primer = 'GM_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = 'GM_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'Long Range':
-			new_primer = 'LR_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = 'LR_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'RT-PCR':
-			new_primer = 'RT_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = 'RT_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_tye') == 'Taqman':
-			new_primer = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'Pyrosequencing':
-			new_primer = 'P_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = 'P_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'ARMS: Mutant':
-			new_primer = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modficiation[i]
+			new_primer = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modficiation_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'ARMS: Normal':
-			new_primer = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification[i]
+			new_primer = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 
 		#save list of matching primers
 		matching_primers = [p for p in all_primers if new_primer in p]
@@ -540,12 +545,13 @@ def submitted(request):
 		#assgin user input to each field of the primer table
 		primer.sequence = seq[i].upper()
 		primer.direction = direction[i].upper()
-		primer.modification = modification[i]
+		primer.modification = mod_3[i]
+		primer.modification_5 = mod_5[i]
 		primer.alt_name = alt_name[i]
 		primer.comments = comments[i]
 		primer.reason_ordered = reason[i]
 		primer.version = version
-		primer.name = str(new_primer) + '__v' + str(version)
+		primer.name = str(new_primer) + '_v' + str(version)
 
 		#if requested, add m13 tag as either forward or reverse 
 		if m13[i] == "no":
