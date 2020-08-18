@@ -195,6 +195,9 @@
 <button onclick="myFunction()">Click to Show / Hide Ordered and Archived Primers</button><br>
 
 <div id="myDIV">
+  {% if primer.name is None %}
+  <p>No records found.</p>
+  {% endif %}
   {% for p in primer %}
     {% if p.order_status != 'Stocked' %}
     <br><br><table class="table2" style="table-layout: fixed; width: 100%">
