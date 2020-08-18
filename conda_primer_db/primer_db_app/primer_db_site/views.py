@@ -485,9 +485,15 @@ def submitted(request):
 	#loop through the number or primers submitted 
 	for i in range(num_primers):
 
-		#add 3' and 5' prefix to modification for naming 
-		modification_3 = '3\'' + mod_3[i]
-		modification_5 = '5\'' + mod_5[i]
+		#add 3' and 5' prefix to modification for naming if exist
+		if mod_3[i] != "":
+			modification_3 = '3\'' + mod_3[i]
+		else:
+			modification_3 = mod_3[i]
+		if mod_5[i] != "":
+			modification_5 = '5\'' + mod_5[i]
+		else:
+			modification_5 = mod_5[i]
 
 		#check if a version of the primer already exists
 		if request.POST.get('analysis_type') == 'Sanger':
@@ -498,7 +504,7 @@ def submitted(request):
 			new_primer = 'LS_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'MLPA':
 			new_primer = 'ML_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif requet.POST.get('analysis_type') == 'Fluorescent':
+		elif request.POST.get('analysis_type') == 'Fluorescent':
 			new_primer = 'GM_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'Long Range':
 			new_primer = 'LR_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
