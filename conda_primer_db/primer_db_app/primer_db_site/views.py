@@ -417,9 +417,9 @@ def submit_new_amplicon(request):
 		new_amplicon = 'TQ' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'Pyrosequencing':
 		new_amplicon = 'P' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'ARMS: Mutant':
+	elif request.POST.get('analysis_type') == 'ARMS_Mutant':
 		new_amplicon = 'ARMS_M' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'ARMS: Normal':
+	elif request.POST.get('analysis_type') == 'ARMS_Normal':
 		new_amplicon = 'ARMS_N' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 
 	#if amplicon does not exist, add to the database
@@ -510,13 +510,13 @@ def submitted(request):
 			new_primer = 'LR_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'RT-PCR':
 			new_primer = 'RT_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_tye') == 'Taqman':
+		elif request.POST.get('analysis_type') == 'Taqman':
 			new_primer = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'Pyrosequencing':
 			new_primer = 'P_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'ARMS: Mutant':
-			new_primer = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modficiation_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'ARMS: Normal':
+		elif request.POST.get('analysis_type') == 'ARMS_Mutant':
+			new_primer = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
+		elif request.POST.get('analysis_type') == 'ARMS_Normal':
 			new_primer = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 
 		#save list of matching primers
@@ -612,11 +612,11 @@ def submitted(request):
 			amplicon_name = 'RT_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 		elif request.POST.get('analysis_type') == 'Taqman':
 			amplicon_name = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif amplicon_name == 'Pyrosequencing':
+		elif request.POST.get('analysis_type') == 'Pyrosequencing':
 			amplicon_name = 'P_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif amplicon_name == 'ARMS: Mutant':
+		elif request.POST.get('analysis_type') == 'ARMS_Mutant':
 			amplicon_name = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif amplicon_name == 'ARMS: Normal':
+		elif request.POST.get('analysis_type') == 'ARMS_Normal':
 			amplicon_name = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 
 		find_amp = Amplicon.objects.get(amplicon_name = amplicon_name)
@@ -676,7 +676,10 @@ def submit_order(request):
 		writer.writerow(['name', 'sequence', 'location', 'reason_for_order', 'date received'])
 		for primer in primer_list:
 			export = Primer.objects.get(pk=primer)
-			writer.writerow([export.name, export.m13_tag + export.sequence, export.location, export.reason_ordered])
+			if export.m13_tag != 'None':
+				writer.writerow([export.name, export.m13_tag + export.sequence, export.location, export.reason_ordered])
+			else:
+				writer.writerow([export.name, export.sequence, export.location, export.reason_ordered])
 
 		#export the csv file
 		return response
