@@ -673,13 +673,13 @@ def submit_order(request):
 
 		#write the relevant primer information to a csv file 
 		writer = csv.writer(response)
-		writer.writerow(['name', 'sequence', 'location', 'reason_for_order', 'date received'])
+		writer.writerow(['name', 'sequence', '3\' modification', '5\' modification', 'location', 'reason_for_order', 'date received'])
 		for primer in primer_list:
 			export = Primer.objects.get(pk=primer)
 			if export.m13_tag != 'None':
-				writer.writerow([export.name, export.m13_tag + export.sequence, export.location, export.reason_ordered])
+				writer.writerow([export.name, export.m13_tag + export.sequence, export.modification, export.modification_5, export.location, export.reason_ordered])
 			else:
-				writer.writerow([export.name, export.sequence, export.location, export.reason_ordered])
+				writer.writerow([export.name, export.sequence, export.modification, export.modification_5, export.location, export.reason_ordered])
 
 		#export the csv file
 		return response
