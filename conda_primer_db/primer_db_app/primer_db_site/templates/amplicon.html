@@ -123,7 +123,7 @@
           {{ p.ngs_audit_number }}
         </td>
         <td>
-          <strong>Imported By</strong>:
+          <strong>Requested By</strong>:
         </td>
         <td>
           {{ p.imported_by_id.imported_by }}
@@ -150,6 +150,12 @@
       </tr>
       <tr>
         <td>
+          <strong>m13_tag</strong>:
+        </td>
+        <td>
+          {{ p.m13_tag }}
+        </td>
+        <td>
           <strong>3' Modification</strong>:
         </td>
         <td>
@@ -161,13 +167,25 @@
         <td>
           {{ p.modification_5 }}
         </td>
+      </tr>
+      <tr>
         <td>
           <strong>Version:</strong>
         </td>
         <td>
           {{ p.version }}
           </td>
-        </tr>
+          <td>
+            <strong>Date Testing Completed:</strong>
+          </td>
+          <td>
+            {{ p.date_testing_completed }}
+          </td>
+          <td>
+          </td>
+          <td>
+          </td>
+      </tr>
       </table><br>
     <p><strong>Comments:</strong> {{ p.comments }}</p><br><br>
     {% endif %}
@@ -301,7 +319,7 @@
           {{ p.ngs_audit_number }}
         </td>
         <td>
-          <strong>Imported By</strong>:
+          <strong>Requested By</strong>:
         </td>
         <td>
           {{ p.imported_by_id.imported_by }}
@@ -328,10 +346,45 @@
       </tr>
       <tr>
         <td>
+          <strong>m13_tag</strong>:
+        </td>
+        <td>
+          {{ p.m13_tag }}
+        </td>
+        <td>
+          <strong>3' Modification</strong>
+        </td>
+        <td>
+          {{ p.modification }}
+        </td>
+        <td>
+          <strong>5' Modification</strong>
+        </td>
+        <td>
+          {{ p.modification_5 }}
+        </td>
+      </tr>
+      <tr>
+        <td>
           <strong>Version:</strong>
         </td>
         <td>
           {{ p.version }}
+          </td>
+          <td>
+            {% if p.order_status == 'Archived' %}
+            <strong>Date Archived</strong>:
+          </td>
+          <td>
+            {{ p.date_archived }}
+          </td>
+            {% else %}
+          <td>
+          </td>
+            {% endif %}
+          <td>
+          </td>
+          <td>
           </td>
         </tr>
       </table><br>
