@@ -494,13 +494,13 @@ def submitted(request):
 
 		#add 3' and 5' prefix to modification for naming if exist
 		if mod_3[i] != "":
-			modification_3 = '3\'' + mod_3[i]
+			modification_3 = '3\'' + mod_3[i].upper()
 		else:
-			modification_3 = mod_3[i]
+			modification_3 = mod_3[i].upper()
 		if mod_5[i] != "":
-			modification_5 = '5\'' + mod_5[i]
+			modification_5 = '5\'' + mod_5[i].upper()
 		else:
-			modification_5 = mod_5[i]
+			modification_5 = mod_5[i].upper()
 
 		#check if a version of the primer already exists
 		if request.POST.get('analysis_type') == 'Sanger':
@@ -558,8 +558,8 @@ def submitted(request):
 		#assgin user input to each field of the primer table
 		primer.sequence = seq[i].upper()
 		primer.direction = direction[i].upper()
-		primer.modification = mod_3[i]
-		primer.modification_5 = mod_5[i]
+		primer.modification = mod_3[i].upper()
+		primer.modification_5 = mod_5[i].upper()
 		primer.alt_name = alt_name[i]
 		primer.comments = comments[i]
 		primer.reason_ordered = reason[i]
