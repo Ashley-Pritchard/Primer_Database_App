@@ -575,12 +575,16 @@ def submitted(request):
 		primer.name = str(new_primer) + '_v' + str(version)
 
 		#if requested, add m13 tag as either forward or reverse 
-		if m13[i] == "no":
-			primer.m13_tag = ""
+		if request.POST.get('analysis_type') == 'Sanger' and direction[i] == 'f':
+			primer.m13_tag = 'GATAAACGACGGCCAGT'
+		elif request.POST.get('analysis_type') == 'Sanger' and direction[i] == 'r':
+			primer.m13_tag = 'CAGGAAACAGCTATGAC'
 		elif m13[i] == "yes" and direction[i] == "f":
 			primer.m13_tag = "GATAAACGACGGCCAGT"
 		elif m13[i] == "yes" and direction[i] == "r":
 			primer.m13_tag = "CAGGAAACAGCTATGAC"
+		else:
+			primer.m13_tag = ""
 
 		#if genomic start or end location and ngs number is blank, assign 'None', otherwise assign user input
 		if start[i] != "":
