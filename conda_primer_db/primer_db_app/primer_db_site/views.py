@@ -254,12 +254,16 @@ def reorder_archive_primer(request):
 				primer.genomic_location_end = reorder.genomic_location_end
 				primer.direction = reorder.direction
 				primer.modification = reorder.modification
+				primer.modification_5 = reorder.modification_5
 				primer.alt_name = reorder.alt_name
 				primer.ngs_audit_number = reorder.ngs_audit_number
 				primer.version = reorder.version
 				primer.amplicon_id = reorder.amplicon_id
 				primer.comments = reorder.comments
 				primer.location = reorder.location
+				primer.date_testing_completed = reorder.date_testing_completed
+				primer.m13_tag = reorder.m13_tag
+
 
 				#assingn the 'imported_by' input selected by user to new primer record 
 				find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
@@ -276,6 +280,10 @@ def reorder_archive_primer(request):
 
 				#add reason reordered input by user to the primer record 
 				primer.reason_ordered = request.POST.get('reason_reordered')
+
+				#close the current primer record 
+				reorder.order_status = "Closed"
+				reorder.save()
 
 				#update the database 
 				primer.save()
