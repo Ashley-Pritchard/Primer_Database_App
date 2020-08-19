@@ -765,6 +765,8 @@ def order_recieved(request):
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
 			recieved.save()		
 
+		return render(request, 'order_recieved.html')
+
 	#if 'testing required non sanger' is clicked - iterate through the list of primers selected, update the order to 'in testing non sanger',assign the 'date order received' as todays date and save changes to the database
 	if 'test_non_sanger' in request.POST:
 		for i in range(list_len):
@@ -773,6 +775,8 @@ def order_recieved(request):
 			today = date.today()
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
 			recieved.save()
+
+		return render(request, 'order_recieved.html')
 
 	#if 'testing not required' is clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_order_received' as todays date and save changes to the database
 	if 'stock' in request.POST:
@@ -783,18 +787,17 @@ def order_recieved(request):
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
 			recieved.save()			
 
-	#provide context of submitted primers for the order_recieved html page 
-	location_list = []
-	for i in range(list_len):
-		location_list.append(Primer.objects.get(pk=primer_list[i]))
+		#provide context of submitted primers for the order_recieved html page 
+		location_list = []
+		for i in range(list_len):
+			location_list.append(Primer.objects.get(pk=primer_list[i]))
 
-	context = {
-		"location_list":location_list
-	} 
+		context = {
+			"location_list":location_list
+		} 
 
-	#render the 'submit order' html page from the templates directory 
-	return render(request, 'order_recieved.html', context=context)
-
+		#render the 'submit order' html page from the templates directory 
+		return render(request, 'order_recieved_non_test.html', context=context)
 
 
 
@@ -877,6 +880,16 @@ def tested(request):
 		if worksheet_list[i] != "":
 			update.worksheet_number = worksheet_list[i]
 		update.save()
+
+	#repeat for location
+	location_list = request.POST.getlist('location')
+
+	list_len_loc = len(location_list)
+	for i in range(list_len_loc):
+		update_loc = Primer.objects.get(pk=all_primer_list[i])
+		if location_list[i] != "":
+			update_loc.location = location_list[i]
+		update_loc.save()
 
 	#if save was selcted
 	if 'save' in request.POST:
@@ -1036,6 +1049,16 @@ def retested(request):
 		if worksheet_list[i] != "":
 			update.worksheet_number = worksheet_list[i]
 		update.save()
+
+	#repeat for location
+	location_list = request.POST.getlist('location')
+
+	list_len_loc = len(location_list)
+	for i in range(list_len_loc):
+		update_loc = Primer.objects.get(pk=all_primer_list[i])
+		if location_list[i] != "":
+			update_loc.location = location_list[i]
+		update_loc.save()
 
 	#if 'save' was selected, reload the page
 	if 'save' in request.POST:
