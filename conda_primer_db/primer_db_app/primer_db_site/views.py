@@ -207,11 +207,18 @@ def amplicon(request):
 	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu 
 	imp_by = Imported_By.objects.all()
 
+	count_stocked = 0
+	for p in primer:
+		if p.order_status != 'Stocked':
+			count_stocked += 1
+
+
 	#provide context for the amplicon html page 
 	context = {
 		'amplicon': amplicon,
 		'primer': primer,
-		'imp_by':imp_by
+		'imp_by': imp_by,
+		'count_stocked': count_stocked
 	}
 
 	#render the amplicon html page from the templates directory 
