@@ -19,6 +19,9 @@ class Analysis_Type(models.Model):
 			self.slug = slugify(self.title)
 		super(Post, self).save(*args, **kwargs)
 
+	def __str__(self):
+		return self.analysis_type
+
 	class Meta:
 		ordering = ['analysis_type']
 
@@ -31,6 +34,9 @@ class Gene(models.Model):
 
 class Primer_Set(models.Model):
 	primer_set = models.CharField(max_length=10)
+
+	def __str__(self):
+		return self.primer_set
 
 class Imported_By(models.Model):
 	imported_by = models.CharField(max_length=30)

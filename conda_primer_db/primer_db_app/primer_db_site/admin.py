@@ -4,19 +4,46 @@ from primer_db_site.models import Amplicon, Analysis_Type, Gene, Primer_Set, Imp
 
 #add access to the database via the admin page 
 
-admin.site.register(Amplicon)
-admin.site.register(Analysis_Type)
-admin.site.register(Gene)
-admin.site.register(Primer_Set)
-admin.site.register(Imported_By)
-
-class PrimerAdmin(admin.ModelAdmin):
-	list_display = ('name', 'location')
-	search_fields = ('name', 'location')
+class GeneAdmin(admin.ModelAdmin):
+	list_display = ('gene_name', 'chromosome')
+	search_fields = ('gene_name', 'chromosome')
 
 	def active(self, obj):
 		return obj.is_active == 1
 
 	active.boolean = True
 
+class Imported_ByAdmin(admin.ModelAdmin):
+	list_display = ('imported_by', 'status')
+	search_fields = ('imported_by', 'status')
+
+	def active(self, obj):
+		return obj.is_active == 1
+
+	active.boolean = True
+
+class AmpliconAdmin(admin.ModelAdmin):
+	list_display = ('amplicon_name', 'exon')
+	search_fields = ('amplicon_name', 'exon')
+
+	def active(self, obj):
+		return obj.is_active == 1
+
+	active.boolean = True
+
+class PrimerAdmin(admin.ModelAdmin):
+	list_display = ('name', 'sequence', 'genomic_location_start', 'genomic_location_end', 'location', 'direction', 'alt_name', 'ngs_audit_number', 'comments', 'date_imported', 'version', 'm13_tag', 'modification', 'modification_5',  'order_status', 'date_order_placed', 'date_order_recieved', 'date_testing_completed', 'reason_ordered', 'reason_archived', 'date_archived', 'worksheet_number')
+	search_fields = ('name', 'location', 'direction', 'ngs_audit_number', 'modification', 'modification_5', 'order_status', 'reason_ordered', 'reason_archived', 'm13_tag', 'worksheet_number')
+
+	def active(self, obj):
+		return obj.is_active == 1
+
+	active.boolean = True
+
+#admin.site.register(Primer, PrimerAdmin, Analysis_Type, Analysis_TypeAdmin, Gene, GeneAdmin, Primer_Set, Primer_SetAdmin, Imported_By, Imported_ByAdmin, Amplicon, AmpliconAdmin)
+admin.site.register(Analysis_Type)
+admin.site.register(Gene, GeneAdmin)
+admin.site.register(Primer_Set)
+admin.site.register(Imported_By, Imported_ByAdmin)
+admin.site.register(Amplicon, AmpliconAdmin)
 admin.site.register(Primer, PrimerAdmin)
