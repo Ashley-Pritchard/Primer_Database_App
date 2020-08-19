@@ -176,14 +176,16 @@
           {{ p.version }}
           </td>
           <td>
+            <strong>Reason Ordered</strong>:
+          </td>
+          <td>
+            {{ p.reason_ordered }}
+          </td>
+          <td>
             <strong>Date Testing Completed:</strong>
           </td>
           <td>
             {{ p.date_testing_completed }}
-          </td>
-          <td>
-          </td>
-          <td>
           </td>
       </tr>
       </table><br>
@@ -372,6 +374,12 @@
           {{ p.version }}
           </td>
           <td>
+            <strong>Reason Ordered</strong>:
+          </td>
+          <td>
+            {{ p.reason_ordered }}
+          </td>
+          <td>
             {% if p.order_status == 'Archived' %}
             <strong>Date Archived</strong>:
           </td>
@@ -382,10 +390,6 @@
           <td>
           </td>
             {% endif %}
-          <td>
-          </td>
-          <td>
-          </td>
         </tr>
       </table><br>
     <p><strong>Comments:</strong> {{ p.comments }}</p><br><br>
