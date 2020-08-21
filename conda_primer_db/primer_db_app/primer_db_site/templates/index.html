@@ -55,9 +55,9 @@
           <td colspan="4">
       <select name="analysis_input" type="text"><br>
         <option value="">Select</option>
-        <option value="NGS">NGS</option>
-        <option value="Sanger">Sanger</option>
-        <option value="Other">Other</option>
+        {% for a in analysis_type %}
+        <option value="{{ a.analysis_type }}">{{ a.analysis_type }}</option>
+        {% endfor %}
           </td>
         </tr>
         <tr>

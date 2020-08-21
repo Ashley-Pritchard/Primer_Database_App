@@ -23,15 +23,16 @@ def index(request):
 	num_amplicons = Amplicon.objects.all().count()
 	num_genes = Gene.objects.all().count()
 
-	#the search page provides a dropdown menu to look up primers by who they were 'imported by' - pull this information from the database
-	imp_by = Imported_By.objects.all()
+	#the search page provides a dropdown menu to look up primers by analysis type - pull this information from the database
+	analysis_type = Analysis_Type.objects.all()
 
+	
 	#assign pulled information as context for the page 
 	context = {
 		'num_primers': num_primers,
 		'num_amplicons': num_amplicons,
 		'num_genes': num_genes,
-		'imp_by': imp_by
+		'analysis_type': analysis_type
 	}
 
 	#returns the index html page from the templates directory 
@@ -52,9 +53,9 @@ def search(request):
 	chr_input = request.GET.get('chr_input', None).upper()
 	alt_input = request.GET.get('alt_input', None)
 
-	#provide a count of how many fields the user completed 
+	#provide a count of how many fields the user completed
 	completed_fields = 0
-	
+
 	#if user completed amplicon id field, add 1 to the completed field variable and pull respective primers
 	if amp_id_input !="":
 		completed_fields +=1
@@ -180,7 +181,7 @@ def search(request):
 
 	#provide a count of the number of returned primers for the html page 
 	num_primers = len(primer_search_results)
-	
+
 	#provide appropriate context for the search html page
 	context = {
 		'primer_search_results': primer_search_results,
@@ -363,11 +364,13 @@ def order_form(request):
 
 	#pull imported by options from database to present as dropdown menu
 	imp_by = Imported_By.objects.all()
+	analysis_type = Analysis_Type.objects.all()
 
 	#provide as context for the order form html page
 	context = {
 		"imp_by": imp_by,
-		"number":number
+		"number":number,
+		"analysis_type":analysis_type
 	}
 
 	#render the order html page from the templates directory 
@@ -432,10 +435,12 @@ def submit_new_amplicon(request):
 		new_amplicon = 'TQ' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'Pyrosequencing':
 		new_amplicon = 'P' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'ARMS_Mutant':
+	elif request.POST.get('analysis_type') == 'ARMS: Mutant':
 		new_amplicon = 'ARMS_M' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'ARMS_Normal':
+	elif request.POST.get('analysis_type') == 'ARMS: Normal':
 		new_amplicon = 'ARMS_N' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+	elif request.POST.get('analysis_type') == 'ddPCR':
+		new_amplicon = 'DD' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 
 	#if amplicon does not exist, add to the database
 	if new_amplicon not in all_amplicons:
@@ -529,10 +534,12 @@ def submitted(request):
 			new_primer = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'Pyrosequencing':
 			new_primer = 'P_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'ARMS_Mutant':
+		elif request.POST.get('analysis_type') == 'ARMS: Mutant':
 			new_primer = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'ARMS_Normal':
+		elif request.POST.get('analysis_type') == 'ARMS: Normal':
 			new_primer = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
+		elif request.POST.get('analysis_type') == 'ddPCR':
+			new_primer = 'DD_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + '_' + modification_5
 
 		#save list of matching primers
 		matching_primers = [p for p in all_primers if new_primer in p]
@@ -633,11 +640,12 @@ def submitted(request):
 			amplicon_name = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 		elif request.POST.get('analysis_type') == 'Pyrosequencing':
 			amplicon_name = 'P_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'ARMS_Mutant':
+		elif request.POST.get('analysis_type') == 'ARMS: Mutant':
 			amplicon_name = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'ARMS_Normal':
+		elif request.POST.get('analysis_type') == 'ARMS: Normal':
 			amplicon_name = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-
+		elif request.POST.get('analysis_type') == 'ddPCR':
+			amplicon_name = 'DD_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 		find_amp = Amplicon.objects.get(amplicon_name = amplicon_name)
 		primer.amplicon_id = find_amp
 

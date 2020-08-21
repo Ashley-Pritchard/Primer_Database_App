@@ -150,3 +150,7 @@ button {
 }
 
 
+input.checkbox {
+	width: 18px;
+	height: 18px;
+}

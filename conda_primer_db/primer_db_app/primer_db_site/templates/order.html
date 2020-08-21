@@ -17,14 +17,14 @@
   </div>
 </div><br><br> 
   <h1>Primer Database: New Primer Order</h1>
-  <p> The following form facilitates the ordering of one or more <strong>new</strong> primers associated with a <strong>single</strong> amplicon. To <strong>reorder</strong> a primer or to order an <strong>additional</strong> primer for an amplicon, please first use the <a class="active" href="{% url 'index' %}">search</a> function and then follow the appropriate links. </p><br><br>
+  <p> The following form facilitates the ordering of one or more <strong>new</strong> primers associated with a <strong>single amplicon set</strong>. To <strong>reorder</strong> a primer, please first use the <a class="active" href="{% url 'index' %}">search</a> function and then follow the appropriate links. </p><br><br>
   <form action="{% url 'order_form' %}" method="GET">
     <table>
       <tr>
         <td>
         </td>
         <td>
-        How many primers would you like to order for your amplicon?
+        How many primers would you like to order for your amplicon <strong>set</strong>? 
         </td>
         <td>
         <input name="number" type="number" required>
