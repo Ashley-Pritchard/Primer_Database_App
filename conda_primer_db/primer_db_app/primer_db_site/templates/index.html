@@ -69,10 +69,9 @@
           <td colspan="4">
       <select name="set_input" type="text"><br>
         <option value="">Select</option>
-        <option value="A">A</option>
-        <option value="B">B</option>
-        <option value="C">C</option>
-        <option value="Other">Other</option>
+        {% for p in primer_set %}
+        <option value="{{ p.primer_set }}">{{ p.primer_set }}</option>
+        {% endfor %}
           </td>
           <td>
           </td>

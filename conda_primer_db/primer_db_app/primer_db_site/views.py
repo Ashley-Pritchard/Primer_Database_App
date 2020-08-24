@@ -15,7 +15,7 @@ import csv
 ## Search Page ##
 
 
-#provides context for the index / search page - takes request from users clicking on the 'search' option of the searchbar 
+#provides context for the index / search page - takes request from users clicking on the 'search' option of the searchbar
 def index(request):
 
 	#pull the count of primers, amplicons and genes
@@ -23,16 +23,17 @@ def index(request):
 	num_amplicons = Amplicon.objects.all().count()
 	num_genes = Gene.objects.all().count()
 
-	#the search page provides a dropdown menu to look up primers by analysis type - pull this information from the database
+	#the search page provides dropdown menus to look up primers by analysis type and primer set - pull this information from the database
 	analysis_type = Analysis_Type.objects.all()
+	primer_set = Primer_Set.objects.all()
 
-	
-	#assign pulled information as context for the page 
+	#assign pulled information as context for the page
 	context = {
 		'num_primers': num_primers,
 		'num_amplicons': num_amplicons,
 		'num_genes': num_genes,
-		'analysis_type': analysis_type
+		'analysis_type': analysis_type,
+		'primer_set': primer_set
 	}
 
 	#returns the index html page from the templates directory 
@@ -64,11 +65,11 @@ def search(request):
 		primer_amp = []
 		for a in amp_id_query:
 			primer_amp.append(a.primer_set.all())
-	
+
 	#if amplicon id field was not completed, set variables to "" to prevent errors of it not being assigned when set as context below
 	else:
 		amp_id_query = ""
-		primer_amp =""	
+		primer_amp =""
 
 	#if user completed the analysis input field, add 1 to the completed field varibale and pull resepctive primers 
 	if analysis_input !="":
@@ -132,7 +133,7 @@ def search(request):
 		chr_query = ""
 		primer_chr = ""
 
-	#if user completed the alt name field, add 1 to the completed field variable and pull respective primers
+	#same process as for the amplicon field input above is repeated for the 'alt name'
 	if alt_input !="":
 		completed_fields +=1
 		primer_alt = Primer.objects.filter(alt_name__icontains=alt_input)
@@ -208,6 +209,7 @@ def amplicon(request):
 	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu 
 	imp_by = Imported_By.objects.all()
 
+	#provide a count of stocked primers as context for the page
 	count_stocked = 0
 	for p in primer:
 		if p.order_status != 'Stocked':
@@ -229,13 +231,13 @@ def amplicon(request):
 
 
 
-#from both the primer and amplicon search result pages, the user can reorder a primer - function takes input of the user clicking 'reorder primer' as request. Users can also archive a primer from the primer search result page - function takes input of the user clicking 'archive primer' as request. 
+#from the amplicon search result pages, the user can reorder a primer - function takes input of the user clicking 'reorder primer' as request.(Note that the archive in name is left over from a removed option to enable archiving primers) 
 def reorder_archive_primer(request):
 
 	#if user selects 'reorder primer'
 	if 'reorder' in request.POST:
 
-		#user can select single primer to reorder from primer page or one or more primers from the amplicon page - pull specific primer(s) from the database 
+		#pull specific primer(s) from the database 
 		reorder_list = request.POST.getlist('primer')
 
 		#check a primer was selected 
@@ -298,48 +300,6 @@ def reorder_archive_primer(request):
 			#render the 'warning' html page from the templates directory 
 			return render(request, 'warning.html')
 
-	#if user selects 'archive primer'
-	if 'archive' in request.POST:
-
-		#user can select primer(s) to archive from primer page - pull specific primer(s) from the database
-		archive_list = request.POST.getlist('primer')
-
-		#check primer was selected
-		if len(archive_list) != 0:
-
-			#loop through primers 
-			for i in archive_list:
-				archive = Primer.objects.get(pk=i)
-
-				#ammend the order status of the primer to archived 
-				archive.order_status = 'Archived'
-
-				#ammend the lab location to ""
-				archive.location = ""
-
-				#assign the 'archived by' input selected by user to the primer record 
-				find_arc = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-				for f in find_arc:
-					archive.archived_by_id = f
-
-				#assign the 'date archived' to the primer record as todays date 
-				today = date.today()
-				archive.date_archived = today.strftime("%d/%m/%Y")
-
-				#add reason archived input by user to the primer record 
-				archive.reason_archived = request.POST.get('reason_archived')
-
-				#update the database 
-				archive.save()
-		
-			#render the archive primer html page from the templates directory
-			return render(request, 'archive_primer.html')
-
-		#if no primer was selected 
-		else:
-
-			#render the 'warning' html page from the templates directory
-			return render(request, 'warning.html')
 
 
 
@@ -347,7 +307,7 @@ def reorder_archive_primer(request):
 ##Order Primer Page ## 
 
 
-#provides context for the order page - takes request from users clicking on the 'order primer' option of the searchbar 
+#provides context for the order page - takes request from users clicking on the 'order new gene/version' option of the searchbar 
 def order(request):
 	#renders the 'order' html page from the templates directory
 	return render(request, 'order.html')
@@ -365,12 +325,14 @@ def order_form(request):
 	#pull imported by options from database to present as dropdown menu
 	imp_by = Imported_By.objects.all()
 	analysis_type = Analysis_Type.objects.all()
+	primer_set = Primer_Set.objects.all()
 
 	#provide as context for the order form html page
 	context = {
 		"imp_by": imp_by,
 		"number":number,
-		"analysis_type":analysis_type
+		"analysis_type":analysis_type, 
+		"primer_set": primer_set,
 	}
 
 	#render the order html page from the templates directory 
@@ -773,6 +735,7 @@ def order_recieved(request):
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
 			recieved.save()		
 
+		#return the order recieved html page from the templates directory
 		return render(request, 'order_recieved.html')
 
 	#if 'testing required non sanger' is clicked - iterate through the list of primers selected, update the order to 'in testing non sanger',assign the 'date order received' as todays date and save changes to the database
@@ -784,6 +747,7 @@ def order_recieved(request):
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
 			recieved.save()
 
+		#return the order recieved html page from the templates directory
 		return render(request, 'order_recieved.html')
 
 	#if 'testing not required' is clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_order_received' as todays date and save changes to the database
@@ -804,7 +768,7 @@ def order_recieved(request):
 			"location_list":location_list
 		} 
 
-		#render the 'submit order' html page from the templates directory 
+		#instead render the 'order recieved' html page from the templates directory - this will direct users to update lab location for these primers as they are being moved to 'stocked' 
 		return render(request, 'order_recieved_non_test.html', context=context)
 
 
@@ -852,7 +816,7 @@ def in_testing_sanger(request):
 
 
 
-#takes user clicking the 'in testing: non sanger' searchbar link as request and pulls information of all non sanger primers in testin
+#takes user clicking the 'in testing: non sanger' searchbar link as request and pulls information of all non sanger primers in testing
 def in_testing_non_sanger(request):
 
 	#pulls primers with order status of in testing and analysis type of non-sanger
