@@ -439,8 +439,8 @@ def submit_new_amplicon(request):
 		new_amplicon = 'ARMS_M' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'ARMS: Normal':
 		new_amplicon = 'ARMS_N' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'ddPCR':
-		new_amplicon = 'DD' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+	elif request.POST.get('analysis_type') == 'Probe':
+		new_amplicon = 'Probe' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 
 	#if amplicon does not exist, add to the database
 	if new_amplicon not in all_amplicons:
@@ -538,8 +538,8 @@ def submitted(request):
 			new_primer = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
 		elif request.POST.get('analysis_type') == 'ARMS: Normal':
 			new_primer = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'ddPCR':
-			new_primer = 'DD_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + '_' + modification_5
+		elif request.POST.get('analysis_type') == 'Probe':
+			new_primer = 'Probe_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + '_' + modification_5
 
 		#save list of matching primers
 		matching_primers = [p for p in all_primers if new_primer in p]
@@ -644,8 +644,8 @@ def submitted(request):
 			amplicon_name = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 		elif request.POST.get('analysis_type') == 'ARMS: Normal':
 			amplicon_name = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'ddPCR':
-			amplicon_name = 'DD_' + request.POST.get('gene') + '-' + request.POST.get('exon')
+		elif request.POST.get('analysis_type') == 'Probe':
+			amplicon_name = 'Probe_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 		find_amp = Amplicon.objects.get(amplicon_name = amplicon_name)
 		primer.amplicon_id = find_amp
 
@@ -1091,7 +1091,7 @@ def retested(request):
 			tested.save()
 
 	#if 'not validated' clicked - iterate through the list of primers selected, update the order status to 'failed validation archived', assign the 'date retesting completed' as todays date and save to database 
-	if 'not validated' in request.POST:
+	if 'not' in request.POST:
 		for primer in primer_list:
 			tested = Primer.objects.get(pk=primer)
 			tested.order_status = 'Failed_Validation_Archived'
