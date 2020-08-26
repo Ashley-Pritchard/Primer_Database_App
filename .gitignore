@@ -1,0 +1,5 @@
+*.DS_Store
+*.bat
+*.sqlite3
+*.save
+__pycache__/
