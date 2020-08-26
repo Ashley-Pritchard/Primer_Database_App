@@ -3,19 +3,7 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<div class="dropdown">
-  <button class="dropbtn">Menu</button>
-  <div class="dropdown-content">
-    <a class="active" href="{% url 'index' %}">Primer Search and Reorders</a>
-    <a class="active" href="{% url 'order' %}">Order New Gene/Version</a>
-    <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
-    <a class="active" href="{% url 'order_placed' %}">Order Primers</a>
-    <a class="active" href="{% url 'in_testing_sanger' %}">Primers in Testing: Sanger</a>
-    <a class="active" href="{% url 'in_testing_non_sanger' %}"> Primers in Testing: Non-Sanger</a>
-    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
-    <a class="active" href="{% url 'retesting' %}">Retesting</a>
-  </div>
-</div><br><br> 
+
   <h1>Primer Database: New Primer Order Form</h1>
   <p> Fill in the amplicon information first, then complete the tables for each of your primers. Required fields are marked with *.<br><br>
   <form action="{% url 'submitted' %}" method="POST">
@@ -58,7 +46,7 @@
       </tr>
       <tr>
         <td>
-        Primer Set: 
+        Primer Set:
         </td>
         <td>
         <select name="set" type="text">
@@ -70,7 +58,7 @@
       </tr>
       <tr>
         <td>
-        Requested by: * 
+        Requested by: *
         </td>
         <td>
         <select name="imp_by" type="text" required=True>
@@ -178,7 +166,7 @@
       </tr>
       <tr>
         <td>
-        Alternative Name: 
+        Alternative Name:
         </td>
         <td>
         <input name="alt_name" type="text">
@@ -208,10 +196,7 @@
       </tr>
     </table><br><br>
     {% endfor %}
-  <input class="p1" type="submit" name="quit" value="Submit and Quit">   
-  <input class="p1" type="submit" name="reload" value="Submit and Order More Primers">           
+  <input class="p1" type="submit" name="quit" value="Submit and Quit">
+  <input class="p1" type="submit" name="reload" value="Submit and Order More Primers">
   </form>
 {% endblock %}
- 
-
-

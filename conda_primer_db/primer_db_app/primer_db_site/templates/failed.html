@@ -3,24 +3,12 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-<div class="dropdown">
-  <button class="dropbtn">Menu</button>
-  <div class="dropdown-content">
-    <a class="active" href="{% url 'index' %}">Primer Search and Reorders</a>
-    <a class="active" href="{% url 'order' %}">Order New Gene/Version</a>
-    <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
-    <a class="active" href="{% url 'order_placed' %}">Ordered Primers</a>
-    <a class="active" href="{% url 'in_testing_sanger' %}">Primers in Testing: Sanger</a>
-    <a class="active" href="{% url 'in_testing_non_sanger' %}">Primers In Testing: Non-Sanger</a>
-    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
-    <a class="active" href="{% url 'retesting' %}">Retesting</a>
-  </div>
-</div><br><br> 
+
   <h1>Primer Database: Failed Validation</h1>
   <p> Primer information for primers that have failed validation:<br><br><br><br>
   {% for t in failed %}
     <table class="table" style="table-layout: auto-fit; width: 100%">
-    <form action="{% url 'remove_failed' %}" method="POST"> 
+    <form action="{% url 'remove_failed' %}" method="POST">
       <tr>
         <td>
           <strong>Primer ID</strong>:
@@ -49,10 +37,8 @@
         <td>
           <input type="checkbox" name="primer" id="primer" value="{{ t.id }}" checked="checked">
     </table>
-  {% endfor %}<br><br> 
-  <input class="p1" type="submit" name="discard" value="Discard">   
+  {% endfor %}<br><br>
+  <input class="p1" type="submit" name="discard" value="Discard">
   <input class="p1" type="submit" name="retest" value="Retest">
   </form>
 {% endblock %}
-
-

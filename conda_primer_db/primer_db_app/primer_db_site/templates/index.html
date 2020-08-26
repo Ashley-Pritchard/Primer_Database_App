@@ -2,19 +2,7 @@
 
 {% extends "base_generic.html" %}
 {% block content %}
-<div class="dropdown">
-  <button class="dropbtn">Menu</button>
-  <div class="dropdown-content">
-    <a class="active" href="{% url 'index' %}">Primer Search and Reorders</a>
-    <a class="active" href="{% url 'order' %}">Order New Gene/Version</a>
-    <a class="active" href="{% url 'ordered' %}">Primers to be Ordered</a>
-    <a class="active" href="{% url 'order_placed' %}">Ordered Primers</a>
-    <a class="active" href="{% url 'in_testing_sanger' %}">Primers in Testing: Sanger</a>
-    <a class="active" href="{% url 'in_testing_non_sanger' %}">Primers in Testing: Non-Sanger</a>
-    <a class="active" href="{% url 'failed' %}">Failed Validation</a>
-    <a class="active" href="{% url 'retesting' %}">Retesting</a>
-  </div>
-</div><br><br> 
+
   <h1>Primer Database: Search and Reorders</h1><br>
   <p>Welcome to the Primer Database for the OUH Molecular Genetics Laboratory. We currently have <strong>{{ num_primers }}</strong> primers covering <strong>{{ num_amplicons }}</strong> amplicons and <strong>{{ num_genes }}</strong> genes. Fill in one or more boxes in the form below to search for primers: </p><br>
   <div>
@@ -87,6 +75,3 @@
     </form>
   </div>
 {% endblock %}
-
-
-
