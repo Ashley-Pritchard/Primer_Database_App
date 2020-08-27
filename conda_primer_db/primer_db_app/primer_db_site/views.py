@@ -1,21 +1,87 @@
-#views - each function takes a web request and returns a web response. The web app has search bar at the top - the below requests have been ordered into respecitive pages and their derivatives. 
+#views - each function takes a web request and returns a web response. The web app has search bar at the top - the below requests have been ordered into respecitive pages and their derivatives.
 
 #import relevant libraries
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
+from django.conf import settings
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth.models import User, Group
+from django.urls import reverse
+from django.contrib import messages
 from .models import *
+from .forms import *
 from itertools import chain
 from collections import Counter
-from datetime import date 
+from datetime import date
 import glob
 import collections
 import csv
 
+LOGINURL = settings.LOGIN_URL
+
+#used in user_passes_test decorator to check if someone if logged in
+def is_logged_in(user):
+    return user.is_active
+
+def loginview(httprequest):
+    if httprequest.user.is_authenticated:
+        logout(httprequest)
+        messages.success(httprequest,"You are now logged out")
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        if httprequest.method == "POST" and "login" in httprequest.POST:
+            form = LoginForm(httprequest.POST)
+            if form.is_valid():
+                user = authenticate(username=form.cleaned_data["username"], password=form.cleaned_data["password"])
+                if user is not None and user.is_active:
+                    login(httprequest, user)
+                    return HttpResponseRedirect(reverse("index"))
+
+                else:
+                    try:
+                        User.objects.get(username=form.cleaned_data["username"])
+                        messages.success(httprequest, "Incorrect password entered")
+                    except:
+                        messages.success(httprequest, f'User {form.cleaned_data["username"]} does not exist')
+            else:
+                pass
+
+        else:
+            form = LoginForm()
+    return render(httprequest, "login.html", {"form": form})
+
+@user_passes_test(is_logged_in, login_url=LOGINURL)
+def change_password(httprequest):
+    if httprequest.method == 'POST':
+        form = PasswordChangeForm(httprequest.user, httprequest.POST)
+        if form.is_valid():
+            if form.cleaned_data["old_password"]==form.cleaned_data["new_password1"]:
+                messages.success(httprequest, 'Your password new password cannot be your old password')
+                return HttpResponseRedirect(reverse("change_password"))
+            user = form.save()
+            update_session_auth_hash(httprequest, user)  # Important!
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            errors=[]
+            for v in form.errors.values():
+                errors+=[str(v[0]).strip('<ul class="errorlist"><li><\lie></').replace("didn't", "do not")]
+            messages.success(httprequest, (" ".join(errors)))
+    else:
+        form = PasswordChangeForm(httprequest.user)
+    submiturl = reverse("change_password")
+    cancelurl = reverse("index")
+    context={"form": form, "heading":"Change Password for {}".format(httprequest.user),
+             "submiturl": submiturl, "cancelurl": cancelurl}
+
+    return render(httprequest, "pwform.html", context)
 
 ## Search Page ##
 
 
 #provides context for the index / search page - takes request from users clicking on the 'search' option of the searchbar
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def index(request):
 
 	#pull the count of primers, amplicons and genes
@@ -36,17 +102,18 @@ def index(request):
 		'primer_set': primer_set
 	}
 
-	#returns the index html page from the templates directory 
+	#returns the index html page from the templates directory
 	return render(request, 'index.html', context=context)
 
 
 
 
 
-#takes the users search terms from the index /search page as the request and queries the database to pull matching primers 
+#takes the users search terms from the index /search page as the request and queries the database to pull matching primers
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def search(request):
 
-	#assign each of the user search inputs to variables 
+	#assign each of the user search inputs to variables
 	amp_id_input = request.GET.get('amp_id_input', None)
 	analysis_input = request.GET.get('analysis_input', None)
 	set_input = request.GET.get('set_input', None)
@@ -71,19 +138,19 @@ def search(request):
 		amp_id_query = ""
 		primer_amp =""
 
-	#if user completed the analysis input field, add 1 to the completed field varibale and pull resepctive primers 
+	#if user completed the analysis input field, add 1 to the completed field varibale and pull resepctive primers
 	if analysis_input !="":
 		completed_fields +=1
 		analysis_query = Analysis_Type.objects.filter(analysis_type=analysis_input)
 
-		#due to foreign key set-up, two steps to pull primer information from analysis_type: analysis_type -> amplicon -> primer 		
+		#due to foreign key set-up, two steps to pull primer information from analysis_type: analysis_type -> amplicon -> primer
 		primer_analysis = []
 		for a in analysis_query:
 			x = a.amplicon_set.all()
 			for y in x:
 				primer_analysis.append(y.primer_set.all())
 
-	#if analysis type field was not completed, set variables to "" to prevent downstream errors 
+	#if analysis type field was not completed, set variables to "" to prevent downstream errors
 	else:
 		analysis_query = ""
 		primer_analysis = ""
@@ -144,7 +211,7 @@ def search(request):
 	#create an empty list and append all primers pulled from the database based on user input above
 	primer_search = []
 
-	#append primers to list - two for loops are required for those with input 2 foreign keys away from the primer table 
+	#append primers to list - two for loops are required for those with input 2 foreign keys away from the primer table
 	for a in primer_amp:
 		for x in a:
 			primer_search.append(x)
@@ -168,10 +235,10 @@ def search(request):
 	for a in primer_alt:
 		primer_search.append(a)
 
-	#provide a count for each primer occurance 
+	#provide a count for each primer occurance
 	occurence_count = collections.Counter(primer_search)
 
-	#want to pull primers that match all search terms - append primers that appear in the primer search list the same number of times as the calculated completed fields variable 
+	#want to pull primers that match all search terms - append primers that appear in the primer search list the same number of times as the calculated completed fields variable
 	primer_search_results = []
 	for primer, count in occurence_count.items():
 		if count == completed_fields:
@@ -180,7 +247,7 @@ def search(request):
 	#order results alphabetically
 	primer_search_results.sort(key=lambda x: x.name)
 
-	#provide a count of the number of returned primers for the html page 
+	#provide a count of the number of returned primers for the html page
 	num_primers = len(primer_search_results)
 
 	#provide appropriate context for the search html page
@@ -196,17 +263,18 @@ def search(request):
 
 
 
-#from the search results page, takes user clicking on specific amplicon as request and pulls respective primer information for those matching the amplicon id 
+#from the search results page, takes user clicking on specific amplicon as request and pulls respective primer information for those matching the amplicon id
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def amplicon(request):
 
 	#pull information for the amplicon selected by the user from the database
 	amplicon_input = request.GET.get('selected_amplicon', None)
 	amplicon = Amplicon.objects.get(amplicon_name=amplicon_input)
 
-	#pull primer information for amplicon 
+	#pull primer information for amplicon
 	primer = amplicon.primer_set.all()
 
-	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu 
+	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu
 	imp_by = Imported_By.objects.all()
 
 	#provide a count of stocked primers as context for the page
@@ -216,7 +284,7 @@ def amplicon(request):
 			count_stocked += 1
 
 
-	#provide context for the amplicon html page 
+	#provide context for the amplicon html page
 	context = {
 		'amplicon': amplicon,
 		'primer': primer,
@@ -224,33 +292,34 @@ def amplicon(request):
 		'count_stocked': count_stocked
 	}
 
-	#render the amplicon html page from the templates directory 
+	#render the amplicon html page from the templates directory
 	return render(request, 'amplicon.html', context=context)
 
 
 
 
 
-#from the amplicon search result pages, the user can reorder a primer - function takes input of the user clicking 'reorder primer' as request.(Note that the archive in name is left over from a removed option to enable archiving primers) 
+#from the amplicon search result pages, the user can reorder a primer - function takes input of the user clicking 'reorder primer' as request.(Note that the archive in name is left over from a removed option to enable archiving primers)
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def reorder_archive_primer(request):
 
 	#if user selects 'reorder primer'
 	if 'reorder' in request.POST:
 
-		#pull specific primer(s) from the database 
+		#pull specific primer(s) from the database
 		reorder_list = request.POST.getlist('primer')
 
-		#check a primer was selected 
+		#check a primer was selected
 		if len(reorder_list) != 0:
 
-			#loop through list of primers 
+			#loop through list of primers
 			for i in reorder_list:
 				reorder = Primer.objects.get(pk=i)
 
-				#make changes to the primer table of the database 
+				#make changes to the primer table of the database
 				primer = Primer()
 
-				#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder 
+				#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder
 				primer.name = reorder.name
 				primer.sequence = reorder.sequence
 				primer.genomic_location_start = reorder.genomic_location_start
@@ -268,12 +337,12 @@ def reorder_archive_primer(request):
 				primer.m13_tag = reorder.m13_tag
 
 
-				#assingn the 'imported_by' input selected by user to new primer record 
+				#assingn the 'imported_by' input selected by user to new primer record
 				find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
 				for f in find_imp:
 					primer.imported_by_id = f
 
-				#assign the 'date imported' to the new primer record as todays date 
+				#assign the 'date imported' to the new primer record as todays date
 				today = date.today()
 				primer.date_imported = today.strftime("%d/%m/%Y")
 				primer.date_order_placed = today.strftime("%d/%m/%Y")
@@ -281,33 +350,34 @@ def reorder_archive_primer(request):
 				#assign the order status of the new primer record to 'ordered'
 				primer.order_status = "Ordered"
 
-				#add reason reordered input by user to the primer record 
+				#add reason reordered input by user to the primer record
 				primer.reason_ordered = request.POST.get('reason_reordered')
 
-				#close the current primer record 
+				#close the current primer record
 				reorder.order_status = "Closed"
 				reorder.save()
 
-				#update the database 
+				#update the database
 				primer.save()
-	
-			#render the 'submitted reorder primer' html page from the templates directory 
+
+			#render the 'submitted reorder primer' html page from the templates directory
 			return render(request, 'submitted_reorder_primer.html')
 
-		#if primer was not selected 
+		#if primer was not selected
 		else:
 
-			#render the 'warning' html page from the templates directory 
+			#render the 'warning' html page from the templates directory
 			return render(request, 'warning.html')
 
 
 
 
 
-##Order Primer Page ## 
+##Order Primer Page ##
 
 
-#provides context for the order page - takes request from users clicking on the 'order new gene/version' option of the searchbar 
+#provides context for the order page - takes request from users clicking on the 'order new gene/version' option of the searchbar
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def order(request):
 	#renders the 'order' html page from the templates directory
 	return render(request, 'order.html')
@@ -316,7 +386,8 @@ def order(request):
 
 
 
-#from the order page, takes user input of how many primers they wish to order as request 
+#from the order page, takes user input of how many primers they wish to order as request
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def order_form(request):
 
 	#pull number of primers user selected for ordering as a range
@@ -331,11 +402,11 @@ def order_form(request):
 	context = {
 		"imp_by": imp_by,
 		"number":number,
-		"analysis_type":analysis_type, 
+		"analysis_type":analysis_type,
 		"primer_set": primer_set,
 	}
 
-	#render the order html page from the templates directory 
+	#render the order html page from the templates directory
 	return render(request, 'order_form.html', context=context)
 
 
@@ -345,21 +416,22 @@ def order_form(request):
 #from the order form page, takes submission of new primer(s) as request
 #function one of three - separated as the first two make changes to the database required for the third
 #function 1 - adds a new gene to the database if the requested primer is in a gene not currently stored
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def submit_new_gene(request):
 
-	#pull all genes from the database and store as a list 
+	#pull all genes from the database and store as a list
 	genes = Gene.objects.all()
 	gene_names = []
 	for g in genes:
 		gene_names.append(g.gene_name)
 
-	#if the submitted gene is not in the gene list, add the gene and respective chromosome to the database 
+	#if the submitted gene is not in the gene list, add the gene and respective chromosome to the database
 	if request.POST.get('gene').upper() not in gene_names:
 		gene = Gene()
 		gene.gene_name = request.POST.get('gene').upper()
 		gene.chromosome = request.POST.get('chr').upper()
 
-		#save the changes to the database 
+		#save the changes to the database
 		gene.save()
 
 	#render the submitted html page from the templates directory
@@ -367,18 +439,19 @@ def submit_new_gene(request):
 
 
 #function 2 of 3 - adds new amplicon to the database if the requested primer is for an amplicon not currently stored
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def submit_new_amplicon(request):
 
 	#call first function
 	submit_new_gene(request)
 
-	#pull all amplicons from the database and store as list 
+	#pull all amplicons from the database and store as list
 	amplicons = Amplicon.objects.all()
 	all_amplicons = []
 	for a in amplicons:
 		all_amplicons.append(a.amplicon_name)
 
-	#create amplicon name using field input 
+	#create amplicon name using field input
 	if request.POST.get('analysis_type') == 'Sanger':
 		new_amplicon = request.POST.get('set') + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
 	elif request.POST.get('analysis_type') == 'NGS':
@@ -430,13 +503,14 @@ def submit_new_amplicon(request):
 			amplicon.primer_set_id = f
 
 		#save the changes to the database
-		amplicon.save()	
+		amplicon.save()
 
-	#render the submitted html page from templates directory 
+	#render the submitted html page from templates directory
 	return render(request, 'submitted.html')
 
 
 #function three of three for primer order submission
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def submitted(request):
 
 	#call second function
@@ -445,7 +519,7 @@ def submitted(request):
 	#pull number of primers submitted by calculating the length of the sequence list (mandatory field)
 	num_primers = len(request.POST.getlist('seq'))
 
-	#pull lists for each input field for primer(s) submitted 
+	#pull lists for each input field for primer(s) submitted
 	seq = request.POST.getlist('seq')
 	direction = request.POST.getlist('direction')
 	start = request.POST.getlist('start')
@@ -458,13 +532,13 @@ def submitted(request):
 	comments = request.POST.getlist('comments')
 	reason = request.POST.getlist('reason')
 
-	#pull all primers from the database and store as list 
+	#pull all primers from the database and store as list
 	primers = Primer.objects.all()
 	all_primers = []
 	for p in primers:
 		all_primers.append(p.name)
 
-	#loop through the number or primers submitted 
+	#loop through the number or primers submitted
 	for i in range(num_primers):
 
 		#add 3' and 5' prefix to modification for naming if exist
@@ -515,7 +589,7 @@ def submitted(request):
 
 			for p in primer_version:
 				version_number.append(p.version)
-				#if sequecen matches, close current primer and assign same version number 
+				#if sequecen matches, close current primer and assign same version number
 				if p.sequence == seq[i].upper():
 					version = p.version
 					version_count += 1
@@ -529,7 +603,7 @@ def submitted(request):
 			else:
 				version = 1
 
-		#make changes to the primer table of the database 
+		#make changes to the primer table of the database
 		primer = Primer()
 
 		#assgin user input to each field of the primer table
@@ -543,7 +617,7 @@ def submitted(request):
 		primer.version = version
 		primer.name = str(new_primer) + '_v' + str(version)
 
-		#if requested, add m13 tag as either forward or reverse 
+		#if requested, add m13 tag as either forward or reverse
 		if request.POST.get('analysis_type') == 'Sanger' and direction[i] == 'f':
 			primer.m13_tag = 'GATAAACGACGGCCAGT'
 		elif request.POST.get('analysis_type') == 'Sanger' and direction[i] == 'r':
@@ -571,7 +645,7 @@ def submitted(request):
 		else:
 			primer.ngs_audit_number = None
 
-		#assign todays date as 'date imported' for new primer record 
+		#assign todays date as 'date imported' for new primer record
 		today = date.today()
 		primer.date_imported = today.strftime("%d/%m/%Y")
 
@@ -631,13 +705,14 @@ def submitted(request):
 ## Primers to be Ordered Page ##
 
 
-#takes user clicking the 'primers on order' searchbar link as request and pulls the information of all primers with an order status of 'ordered' 
+#takes user clicking the 'primers on order' searchbar link as request and pulls the information of all primers with an order status of 'ordered'
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def ordered(request):
 
 	#pull primers with order status of ordered
 	ordered = Primer.objects.filter(order_status = "Ordered")
 
-	#provide context for the ordered html page 
+	#provide context for the ordered html page
 	context = {
 		"ordered": ordered
 	}
@@ -649,7 +724,8 @@ def ordered(request):
 
 
 
-#from the 'primers on order page', users are able to select primers and can click one of three buttons to either download the primer information for placing an order for the primers with a company, change the status of the primer to having been ordered with a company or delete the primer order before it is ordered from a company - this function takes the user clicking on any of these buttons as request 
+#from the 'primers on order page', users are able to select primers and can click one of three buttons to either download the primer information for placing an order for the primers with a company, change the status of the primer to having been ordered with a company or delete the primer order before it is ordered from a company - this function takes the user clicking on any of these buttons as request
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def submit_order(request):
 
 	#pull the selected primers based on the checkboxes selected on the 'primers to be ordered' html page
@@ -660,7 +736,7 @@ def submit_order(request):
 		response = HttpResponse(content_type='text/csv')
 		response['Content-Disposition'] = 'attachment; filename="order_information.csv"'
 
-		#write the relevant primer information to a csv file 
+		#write the relevant primer information to a csv file
 		writer = csv.writer(response)
 		writer.writerow(['name', 'sequence', '3\' modification', '5\' modification', 'location', 'reason_for_order', 'date received'])
 		for primer in primer_list:
@@ -673,23 +749,23 @@ def submit_order(request):
 		#export the csv file
 		return response
 
-	
-	#if the 'ordered' button is clicked - iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date. 
+
+	#if the 'ordered' button is clicked - iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date.
 	if 'ordered' in request.POST:
 		for primer in primer_list:
 			order = Primer.objects.get(pk=primer)
 			order.order_status = 'Order Placed'
 			today = date.today()
 			order.date_order_placed = today.strftime("%d/%m/%Y")
-			order.save()		
+			order.save()
 
 	#if the 'delete' button is clicked - iterate through the list of primers selected and delete from the database
 	if 'delete' in request.POST:
 		for primer in primer_list:
 			delete = Primer.objects.get(pk=primer)
-			delete.delete()			
+			delete.delete()
 
-	#render the 'submit order' html page from the templates directory 
+	#render the 'submit order' html page from the templates directory
 	return render(request, 'submit_order.html')
 
 
@@ -699,18 +775,19 @@ def submit_order(request):
 ## Primers on Order Page ##
 
 
-#takes user clicking the 'primers on order' searchbar link as request and pulls the information of all primers with an order status of 'order placed' 
+#takes user clicking the 'primers on order' searchbar link as request and pulls the information of all primers with an order status of 'order placed'
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def order_placed(request):
 
 	#pull primers with order status of order placed
 	ordered = Primer.objects.filter(order_status = "Order Placed")
 
-	#provide context for the order placed html page 
+	#provide context for the order placed html page
 	context = {
 		"ordered": ordered
 	}
 
-	#render the order placed html page from the templates directory 
+	#render the order placed html page from the templates directory
 	return render(request, 'order_placed.html', context=context)
 
 
@@ -718,9 +795,10 @@ def order_placed(request):
 
 
 #from the 'primers to be ordered' page, allow users to update the status of a primer from having been requested to order placed with the company - takes users selecting primer(s) and clicking on either 'recieved: testing required' or 'recieved: testing not required' as request
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def order_recieved(request):
 
-	#pull the selected primer(s) based on the checkboxes selected on the 'primers to be ordered' html page. 
+	#pull the selected primer(s) based on the checkboxes selected on the 'primers to be ordered' html page.
 	primer_list = request.POST.getlist('primer')
 
 	#calculate how many primers have been selected from the length of the primer list
@@ -733,7 +811,7 @@ def order_recieved(request):
 			recieved.order_status = 'In Testing Sanger'
 			today = date.today()
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
-			recieved.save()		
+			recieved.save()
 
 		#return the order recieved html page from the templates directory
 		return render(request, 'order_recieved.html')
@@ -757,32 +835,33 @@ def order_recieved(request):
 			recieved.order_status = 'Stocked'
 			today = date.today()
 			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
-			recieved.save()			
+			recieved.save()
 
-		#provide context of submitted primers for the order_recieved html page 
+		#provide context of submitted primers for the order_recieved html page
 		location_list = []
 		for i in range(list_len):
 			location_list.append(Primer.objects.get(pk=primer_list[i]))
 
 		context = {
 			"location_list":location_list
-		} 
+		}
 
-		#instead render the 'order recieved' html page from the templates directory - this will direct users to update lab location for these primers as they are being moved to 'stocked' 
+		#instead render the 'order recieved' html page from the templates directory - this will direct users to update lab location for these primers as they are being moved to 'stocked'
 		return render(request, 'order_recieved_non_test.html', context=context)
 
 
 
 
 #for primers submitted as recieved, update the location information
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def location_updated(request):
 
-	#pull lists of submitted primers and locations 
+	#pull lists of submitted primers and locations
 	primer = request.POST.getlist('primer')
 	location_list = request.POST.getlist('location')
 	list_len = len(request.POST.getlist('location'))
 
-	#update the location info for primers locations were submitted for 
+	#update the location info for primers locations were submitted for
 	for i in range(list_len):
 		update = Primer.objects.get(pk=primer[i])
 		if location_list[i] != "":
@@ -799,13 +878,14 @@ def location_updated(request):
 ## In Testing Page ##
 
 
-#takes user clicking the 'in testing:sanger' searchbar link as request and pulls the information of all sanger primers with an order status of 'in testing' 
+#takes user clicking the 'in testing:sanger' searchbar link as request and pulls the information of all sanger primers with an order status of 'in testing'
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def in_testing_sanger(request):
 
 	#pull primers with order status of in testing and analysis type of sanger
 	testing = Primer.objects.filter(order_status = "In Testing Sanger")
 
-	#provide context for the in testing: sanger html page 
+	#provide context for the in testing: sanger html page
 	context = {
 		"testing": testing
 	}
@@ -817,12 +897,13 @@ def in_testing_sanger(request):
 
 
 #takes user clicking the 'in testing: non sanger' searchbar link as request and pulls information of all non sanger primers in testing
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def in_testing_non_sanger(request):
 
 	#pulls primers with order status of in testing and analysis type of non-sanger
 	testing = Primer.objects.filter(order_status = "In Testing Non-Sanger")
 
-	#provide context for the in testing: non-sanger html page 
+	#provide context for the in testing: non-sanger html page
 	context = {
 		"testing": testing
 	}
@@ -833,13 +914,14 @@ def in_testing_non_sanger(request):
 
 
 
-#from the 'in testing' page, allows users to update the status of a primer from in testing to either stocked or failed validation - takes user selecting primers and clicking 'validated' or 'not validated' as request   
+#from the 'in testing' page, allows users to update the status of a primer from in testing to either stocked or failed validation - takes user selecting primers and clicking 'validated' or 'not validated' as request
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def tested(request):
 
-	#pull all primers from 'in testing' page 
+	#pull all primers from 'in testing' page
 	all_primer_list = request.POST.getlist('all_primers')
 
-	#pull worksheet info from free text field for all primers 
+	#pull worksheet info from free text field for all primers
 	worksheet_list = request.POST.getlist('worksheet')
 
 	#pull the selected primers based on the checkboxes selected on the 'in testing' page
@@ -899,16 +981,16 @@ def tested(request):
 			tested.order_status = 'Stocked'
 			today = date.today()
 			tested.date_testing_completed = today.strftime("%d/%m/%Y")
-			tested.save()		
+			tested.save()
 
-	#if 'not validated' selected, iterate through the list of primers selected, update the order status to 'failed validation', assign the 'date_testing_completed' as todays date and save changes to database 
+	#if 'not validated' selected, iterate through the list of primers selected, update the order status to 'failed validation', assign the 'date_testing_completed' as todays date and save changes to database
 	if 'not' in request.POST:
 		for primer in primer_list:
 			tested = Primer.objects.get(pk=primer)
 			tested.order_status = 'Failed Validation'
 			today = date.today()
 			tested.date_testing_completed = today.strftime("%d/%m/%Y")
-			tested.save()			
+			tested.save()
 
 	#if 'export name and sequence' selected, download a csv file with resepctive information
 	if 'export' in request.POST:
@@ -922,7 +1004,7 @@ def tested(request):
 			export = Primer.objects.get(pk=primer)
 			writer.writerow([export.name, export.m13_tag + export.sequence])
 
-		#export the csv file 
+		#export the csv file
 		return response
 
 	#render the 'tested' html page from the templates directory
@@ -936,12 +1018,13 @@ def tested(request):
 
 
 #takes user clicking the 'failed validation' searchbar link as request and pulls the information of all primers with an order status of 'failed validation'
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def failed(request):
 
 	#pull primers with order status of failed validation
 	failed = Primer.objects.filter(order_status = "Failed Validation")
 
-	#provide context for the failed html page 
+	#provide context for the failed html page
 	context = {
 		"failed": failed
 	}
@@ -954,20 +1037,21 @@ def failed(request):
 
 
 #allows users to remove primers from the 'failed validation' primers by changing their order status to archived - takes users selecting primers and clicking on 'remove' as request
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def remove_failed(request):
 
-	#pull selected primer(s) from the database 
+	#pull selected primer(s) from the database
 	update_list = request.POST.getlist('primer')
 
 	#if choose to discard primer
-	if 'discard' in request.POST: 
-		#iterate through primer list, update order status and save changes to database 
+	if 'discard' in request.POST:
+		#iterate through primer list, update order status and save changes to database
 		for i in update_list:
 			update = Primer.objects.get(pk=i)
 			update.order_status = 'Failed_Validation_Archived'
 			update.save()
 
-	#if choose to retest primer 
+	#if choose to retest primer
 	if 'retest' in request.POST:
 		#iterate through primer list, update order status and save changes to database
 		for i in update_list:
@@ -975,7 +1059,7 @@ def remove_failed(request):
 			update.order_status = "Retesting"
 			update.save()
 
-	#render the remove failed html page from templates directory 
+	#render the remove failed html page from templates directory
 	return render(request, 'remove_failed.html')
 
 
@@ -986,23 +1070,25 @@ def remove_failed(request):
 
 
 #takes user cliking on the 'primers in retesting' searchbar link as request and pulls the information of all primers with an order status of 'retesting'
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def retesting(request):
 
 	#pull primers with an order status of retesting
 	testing = Primer.objects.filter(order_status = "Retesting")
 
-	#provide context for the retesting html page 
+	#provide context for the retesting html page
 	context = {
 		"testing": testing
 	}
 
-	#render the retesting html page from the templates directory 
+	#render the retesting html page from the templates directory
 	return render(request, 'retesting.html', context=context)
 
 
 
 
 #from the 'retesting' page, allows users to update the status of a primer from retesting to either stocked or failed testing archived - takes user selecting primers and clicking validated or not validated as request:
+@user_passes_test(is_logged_in, login_url=LOGINURL)
 def retested(request):
 
 	#pull all primers from 'restesting' page
@@ -1045,7 +1131,7 @@ def retested(request):
 		#render the retesting html page from the templates directory
 		return render(request, 'retesting.html', context=context)
 
-	#if 'validated' clicked - iterate through the list of primers selected, update the order status to stocked, assign the 'date retesting completed' as todays date and save the changes to the database 
+	#if 'validated' clicked - iterate through the list of primers selected, update the order status to stocked, assign the 'date retesting completed' as todays date and save the changes to the database
 	if 'validated' in request.POST:
 		for primer in primer_list:
 			tested = Primer.objects.get(pk=primer)
@@ -1054,7 +1140,7 @@ def retested(request):
 			tested.date_retesting_completed = today.strftime("%d/%m/%Y")
 			tested.save()
 
-	#if 'not validated' clicked - iterate through the list of primers selected, update the order status to 'failed validation archived', assign the 'date retesting completed' as todays date and save to database 
+	#if 'not validated' clicked - iterate through the list of primers selected, update the order status to 'failed validation archived', assign the 'date retesting completed' as todays date and save to database
 	if 'not' in request.POST:
 		for primer in primer_list:
 			tested = Primer.objects.get(pk=primer)
@@ -1063,5 +1149,5 @@ def retested(request):
 			tested.date_retesting_completed = today.strftime("%d/%m/%Y")
 			tested.save()
 
-	#render the  'tested' html page from the templates directory 
+	#render the  'tested' html page from the templates directory
 	return render(request, 'tested.html')

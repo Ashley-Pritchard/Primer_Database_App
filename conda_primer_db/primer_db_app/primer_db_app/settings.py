@@ -20,16 +20,21 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# need to create file when launching on server 
-with open('/srv/Primer_DB_Key/secret_key.txt') as f:
-	SECRET_KEY = f.read().strip()
-
+# need to create file when launching on server
+#try except for home dev
+try:
+    with open('/srv/Primer_DB_Key/secret_key.txt') as f:
+    	SECRET_KEY = f.read().strip()
+except:
+    SECRET_KEY="CLEARLY_TESTING"
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['127.0.0.1','localhost', '']
 
 SITE_URL =""
+
+LOGIN_URL="/primer_database/loginview/"
 
 # Application definition
 INSTALLED_APPS = [

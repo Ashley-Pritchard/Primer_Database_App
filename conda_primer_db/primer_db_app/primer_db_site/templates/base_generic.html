@@ -35,6 +35,27 @@
               <li><a class="active" href="{% url 'retesting' %}">Retesting</a></li>
             </div>
             </ul>
+          <ul class="nav navbar-nav navbar-left">
+            <!-- <li class="dropdown-toggle" data-toggle="dropdown" role="button">
+              <span class "glyphicon glyphicon-cog"></span>
+              Account Settings
+              <span class="caret"></span>
+              <ul class="dropdown-menu" style="max-width: 500px;">
+                <li><a class="active" href="{% url 'loginview' %}">Logout {{user.username}}</a></li>
+                <li><a class="active" href="{% url 'loginview' %}">Logout {{user.username}}</a></li>
+              </ul> -->
+              <div class="dropdown">
+
+                <button class="dropbtn">
+                  Account Settings
+                </button>
+                <div class="dropdown-content">
+                  <li><a class="active" href="{% url 'loginview' %}">Logout {{user.username}}</a></li>
+                  <li><a class="active" href="{% url 'change_password' %}">Change Password</a></li>
+                </div>
+              </ul>
+            </li>
+          </ul>
           </div>
         </nav>
         {% block content %}{% endblock %}</div>

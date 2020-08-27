@@ -1,10 +1,12 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
-#urls - each corresponds to both a html page in the templates directory and a function in the views.py file 
+#urls - each corresponds to both a html page in the templates directory and a function in the views.py file
 
 urlpatterns = [
     path('', views.index, name='index'),
+    re_path(r"^loginview/$", views.loginview, name="loginview"),
+    re_path(r"^change_password/$", views.change_password, name="change_password"),
     path('search/', views.search, name='search'),
     path('amplicon/', views.amplicon, name='amplicon'),
     path('order/', views.order, name='order'),

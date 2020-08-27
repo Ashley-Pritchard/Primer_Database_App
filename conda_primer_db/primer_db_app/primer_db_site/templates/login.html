@@ -1,0 +1,19 @@
+
+
+{% block content %}
+
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+
+
+<div class=container">
+  <form action="{{ submiturl }}" method="post" class="form-signin">
+    <h4>Login Required</h4>
+      <table>
+         {{ form }}
+       </table>
+    <input type="submit" class="btn btn-primary" name="login" value="login" />
+	<!-- <a href="/stock/resetpw" class="btn btn-link" role="button"> Forgot Password?</a> -->
+  </form>
+</div>
+{% endblock content %}
