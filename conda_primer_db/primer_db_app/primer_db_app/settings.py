@@ -57,6 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 #    'django.middleware.csrf.CsrfViewMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django_session_timeout.middleware.SessionTimeoutMiddleware',
 ]
 
 #SESSION_COOKIE_SECURE = True
