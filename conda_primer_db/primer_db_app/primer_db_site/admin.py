@@ -2,7 +2,11 @@ from django.contrib import admin
 from primer_db_site.models import Primer
 from primer_db_site.models import Amplicon, Analysis_Type, Gene, Primer_Set, Imported_By
 
-#add access to the database via the admin page 
+#Changes titles on Admin Site
+admin.site.site_header="Primer Database Admin Page"
+admin.site.index_title="PrimerDB Administration"
+#Changes the "View site" URL
+admin.site.site_url = "/primer_database/"
 
 class GeneAdmin(admin.ModelAdmin):
 	list_display = ('gene_name', 'chromosome')
