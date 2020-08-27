@@ -4,5 +4,6 @@
 *.save
 *.Rhistory
 __pycache__/
+migrations/
 conda_primer_db/primer_db_app/static/
 conda_primer_db/primer_db_app/primer_db_env/
