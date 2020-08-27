@@ -3,3 +3,4 @@
 *.sqlite3
 *.save
 __pycache__/
+conda_primer_db/primer_db_app/static/*
