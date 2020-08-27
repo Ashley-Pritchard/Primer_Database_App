@@ -1,9 +1,9 @@
-<! html page with search results for amplicon !>
+<!-- html page with search results for amplicon -->
 
 {% extends "base_generic.html" %}
 
 {% block content %}
- 
+
   <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
   <p> The following page provides a record of all OMGL primers associated with amplicon {{ amplicon.amplicon_name }}. To <strong>reorder</strong> one or more of the below primers, <strong>select the box</strong> next to the primer and use the 'reorder' option at the bottom of the page.<br><br><br>
   {% for p in primer %}

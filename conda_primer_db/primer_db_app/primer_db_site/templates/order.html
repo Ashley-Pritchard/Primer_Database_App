@@ -1,9 +1,9 @@
-<! html page to order new primers !>
+<!-- html page to order new primers -->
 
 {% extends "base_generic.html" %}
 
 {% block content %}
- 
+
   <h1>Primer Database: New Primer Order</h1>
   <p> The following form facilitates the ordering of one or more <strong>new</strong> primers associated with a <strong>single amplicon set</strong>. To <strong>reorder</strong> a primer, please first use the <a class="active" href="{% url 'index' %}">search</a> function and then follow the appropriate links. </p><br><br>
   <form action="{% url 'order_form' %}" method="GET">
