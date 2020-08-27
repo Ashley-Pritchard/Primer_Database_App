@@ -6,6 +6,7 @@
 
   <h1>Primer Database: Failed Validation</h1>
   <p> Primer information for primers that have failed validation:<br><br><br><br>
+    {% if failed %}<td><input type="button" onclick="ToggleAll()" value="Select/Deselect All"</td>{% endif %}
   {% for t in failed %}
     <table class="table" style="table-layout: auto-fit; width: 100%">
     <form action="{% url 'remove_failed' %}" method="POST">
