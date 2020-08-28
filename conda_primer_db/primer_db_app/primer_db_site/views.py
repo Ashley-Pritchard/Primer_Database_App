@@ -158,7 +158,7 @@ def search(request,filters):
         context.update({"subheader":subheader})
     #ADD IN GO DIRECT TO PAGE IF ONLY ONE RESULT
     if len(primers)==1:
-        print("ONLY 1")
+        return HttpResponseRedirect(reverse("amplicon",args=[primers[0].amplicon_id.amplicon_name]))
 
     #render the search html page from templates directory
     return render(request, 'search.html', context=context)
