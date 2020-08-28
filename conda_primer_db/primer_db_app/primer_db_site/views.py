@@ -132,7 +132,7 @@ def search(request,filters):
 
     query = dict([q.split("=") for q in filters.split(";")])
     primers=Primer.objects.filter(**query)
-
+    context={"header":header}
     if len(primers)>0:
         headings = ["Amplicon ID", "Primer ID", "Alt Name", "Location", "Comments"]
         subheader = f"Your search returned <strong>{len(primers)}</strong> results. Click on the Amplicon ID for full information about individual primers or primer sets."
@@ -152,18 +152,13 @@ def search(request,filters):
                   "",
                   ]
             body.append(zip(values,urls))
+            context.update({"headings":headings, "body": body, "subheader":subheader})
     else:
         subheader = "Your search returned <strong>0</strong> results"
+        context.update({"subheader":subheader})
     #ADD IN GO DIRECT TO PAGE IF ONLY ONE RESULT
     if len(primers)==1:
         print("ONLY 1")
-
-    context = {
-        "header": header,
-        "subheader": subheader,
-        "headings":headings,
-        "body": body,
-    }
 
     #render the search html page from templates directory
     return render(request, 'search.html', context=context)
