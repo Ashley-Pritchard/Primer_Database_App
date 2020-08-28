@@ -83,27 +83,42 @@ def change_password(httprequest):
 #provides context for the index / search page - takes request from users clicking on the 'search' option of the searchbar
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def index(request):
+    if request.method=="POST":
+        if "submit" not in request.POST:
+            return HttpResponseRedirect(reverse("index"))
+        else:
+            form = IndexSearchForm(request.POST)
+            if form.is_valid():
+                queries = []
+                for key, query in [("Amplicon_ID", "amplicon_id__amplicon_name__icontains"), ("Chromosome", "amplicon_id__gene_id__chromosome__exact"),
+                                    ("Primer_Set", "amplicon_id__primer_set_id__primer_set__exact"),("Gene", "amplicon_id__gene_id__gene_name__exact"),
+                                   ("Analysis_Type", "amplicon_id__analysis_type_id__analysis_type__exact"), ("Alt_Name","alt_name__icontains"),
+                                  ]:
+                    val = form.cleaned_data[key]
+                    if val:
+                        queries += ["{}={}".format(query, val)]
+                return HttpResponseRedirect(reverse("search", args=[";".join(queries)]))
+    else:
+        form=IndexSearchForm()
+    submiturl = reverse("index")
+    cancelurl = reverse("index")
+    #pull the count of primers, amplicons and genes
+    num_primers = Primer.objects.all().count()
+    num_amplicons = Amplicon.objects.all().count()
+    num_genes = Gene.objects.all().count()
+    header="Primer Database: Search and Reorders"
+    subheader=f"Welcome to the Primer Database for the OUH Molecular Genetics Laboratory. We currently have <strong>{num_primers}</strong> primers covering <strong>{num_amplicons}</strong> amplicons and <strong>{num_genes}</strong> genes. Fill in one or more boxes in the form below to search for primers: "
+    #assign pulled information as context for the page
+    context = {
+        "header": header,
+    	"subheader": subheader,
+        "form": form,
+        "submiturl": submiturl,
+        "cancelurl": cancelurl,
+    }
 
-	#pull the count of primers, amplicons and genes
-	num_primers = Primer.objects.all().count()
-	num_amplicons = Amplicon.objects.all().count()
-	num_genes = Gene.objects.all().count()
-
-	#the search page provides dropdown menus to look up primers by analysis type and primer set - pull this information from the database
-	analysis_type = Analysis_Type.objects.all()
-	primer_set = Primer_Set.objects.all()
-
-	#assign pulled information as context for the page
-	context = {
-		'num_primers': num_primers,
-		'num_amplicons': num_amplicons,
-		'num_genes': num_genes,
-		'analysis_type': analysis_type,
-		'primer_set': primer_set
-	}
-
-	#returns the index html page from the templates directory
-	return render(request, 'index.html', context=context)
+    #returns the index html page from the templates directory
+    return render(request, 'form.html', context=context)
 
 
 
@@ -111,153 +126,47 @@ def index(request):
 
 #takes the users search terms from the index /search page as the request and queries the database to pull matching primers
 @user_passes_test(is_logged_in, login_url=LOGINURL)
-def search(request):
+def search(request,filters):
 
-	#assign each of the user search inputs to variables
-	amp_id_input = request.GET.get('amp_id_input', None)
-	analysis_input = request.GET.get('analysis_input', None)
-	set_input = request.GET.get('set_input', None)
-	gene_input = request.GET.get('gene_input', None).upper()
-	chr_input = request.GET.get('chr_input', None).upper()
-	alt_input = request.GET.get('alt_input', None)
+    header="Primer Database: Search Results"
 
-	#provide a count of how many fields the user completed
-	completed_fields = 0
+    query = dict([q.split("=") for q in filters.split(";")])
+    primers=Primer.objects.filter(**query)
 
-	#if user completed amplicon id field, add 1 to the completed field variable and pull respective primers
-	if amp_id_input !="":
-		completed_fields +=1
-		amp_id_query = Amplicon.objects.filter(amplicon_name__icontains=amp_id_input)
+    if len(primers)>0:
+        headings = ["Amplicon ID", "Primer ID", "Alt Name", "Location", "Comments"]
+        subheader = f"Your search returned <strong>{len(primers)}</strong> results. Click on the Amplicon ID for full information about individual primers or primer sets."
+        body=[]
+        for p in primers:
+            values=[p.amplicon_id.amplicon_name,
+                    p.name,
+                    p.alt_name,
+                    p.location,
+                    p.comments,
+                    ]
+            #THIS WILL NEED CHANGING WHEN AMPLICON PAGE GETS UPDATED TO NEW STYLE
+            urls=[reverse("amplicon",args=[p.amplicon_id.amplicon_name]),
+                  "",
+                  "",
+                  "",
+                  "",
+                  ]
+            body.append(zip(values,urls))
+    else:
+        subheader = "Your search returned <strong>0</strong> results"
+    #ADD IN GO DIRECT TO PAGE IF ONLY ONE RESULT
+    if len(primers)==1:
+        print("ONLY 1")
 
-		primer_amp = []
-		for a in amp_id_query:
-			primer_amp.append(a.primer_set.all())
+    context = {
+        "header": header,
+        "subheader": subheader,
+        "headings":headings,
+        "body": body,
+    }
 
-	#if amplicon id field was not completed, set variables to "" to prevent errors of it not being assigned when set as context below
-	else:
-		amp_id_query = ""
-		primer_amp =""
-
-	#if user completed the analysis input field, add 1 to the completed field varibale and pull resepctive primers
-	if analysis_input !="":
-		completed_fields +=1
-		analysis_query = Analysis_Type.objects.filter(analysis_type=analysis_input)
-
-		#due to foreign key set-up, two steps to pull primer information from analysis_type: analysis_type -> amplicon -> primer
-		primer_analysis = []
-		for a in analysis_query:
-			x = a.amplicon_set.all()
-			for y in x:
-				primer_analysis.append(y.primer_set.all())
-
-	#if analysis type field was not completed, set variables to "" to prevent downstream errors
-	else:
-		analysis_query = ""
-		primer_analysis = ""
-
-	#same process as for the analysis field input above is repeated for 'primer set' input
-	if set_input !="":
-		completed_fields +=1
-		set_query = Primer_Set.objects.filter(primer_set=set_input)
-
-		primer_set = []
-		for s in set_query:
-			x = s.amplicon_set.all()
-			for y in x:
-				primer_set.append(y.primer_set.all())
-
-	else:
-		set_query = ""
-		primer_set = ""
-
-	#same process as for the analysis field input above is repeated for 'gene' input
-	if gene_input !="":
-		completed_fields +=1
-		gene_query = Gene.objects.filter(gene_name=gene_input)
-
-		primer_gene = []
-		for g in gene_query:
-			x = g.amplicon_set.all()
-			for y in x:
-				primer_gene.append(y.primer_set.all())
-
-	else:
-		gene_query = ""
-		primer_gene = ""
-
-	#same process as for the analysis field input above is repeated for 'chromosome' input
-	if chr_input !="":
-		completed_fields +=1
-		chr_query = Gene.objects.filter(chromosome=chr_input)
-
-		primer_chr = []
-		for c in chr_query:
-			x = c.amplicon_set.all()
-			for y in x:
-				primer_chr.append(y.primer_set.all())
-
-	else:
-		chr_query = ""
-		primer_chr = ""
-
-	#same process as for the amplicon field input above is repeated for the 'alt name'
-	if alt_input !="":
-		completed_fields +=1
-		primer_alt = Primer.objects.filter(alt_name__icontains=alt_input)
-
-	else:
-		primer_alt = ""
-
-	#create an empty list and append all primers pulled from the database based on user input above
-	primer_search = []
-
-	#append primers to list - two for loops are required for those with input 2 foreign keys away from the primer table
-	for a in primer_amp:
-		for x in a:
-			primer_search.append(x)
-
-	for a in primer_analysis:
-		for x in a:
-			primer_search.append(x)
-
-	for s in primer_set:
-		for x in s:
-			primer_search.append(x)
-
-	for g in primer_gene:
-		for x in g:
-			primer_search.append(x)
-
-	for c in primer_chr:
-		for x in c:
-			primer_search.append(x)
-
-	for a in primer_alt:
-		primer_search.append(a)
-
-	#provide a count for each primer occurance
-	occurence_count = collections.Counter(primer_search)
-
-	#want to pull primers that match all search terms - append primers that appear in the primer search list the same number of times as the calculated completed fields variable
-	primer_search_results = []
-	for primer, count in occurence_count.items():
-		if count == completed_fields:
-			primer_search_results.append(primer)
-
-	#order results alphabetically
-	primer_search_results.sort(key=lambda x: x.name)
-
-	#provide a count of the number of returned primers for the html page
-	num_primers = len(primer_search_results)
-
-	#provide appropriate context for the search html page
-	context = {
-		'primer_search_results': primer_search_results,
-		'num_primers': num_primers,
-	}
-
-	#render the search html page from templates directory
-	return render(request, 'search.html', context=context)
+    #render the search html page from templates directory
+    return render(request, 'search.html', context=context)
 
 
 
@@ -265,10 +174,9 @@ def search(request):
 
 #from the search results page, takes user clicking on specific amplicon as request and pulls respective primer information for those matching the amplicon id
 @user_passes_test(is_logged_in, login_url=LOGINURL)
-def amplicon(request):
+def amplicon(request,amplicon_input):
 
 	#pull information for the amplicon selected by the user from the database
-	amplicon_input = request.GET.get('selected_amplicon', None)
 	amplicon = Amplicon.objects.get(amplicon_name=amplicon_input)
 
 	#pull primer information for amplicon

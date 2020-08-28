@@ -81,7 +81,6 @@ h1 {
 	text-align: left;
 }
 
-
 p {
 	padding: 20px 5px 5px 5px;
 }
@@ -129,9 +128,6 @@ table.table2 tr:nth-child(even) {
   background-color: #dddddd;
 }
 
-a {
-	color: #5d5c61
-}
 
 form.search {
 	text-align: left;
@@ -143,10 +139,7 @@ input {
 	word-wrap: break-word;
 	white-space: normal;
 }
-
-button {
-	border-color: black;
-	padding: 5px
+.btn.btn-success{
+  width: auto;
 }
-
 

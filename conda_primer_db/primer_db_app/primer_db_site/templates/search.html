@@ -4,45 +4,26 @@
 
 {% block content %}
 
-  <h1>Primer Database: Search Results</h1>
-  <p>Your search returned <strong>{{ num_primers }}</strong> primer(s). Click on the Amplicon ID for full information about individual primers or primer sets. <br><br></p>
+  <h1>{{ header }}</h1>
+  <br>
+  {% if subheader %}
+  <p>{{ subheader | safe }}</p>
+  <br>
+  {% endif %}
   <table class="table2" style="table-layout: fixed; width: 100%">
     <tr>
-      <th>
-        Amplicon ID
-      </th>
-      <th>
-        Primer ID
-      </th>
-      <th>
-        Alt. Name
-      </th>
-      <th>
-        Location
-      </th>
-      <th>
-        Comments
-      </th>
-      {% for primer in primer_search_results %}
-    <tr>
-      <td>
-        <form class="search" id = selected_amplicon method = get action = {% url 'amplicon' %} >
-          <input type = "submit" default = None name = "selected_amplicon" value = "{{ primer.amplicon_id.amplicon_name }}" white-space: normal; word-wrap: break-word; width: 100%>
-        </form>
-      </td>
-      <td>
-        {{ primer.name }}
-      </td>
-      <td>
-        {{ primer.alt_name }}
-      </td>
-      <td>
-        {{ primer.location }}
-      </td>
-      <td>
-        {{ primer.comments }}
-      </td>
+      {% for item in headings %}
+        <th scope="col">{{ item }}</th>
+      {% endfor %}
     </tr>
+    {% for row in body %}
+      <tr>
+        {% for entry, url in row %}
+          <td>
+            {% if url %}<a href="{{ url }}">{% endif %}{{ entry }}{% if url %}</a>{% endif %}
+          </td>
+        {% endfor %}
+      </tr>
     {% endfor %}
   </table><br><br>
 {% endblock %}
