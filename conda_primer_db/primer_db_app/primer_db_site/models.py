@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 
-#create the tables of the primer database 
+#create the tables of the primer database
 
 class Analysis_Type(models.Model):
 	analysis_type = models.CharField(max_length=30)
@@ -38,10 +38,12 @@ class Primer_Set(models.Model):
 	def __str__(self):
 		return self.primer_set
 
-class Imported_By(models.Model):
-	imported_by = models.CharField(max_length=30)
-	choice = [("current", "current"), ("ex", "ex")]
-	status = models.CharField(max_length = 10, default = 'current', choices = choice)
+# class Imported_By(models.Model):
+# 	def __str__(self):
+# 		return(self.imported_by)
+# 	imported_by = models.CharField(max_length=30)
+# 	choice = [("current", "current"), ("ex", "ex")]
+# 	status = models.CharField(max_length = 10, default = 'current', choices = choice)
 
 class Amplicon(models.Model):
 	amplicon_name = models.CharField(max_length=100)
@@ -60,8 +62,8 @@ class Primer(models.Model):
 	alt_name = models.TextField(max_length=255, null=True, blank=True)
 	ngs_audit_number = models.IntegerField(null=True, blank=True)
 	comments = models.CharField(max_length=1000, null=True, blank=True)
-	imported_by_id = models.ForeignKey(Imported_By, on_delete = models.SET_NULL, null=True, blank=True)
-	date_imported = models.CharField(max_length=20, null=True, blank=True)
+	imported_by_id = models.ForeignKey(User, limit_choices_to={"is_active":True}, on_delete=models.PROTECT, null=True, blank=True)
+	date_imported = models.DateField(null=True, blank=True)
 	amplicon_id = models.ForeignKey(Amplicon, on_delete = models.SET_NULL, null=True, blank=True)
 	version = models.IntegerField(blank=True, default='1')
 	choice_1 = [("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN"), ("", "")]
@@ -70,12 +72,12 @@ class Primer(models.Model):
 	choice_2 = [("Stocked", "Stocked"), ("Ordered", "Ordered"), ("Order Placed", "Order Placed"), ("Recieved", "Recieved"), ("In Testing Sanger", "In Testing Sanger"), ("In Testing Non-Sanger", "In Testing Non-Sanger"), ("Failed Validation", "Failed Validation"), ("Archived", "Archived")]
 	order_status = models.CharField(max_length=50, default='Stocked', choices=choice_2)
 	reason_archived = models.CharField(max_length=1000, null=True, blank=True)
-	date_archived = models.CharField(max_length=20, null=True, blank=True)
-	archived_by_id = models.ForeignKey(Imported_By, related_name = 'archived_by', on_delete = models.SET_NULL, null=True, blank=True)
-	date_order_placed = models.CharField(max_length=20, null=True, blank=True)
-	date_order_recieved = models.CharField(max_length=20, null=True, blank=True)
-	date_testing_completed = models.CharField(max_length=20, null=True, blank=True)
-	date_retesting_completed = models.CharField(max_length=20, null=True, blank=True)
+	date_archived = models.DateField(null=True, blank=True)
+	archived_by_id = models.ForeignKey(User, limit_choices_to={"is_active":True}, related_name = 'archived_by', on_delete = models.PROTECT, null=True, blank=True)
+	date_order_placed = models.DateField(null=True, blank=True)
+	date_order_recieved = models.DateField(null=True, blank=True)
+	date_testing_completed = models.DateField(null=True, blank=True)
+	date_retesting_completed = models.DateField(null=True, blank=True)
 	choice_3 = [("Repeat order", "Repeat order"), ("New gene / version", "New gene / version"), ("NGS confirmation", "NGS confirmation"), ("Scientist R&D", "Scientist - R&D"), ("Other", "Other"), ("None", "None")]
 	reason_ordered = models.CharField(max_length=100, default='None', choices=choice_3)
 	choice_4 = [("GTAAAACGACGGCCAGT", "GTAAAACGACGGCCAGT"), ("CAGGAAACAGCTATGAC", "CAGGAAACAGCTATGAC"), ("None", "None")]
