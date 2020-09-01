@@ -238,8 +238,6 @@ def amplicon(request,amplicon_input):
     else:
         form=form()
 
-
-
         #list of heading (text) and primer attribute tuples. primer attr will be used to eval the actual attribute in a loop
         #e.g in headings[0] the title is "Primer" and the attr is "name" (e.g primer.name)
         in_stock_headings=[("Primer","name"), ("Order Status","order_status"), ("Analysis","amplicon_id.analysis_type_id.analysis_type"),
@@ -305,328 +303,208 @@ def reorder_archive_primer(request,success,amplicon):
 #provides context for the order page - takes request from users clicking on the 'order new gene/version' option of the searchbar
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def order(request):
-	#renders the 'order' html page from the templates directory
-	return render(request, 'order.html')
-
-
+    header="Primer Database: New Primer Order"
+    subheader="The following form facilitates the ordering of one or more <strong>new</strong> primers associated with a <strong>single amplicon set</strong>. To <strong>reorder</strong> a primer, please first use the <a class='active' href='/primer_database/'>search</a> function and then follow the appropriate links."
+    form = NewPrimerOrderForm
+    if request.method=="POST":
+        if "submit" not in request.POST:
+            return HttpResponseRedirect(reverse("order"))
+        else:
+            form = form(request.POST)
+            if form.is_valid():
+                return HttpResponseRedirect(reverse("order_form", args=[form.data["number"]]))
+    else:
+        form=form()
+    submiturl = reverse("order")
+    cancelurl = reverse("order")
+    context = {
+        "header": header,
+        "subheader": subheader,
+        "form": form,
+        "submiturl": submiturl,
+        "cancelurl": cancelurl,
+    }
+    return render(request, 'form.html', context=context)
 
 
 
 #from the order page, takes user input of how many primers they wish to order as request
 @user_passes_test(is_logged_in, login_url=LOGINURL)
-def order_form(request):
+def order_form(request,number):
+    header="Primer Database: New Primer Order Form"
+    subheader="Fill in the amplicon information first, then complete the tables for each of your primers. Required fields are marked with *."
+    amplicon_form=OrderFormAmplicon
+    primer_form=OrderFormPrimer
+    if request.method=="POST":
+        amplicon_form = amplicon_form(request.POST)
+        primer_form = primer_form(request.POST)
+        #have to error check this one here as it relies on values from both forms
+        if Analysis_Type.objects.get(id=amplicon_form.data["analysis_type"]).analysis_type=="NGS":
+            for audit_no in primer_form.data.getlist("ngs_number"):
+                if audit_no=="":
+                    primer_form.add_error("ngs_number","If amplicon type is NGS an audit number must be entered")
+        if amplicon_form.is_valid() and primer_form.is_valid():
+            genes = Gene.objects.filter(gene_name__icontains=amplicon_form.data["gene"], chromosome=amplicon_form.data["chromosome"])
 
-	#pull number of primers user selected for ordering as a range
-	number = list(range(0, int(request.GET.get('number'))))
+            #if the submitted gene is not in the gene list, add the gene and respective chromosome to the database
+            if genes.first() is None:
+                gene = Gene()
+                gene.gene_name = amplicon_form.data["gene"].upper()
+                gene.chromosome = amplicon_form.data["chromosome"].upper()
+                gene.save()
+            else:
+                gene=genes.first()
 
-	#pull imported by options from database to present as dropdown menu
-	imp_by = Imported_By.objects.all()
-	analysis_type = Analysis_Type.objects.all()
-	primer_set = Primer_Set.objects.all()
+            analysis_type=Analysis_Type.objects.get(id=amplicon_form.data["analysis_type"])
+            for i in range(0,int(number)):
+                if analysis_type.analysis_type == 'Sanger':
+                    new_amplicon = str(Primer_Set.objects.get(id=amplicon_form.data["primer_set"])) + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'NGS':
+                    new_amplicon = str(Primer_Set.objects.get(id=amplicon_form.data["primer_set"])) + '_' + gene.gene_name + '_NGS-' + primer_form.data.getlist("ngs_number")[i]
+                elif analysis_type.analysis_type == 'Light Scanner':
+                    new_amplicon = 'LS' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'MLPA':
+                    new_amplicon = 'ML' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'Fluorescent':
+                    new_amplicon = 'GM' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'Long Range':
+                    new_amplicon = 'LR' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'RT-PCR':
+                    new_amplicon = 'RT' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'Taqman':
+                    new_amplicon = 'TQ' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'Pyrosequencing':
+                    new_amplicon = 'P' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'ARMS: Mutant':
+                    new_amplicon = 'ARMS_M' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'ARMS: Normal':
+                    new_amplicon = 'ARMS_N' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                elif analysis_type.analysis_type == 'Probe':
+                    new_amplicon = 'Probe' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                amplicons=Amplicon.objects.filter(amplicon_name=new_amplicon)
+                if amplicons.first() is None:
+                    amplicon = Amplicon()
+                    #assign name as created above
+                    amplicon.amplicon_name = new_amplicon
 
-	#provide as context for the order form html page
-	context = {
-		"imp_by": imp_by,
-		"number":number,
-		"analysis_type":analysis_type,
-		"primer_set": primer_set,
+                    #set exon based on form submission
+                    amplicon.exon = amplicon_form.data["exon"]
+
+                    amplicon.analysis_type_id=analysis_type
+
+                    amplicon.gene_id=gene
+
+                    amplicon.primer_set_id=Primer_Set.objects.get(id=amplicon_form.data["primer_set"])
+                    amplicon.save()
+                else:
+                    amplicon=amplicons.first()
+
+
+
+                seq=primer_form.data.getlist("sequence")[i]
+                direction=primer_form.data.getlist("direction")[i]
+                start = primer_form.data.getlist('start')[i]
+                end = primer_form.data.getlist('end')[i]
+                m13 = primer_form.data.getlist('m13')[i]
+                mod_3 = ('3\'' + primer_form.data.getlist('prime3')[i]) if primer_form.data.getlist('prime3')[i] is not "" else ""
+                mod_5 = ('5\'' + primer_form.data.getlist('prime5')[i]) if primer_form.data.getlist('prime5')[i] is not "" else ""
+                ngs = primer_form.data.getlist('ngs_number')[i]
+                alt_name = primer_form.data.getlist('alt_name')[i]
+                comments = primer_form.data.getlist('comments')[i]
+                reason = primer_form.data.getlist('reason')[i]
+
+                if analysis_type.analysis_type == 'Sanger':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'NGS':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'Light Scanner':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'MLPA':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'Fluorescent':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'Long Range':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'RT-PCR':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'Taqman':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'Pyrosequencing':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'ARMS: Mutant':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'ARMS: Normal':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                elif analysis_type.analysis_type == 'Probe':
+                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + '_' + mod_5
+
+
+                matching_primers=Primer.objects.filter(name__icontains=new_primer)
+                version_count = 0
+                version_number = []
+                version = ()
+                for p in matching_primers:
+                    version_number.append(p.version)
+                    #if sequecen matches, close current primer and assign same version number
+                    if p.sequence == seq.upper():
+                        version = p.version
+                        version_count += 1
+                        p.order_status = 'Closed'
+                        p.save()
+                #if does not match a sequence of any current primer version, make new primer version
+                if version_count == 0:
+                    if len(version_number) != 0:
+                        version = max(version_number) + 1
+                else:
+                    version = 1
+                primer = Primer()
+                primer.sequence = seq.upper()
+                primer.direction = direction.upper()
+                primer.modification = mod_3.upper()
+                primer.modification_5 = mod_5.upper()
+                primer.alt_name = alt_name
+                primer.comments = comments
+                primer.reason_ordered = reason
+                primer.version = version
+                primer.name = str(new_primer) + '_v' + str(version)
+
+                if analysis_type.analysis_type == 'Sanger' and direction.upper() == 'F':
+                    primer.m13_tag = 'GATAAACGACGGCCAGT'
+                elif request.POST.get('analysis_type') == 'Sanger' and direction.upper() == 'R':
+                    primer.m13_tag = 'CAGGAAACAGCTATGAC'
+                elif m13 == "yes" and direction.upper() == "F":
+                    primer.m13_tag = "GATAAACGACGGCCAGT"
+                elif m13 == "yes" and direction.upper() == "R":
+                    primer.m13_tag = "CAGGAAACAGCTATGAC"
+                else:
+                    primer.m13_tag = ""
+                primer.date_imported=date.today()
+                primer.order_status="Ordered"
+                primer.imported_by_id=request.user
+                primer.amplicon_id=amplicon
+                primer.save()
+        if "quit" in request.POST:
+            return render(request, "submitted.html")
+        elif "reorder" in request.POST:
+            return HttpResponseRedirect(reverse("order"))
+
+    else:
+        amplicon_form=amplicon_form()
+        primer_form=primer_form()
+    submiturl = reverse("order_form",args=[number])
+    cancelurl = reverse("order_form",args=[number])
+    context = {
+        "header":header,
+        "subheader":subheader,
+        "number":[i for i in range(0,int(number))],
+        "amplicon_form": amplicon_form,
+        "primer_form":primer_form,
+        "submiturl": submiturl,
+        "cancelurl": cancelurl,
 	}
 
-	#render the order html page from the templates directory
-	return render(request, 'order_form.html', context=context)
-
-
-
-
-
-#from the order form page, takes submission of new primer(s) as request
-#function one of three - separated as the first two make changes to the database required for the third
-#function 1 - adds a new gene to the database if the requested primer is in a gene not currently stored
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def submit_new_gene(request):
-
-	#pull all genes from the database and store as a list
-	genes = Gene.objects.all()
-	gene_names = []
-	for g in genes:
-		gene_names.append(g.gene_name)
-
-	#if the submitted gene is not in the gene list, add the gene and respective chromosome to the database
-	if request.POST.get('gene').upper() not in gene_names:
-		gene = Gene()
-		gene.gene_name = request.POST.get('gene').upper()
-		gene.chromosome = request.POST.get('chr').upper()
-
-		#save the changes to the database
-		gene.save()
-
-	#render the submitted html page from the templates directory
-	return render(request, 'submitted.html')
-
-
-#function 2 of 3 - adds new amplicon to the database if the requested primer is for an amplicon not currently stored
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def submit_new_amplicon(request):
-
-	#call first function
-	submit_new_gene(request)
-
-	#pull all amplicons from the database and store as list
-	amplicons = Amplicon.objects.all()
-	all_amplicons = []
-	for a in amplicons:
-		all_amplicons.append(a.amplicon_name)
-
-	#create amplicon name using field input
-	if request.POST.get('analysis_type') == 'Sanger':
-		new_amplicon = request.POST.get('set') + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'NGS':
-		new_amplicon = request.POST.get('set') + '_' + request.POST.get('gene') + '_NGS-' + request.POST.get('ngs')
-	elif request.POST.get('analysis_type') == 'Light Scanner':
-		new_amplicon = 'LS' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'MLPA':
-		new_amplicon = 'ML' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'Fluorescent':
-		new_amplicon = 'GM' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'Long Range':
-		new_amplicon = 'LR' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'RT-PCR':
-		new_amplicon = 'RT' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'Taqman':
-		new_amplicon = 'TQ' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'Pyrosequencing':
-		new_amplicon = 'P' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'ARMS: Mutant':
-		new_amplicon = 'ARMS_M' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'ARMS: Normal':
-		new_amplicon = 'ARMS_N' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-	elif request.POST.get('analysis_type') == 'Probe':
-		new_amplicon = 'Probe' + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-
-	#if amplicon does not exist, add to the database
-	if new_amplicon not in all_amplicons:
-		amplicon = Amplicon()
-
-		#assign name as created above
-		amplicon.amplicon_name = new_amplicon
-
-		#set exon based on form submission
-		amplicon.exon = request.POST.get('exon')
-
-		#select analysis type from database by filtering on what was input in the submission
-		find_analysis = Analysis_Type.objects.filter(analysis_type=request.POST.get('analysis_type'))
-		for f in find_analysis:
-			amplicon.analysis_type_id = f
-
-		#select gene from database by filtering on what was input in the submission
-		find_gene = Gene.objects.filter(gene_name=request.POST.get('gene').upper())
-		for f in find_gene:
-			amplicon.gene_id = f
-
-		#select set from database by filtering on what was input in the submission
-		find_set = Primer_Set.objects.filter(primer_set=request.POST.get('set'))
-		for f in find_set:
-			amplicon.primer_set_id = f
-
-		#save the changes to the database
-		amplicon.save()
-
-	#render the submitted html page from templates directory
-	return render(request, 'submitted.html')
-
-
-#function three of three for primer order submission
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def submitted(request):
-
-	#call second function
-	submit_new_amplicon(request)
-
-	#pull number of primers submitted by calculating the length of the sequence list (mandatory field)
-	num_primers = len(request.POST.getlist('seq'))
-
-	#pull lists for each input field for primer(s) submitted
-	seq = request.POST.getlist('seq')
-	direction = request.POST.getlist('direction')
-	start = request.POST.getlist('start')
-	end = request.POST.getlist('end')
-	m13 = request.POST.getlist('m13')
-	mod_3 = request.POST.getlist('3_modification')
-	mod_5 = request.POST.getlist('5_modification')
-	ngs = request.POST.getlist('ngs')
-	alt_name = request.POST.getlist('alt_name')
-	comments = request.POST.getlist('comments')
-	reason = request.POST.getlist('reason')
-
-	#pull all primers from the database and store as list
-	primers = Primer.objects.all()
-	all_primers = []
-	for p in primers:
-		all_primers.append(p.name)
-
-	#loop through the number or primers submitted
-	for i in range(num_primers):
-
-		#add 3' and 5' prefix to modification for naming if exist
-		if mod_3[i] != "":
-			modification_3 = '3\'' + mod_3[i].upper()
-		else:
-			modification_3 = mod_3[i].upper()
-		if mod_5[i] != "":
-			modification_5 = '5\'' + mod_5[i].upper()
-		else:
-			modification_5 = mod_5[i].upper()
-
-		#check if a version of the primer already exists
-		if request.POST.get('analysis_type') == 'Sanger':
-			new_primer = request.POST.get('set') + '_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'NGS':
-			new_primer = request.POST.get('set') + '_' + request.POST.get('gene') + '_NGS-' + request.POST.get('ngs') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'Light Scanner':
-			new_primer = 'LS_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'MLPA':
-			new_primer = 'ML_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'Fluorescent':
-			new_primer = 'GM_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'Long Range':
-			new_primer = 'LR_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'RT-PCR':
-			new_primer = 'RT_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'Taqman':
-			new_primer = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'Pyrosequencing':
-			new_primer = 'P_' + request.POST.get('gene') + '-' + request.POST.get('gene') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'ARMS: Mutant':
-			new_primer = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'ARMS: Normal':
-			new_primer = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + modification_5
-		elif request.POST.get('analysis_type') == 'Probe':
-			new_primer = 'Probe_' + request.POST.get('gene') + '-' + request.POST.get('exon') + '___' + direction[i].upper() + '_' + modification_3 + '_' + '_' + modification_5
-
-		#save list of matching primers
-		matching_primers = [p for p in all_primers if new_primer in p]
-
-		#loop through matching primers to get a count of primer versions and current version number
-		version_count = 0
-		version_number = []
-		version = ()
-		for m in matching_primers:
-			primer_version = Primer.objects.filter(name=m)
-
-			for p in primer_version:
-				version_number.append(p.version)
-				#if sequecen matches, close current primer and assign same version number
-				if p.sequence == seq[i].upper():
-					version = p.version
-					version_count += 1
-					p.order_status = 'Closed'
-					p.save()
-
-		#if does not match a sequence of any current primer version, make new primer version
-		if version_count == 0:
-			if len(version_number) != 0:
-				version = max(version_number) + 1
-			else:
-				version = 1
-
-		#make changes to the primer table of the database
-		primer = Primer()
-
-		#assgin user input to each field of the primer table
-		primer.sequence = seq[i].upper()
-		primer.direction = direction[i].upper()
-		primer.modification = mod_3[i].upper()
-		primer.modification_5 = mod_5[i].upper()
-		primer.alt_name = alt_name[i]
-		primer.comments = comments[i]
-		primer.reason_ordered = reason[i]
-		primer.version = version
-		primer.name = str(new_primer) + '_v' + str(version)
-
-		#if requested, add m13 tag as either forward or reverse
-		if request.POST.get('analysis_type') == 'Sanger' and direction[i] == 'f':
-			primer.m13_tag = 'GATAAACGACGGCCAGT'
-		elif request.POST.get('analysis_type') == 'Sanger' and direction[i] == 'r':
-			primer.m13_tag = 'CAGGAAACAGCTATGAC'
-		elif m13[i] == "yes" and direction[i] == "f":
-			primer.m13_tag = "GATAAACGACGGCCAGT"
-		elif m13[i] == "yes" and direction[i] == "r":
-			primer.m13_tag = "CAGGAAACAGCTATGAC"
-		else:
-			primer.m13_tag = ""
-
-		#if genomic start or end location and ngs number is blank, assign 'None', otherwise assign user input
-		if start[i] != "":
-			primer.genomic_location_start = start[i]
-		else:
-			primer.genomic_location_start = None
-
-		if end[i] != "":
-			primer.genomic_location_end = end[i]
-		else:
-			primer.genomic_location_end = None
-
-		if ngs[i] != "":
-			primer.ngs_audit_number = ngs[i]
-		else:
-			primer.ngs_audit_number = None
-
-		#assign todays date as 'date imported' for new primer record
-		today = date.today()
-		primer.date_imported = today.strftime("%d/%m/%Y")
-
-		#assign 'order status' to ordered
-		primer.order_status = "Ordered"
-
-		#assign 'imported by' to user selection
-		find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-		for f in find_imp:
-			primer.imported_by_id = f
-
-		#assign the amplicon id
-		if request.POST.get('analysis_type') == 'Sanger':
-			amplicon_name = request.POST.get('set') + '_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'NGS':
-			amplicon_name = request.POST.get('set') + '_' + request.POST.get('gene') + '_NGS-' + request.POST.get('ngs')
-		elif request.POST.get('analysis_type') == 'Light Scanner':
-			amplicon_name = 'LS_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'MLPA':
-			amplicon_name = 'ML_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'Fluorescent':
-			amplicon_name = 'GM_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'Long Range':
-			amplicon_name = 'LR_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'RT-PCR':
-			amplicon_name = 'RT_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'Taqman':
-			amplicon_name = 'TQ_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'Pyrosequencing':
-			amplicon_name = 'P_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'ARMS: Mutant':
-			amplicon_name = 'ARMS_M_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'ARMS: Normal':
-			amplicon_name = 'ARMS_N_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		elif request.POST.get('analysis_type') == 'Probe':
-			amplicon_name = 'Probe_' + request.POST.get('gene') + '-' + request.POST.get('exon')
-		find_amp = Amplicon.objects.get(amplicon_name = amplicon_name)
-		primer.amplicon_id = find_amp
-
-		#save changes to the database
-		primer.save()
-
-		#provide primer context
-		context = {
-			"primer": primer
-		}
-
-	if 'quit' in request.POST:
-		#render the submitted html page from the templates directory if they choose to quit
-		return render(request, 'submitted.html', context=context)
-
-	if 'reload' in request.POST:
-		#render the order.html page from the templates directory if they choose to order more primers
-		return render(request, 'order.html')
-
+    #render the order html page from the templates directory
+    return render(request, 'order_form.html', context=context)
 
 ## Primers to be Ordered Page ##
 

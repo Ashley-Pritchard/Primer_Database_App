@@ -46,6 +46,9 @@ class Primer_Set(models.Model):
 # 	status = models.CharField(max_length = 10, default = 'current', choices = choice)
 
 class Amplicon(models.Model):
+
+	def __str__(self):
+		return self.amplicon_name
 	amplicon_name = models.CharField(max_length=100)
 	exon = models.CharField(max_length=20, null=True, blank=True)
 	gene_id = models.ForeignKey(Gene, on_delete = models.SET_NULL, null=True, blank=True)
@@ -66,7 +69,7 @@ class Primer(models.Model):
 	date_imported = models.DateField(null=True, blank=True)
 	amplicon_id = models.ForeignKey(Amplicon, on_delete = models.SET_NULL, null=True, blank=True)
 	version = models.IntegerField(blank=True, default='1')
-	choice_1 = [("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN"), ("", "")]
+	choice_1 = [("", ""), ("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN")]
 	modification = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
 	modification_5 = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
 	choice_2 = [("Stocked", "Stocked"), ("Ordered", "Ordered"), ("Order Placed", "Order Placed"), ("Recieved", "Recieved"), ("In Testing Sanger", "In Testing Sanger"), ("In Testing Non-Sanger", "In Testing Non-Sanger"), ("Failed Validation", "Failed Validation"), ("Archived", "Archived")]
@@ -78,7 +81,7 @@ class Primer(models.Model):
 	date_order_recieved = models.DateField(null=True, blank=True)
 	date_testing_completed = models.DateField(null=True, blank=True)
 	date_retesting_completed = models.DateField(null=True, blank=True)
-	choice_3 = [("Repeat order", "Repeat order"), ("New gene / version", "New gene / version"), ("NGS confirmation", "NGS confirmation"), ("Scientist R&D", "Scientist - R&D"), ("Other", "Other"), ("None", "None")]
+	choice_3 = [("",""), ("Repeat order", "Repeat order"), ("New gene / version", "New gene / version"), ("NGS confirmation", "NGS confirmation"), ("Scientist R&D", "Scientist - R&D"), ("Other", "Other")]
 	reason_ordered = models.CharField(max_length=100, default='None', choices=choice_3)
 	choice_4 = [("GTAAAACGACGGCCAGT", "GTAAAACGACGGCCAGT"), ("CAGGAAACAGCTATGAC", "CAGGAAACAGCTATGAC"), ("None", "None")]
 	m13_tag = models.CharField(max_length=20, default="None", choices=choice_4)

@@ -26,8 +26,41 @@ class IndexSearchForm(forms.Form):
                 self.add_error("Chromosome", forms.ValidationError("Chromosome must be 1-22, X, Y or M"))
 
 class AmpliconOrderForm(forms.Form):
-    reason = forms.ChoiceField(label=u"Reason for Reorder", choices=[("Repeat order","Repeat order"),("New Gene/Version","New Gene/Version"),
-                                                                      ("NGS Confirmation","NGS Confirmation"), ("Scientist - R&D","Scientist - R&D"),
-                                                                      ("Other","Other")])
+    reason = forms.ChoiceField(label=u"Reason for Reorder", choices=Primer.choice_3)
+class NewPrimerOrderForm(forms.Form):
+    number=forms.IntegerField(min_value=1, label="How many primers would you like to order for your amplicon set?")
 
-    # ReOrderedBy = forms.ModelChoiceField(label=u"Reordered By", queryset = Imported_By.objects.filter(status="current"))
+class OrderFormAmplicon(forms.Form):
+    analysis_type=forms.ModelChoiceField(queryset=Analysis_Type.objects.all(), label=u"Analysis Type")
+    gene=forms.CharField(label=u"Gene", max_length=75)
+    chromosome=forms.CharField(label=u"Chromosome", max_length=2)
+    exon=forms.IntegerField(label=u"Exon", required=False)
+    primer_set=forms.ModelChoiceField(queryset=Primer_Set.objects.all(), label=u"Primer Set", required=False)
+
+
+    def clean(self):
+        super(OrderFormAmplicon, self).clean()
+        #regex that matches 1-22, X, Y or M ONLY (E.g X is fine, Y is fine, XY is not)
+        Chr_regex="((^[1-9]$|^1[0-9]$|^2[0-2]$)|^X$|^Y$|^M$)"
+        if self.cleaned_data["chromosome"]!="":
+            if not re.match(Chr_regex, self.cleaned_data["chromosome"]):
+                self.add_error("chromosome", forms.ValidationError("Chromosome must be 1-22, X, Y or M"))
+        if self.cleaned_data["primer_set"] is None and ((self.cleaned_data["analysis_type"].analysis_type=="Sanger") or (self.cleaned_data["analysis_type"].analysis_type=="NGS")):
+            self.add_error("primer_set",f"Primer Set must be selected for {self.cleaned_data['analysis_type'].analysis_type}")
+        if self.cleaned_data["analysis_type"].analysis_type!="NGS" and self.cleaned_data["analysis_type"] is not None and self.cleaned_data["exon"] is None:
+            self.add_error("exon", f"Exon must be selected for analysis type {self.cleaned_data['analysis_type'].analysis_type}")
+        
+
+class OrderFormPrimer(forms.Form):
+    sequence=forms.CharField(max_length=150, label=u"Sequence")
+    direction=forms.ChoiceField(label=u"Direction", choices=[("",""), ("F","F"), ("R","R"), ("T","T"), ("Left","Left"),
+                                                                             ("Right","Right"), ("SF","SF"), ("SR","SR")])
+    start=forms.IntegerField(label=u"Genomic Location Start", required=False)
+    end=forms.IntegerField(label=u"Genomic Location End", required=False)
+    m13=forms.ChoiceField(label=u"M13 Tag (for R/F primers) Note: auto-added for Sanger", choices=[("YES","YES"),("NO","NO")])
+    prime3=forms.ChoiceField(label=u"3' Modification", required=False, choices=Primer.choice_1)
+    prime5=forms.ChoiceField(label=u"5' Modification", required=False, choices=Primer.choice_1)
+    ngs_number=forms.CharField(label=u"NGS Audit Number", required=False, max_length=25)
+    alt_name=forms.CharField(label=u"Alternative Name", required=False, max_length=255)
+    comments=forms.CharField(label=u"Comments", required=False, max_length=255)
+    reason = forms.ChoiceField(label=u"Reason for Reorder", choices=Primer.choice_3)

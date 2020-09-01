@@ -4,199 +4,34 @@
 
 {% block content %}
 
-  <h1>Primer Database: New Primer Order Form</h1>
-  <p> Fill in the amplicon information first, then complete the tables for each of your primers. Required fields are marked with *.<br><br>
-  <form action="{% url 'submitted' %}" method="POST">
-  <strong><p>Amplicon</p></strong><br>
+  <form action="{{ submitur }}" method="POST">
     <table>
     <tr>
+    {% for field in amplicon_form.visible_fields %}
+      <tr>
       <td>
-      Analysis Type: *
+        <label for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %}<span class="required" style="color:red">*</span>{% endif %}:</label>
       </td>
-      <td>
-        <select name = "analysis_type" type = "text">
-          {% for a in analysis_type %}
-          <option value="{{ a.analysis_type }}">{{ a.analysis_type }}</option>
-          {% endfor %}
-        </td>
+      <td> {{ field }} {% if field.errors %}{{ field.errors }}{% endif %}</td>
       </tr>
-      <tr>
-        <td>
-        Gene: *
-        </td>
-        <td>
-        <input name="gene" type="text" required>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Chromosome: *
-        </td>
-        <td>
-        <input name="chr" type="text" required>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Exon:
-        </td>
-        <td>
-        <input name="exon" type="text">
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Primer Set:
-        </td>
-        <td>
-        <select name="set" type="text">
-          <option value="">Select</option>
-          {% for ps in primer_set %}
-          <option value="(( ps.primer_set }}">{{ ps.primer_set }}</option>
-          {% endfor %}
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Requested by: *
-        </td>
-        <td>
-        <select name="imp_by" type="text" required=True>
-          <option value="">---</option>
-          {% for i in imp_by %}
-            {% if i.status == "current" %}
-              <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
-            {% endif %}
-          {% endfor %}
-        </td>
-      </tr>
-    </table><br><br>
+    {% endfor %}
+  </table>
     {% for n in number %}
     <strong><p>Primer</p></strong><br>
     <table>
+    <tr>
+    {% for field in primer_form.visible_fields %}
       <tr>
-        <td>
-        Sequence: *
-        </td>
-        <td>
-        <input name="seq" type="text" required>
-        </td>
+      <td>
+        <label for="id_{{ field.name }}">{{ field.label }}{% if field.field.required %}<span class="required" style="color:red">*</span>{% endif %}:</label>
+      </td>
+      <td> {{ field }} {% if field.errors %}{{ field.errors }}{% endif %}</td>
       </tr>
-      <tr>
-        <td>
-        Direction:
-        </td>
-        <td>
-        <select name="direction" type="text">
-          <option value="">Select</option>
-          <option value="f">F</option>
-          <option value="r">R</otion>
-          <option value="t">T</otion>
-          <option value="left">Left</otion>
-          <option value="right">Right</otion>
-          <option value="sf">SF</otion>
-          <option value="sr">SR</option>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Genomic Location Start:
-        </td>
-        <td>
-        <input name="start" type="number">
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Genomic Location End:
-        </td>
-        <td>
-        <input name="end" type="number">
-        </td>
-      </tr>
-      <tr>
-        <td>
-        M13 Tag (for R/F primers): *<br> Note: auto-added for Sanger.
-        </td>
-        <td>
-        <select name="m13" type="text">
-          <option value="no">No</option>
-          <option value="yes">Yes</option>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        3' Modification:
-        </td>
-        <td>
-        <input type="text" name="3_modification">
-        <datalist id="3_modification">
-          <option value="">None</option>
-          <option value="HEX">HEX</option>
-          <option value="6FAM">6FAM</otion>
-          <option value="5FAM">5FAM</otion>
-          <option value="TAM">TAM</otion>
-          <option value="BIOTIN">BIOTIN</otion>
-        </datalist>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        5' Modification:
-        </td>
-        <td>
-        <input name="5_modification" type="text">
-        <datalist id="3_modification">
-          <option value="">None</option>
-          <option value="HEX">HEX</option>
-          <option value="6FAM">6FAM</option>
-          <option value="5FAM">5FAM</option>
-          <option value="TAM">TAM</option>
-          <option value="BIOTIN">BIOTIN</option>
-        </datalist>
-        </td>
-      </tr>
-      <tr>
-        <td>
-        NGS Number (if applicable):
-        </td>
-        <td>
-        <input name="ngs" type="number">
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Alternative Name:
-        </td>
-        <td>
-        <input name="alt_name" type="text">
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Comments:
-        </td>
-        <td>
-        <input name="comments" type="text">
-        </td>
-      </tr>
-      <tr>
-        <td>
-        Reason for Order: *
-        </td>
-        <td>
-        <select name="reason" type="text" required=True>
-          <option value="">---</option>
-          <option value="Repeat order">Repeat order</option>
-          <option value="New gene / version">New gene / version</option>
-          <option value="NGS confirmation">NGS confirmation</option>
-          <option value="Scientist - R&D">Scientist R&D</option>
-          <option value="Other">Other</option>
-        </td>
-      </tr>
-    </table><br><br>
     {% endfor %}
-  <input class="p1" type="submit" name="quit" value="Submit and Quit">
-  <input class="p1" type="submit" name="reload" value="Submit and Order More Primers">
+  </table><br><br>
+    {% endfor %}
+    <input type="submit" class="btn btn-success" name="quit" value="Submit and Quit" />
+    <input type="submit" class="btn btn-success" name="reorder" value="Submit and Reorder" />
+    <a class="btn btn-danger" href="{{ cancelurl }}">cancel</a>
   </form>
 {% endblock %}
