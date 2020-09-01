@@ -85,6 +85,14 @@
         {{ form.media.js }}
           {% block toolbar %}
           {% endblock toolbar %}
+          {% if header %}
+          <h1>{{ header }}</h1>
+          <br>
+          {% endif %}
+          {% if subheader %}
+          <p>{{ subheader | safe }}</p>
+          <br>
+          {% endif %}
           {% block content %}
           {% endblock content %}</div>
     </div>

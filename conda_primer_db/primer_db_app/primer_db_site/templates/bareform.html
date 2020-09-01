@@ -1,12 +1,7 @@
 <div class="container-fluid">
 
 
-<h1>{{ header }}</h1>
-<br>
-{% if subheader %}
-<p>{{ subheader | safe }}</p>
-<br>
-{% endif %}
+
 <div >
     <form action="{{ submiturl }}" method="post">
       {% csrf_token %}

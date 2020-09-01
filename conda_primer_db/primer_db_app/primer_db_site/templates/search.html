@@ -4,12 +4,6 @@
 
 {% block content %}
 
-  <h1>{{ header }}</h1>
-  <br>
-  {% if subheader %}
-  <p>{{ subheader | safe }}</p>
-  <br>
-  {% endif %}
   <table class="table2" style="table-layout: fixed; width: 100%">
     <tr>
       {% for item in headings %}
