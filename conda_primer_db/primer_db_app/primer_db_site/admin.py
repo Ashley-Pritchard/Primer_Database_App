@@ -1,6 +1,6 @@
 from django.contrib import admin
 from primer_db_site.models import Primer
-from primer_db_site.models import Amplicon, Analysis_Type, Gene, Primer_Set, Imported_By
+from primer_db_site.models import Amplicon, Analysis_Type, Gene, Primer_Set
 
 #Changes titles on Admin Site
 admin.site.site_header="Primer Database Admin Page"
@@ -17,14 +17,14 @@ class GeneAdmin(admin.ModelAdmin):
 
 	active.boolean = True
 
-class Imported_ByAdmin(admin.ModelAdmin):
-	list_display = ('imported_by', 'status')
-	search_fields = ('imported_by', 'status')
-
-	def active(self, obj):
-		return obj.is_active == 1
-
-	active.boolean = True
+# class Imported_ByAdmin(admin.ModelAdmin):
+# 	list_display = ('imported_by', 'status')
+# 	search_fields = ('imported_by', 'status')
+#
+# 	def active(self, obj):
+# 		return obj.is_active == 1
+#
+# 	active.boolean = True
 
 class AmpliconAdmin(admin.ModelAdmin):
 	list_display = ('amplicon_name', 'exon')
@@ -48,6 +48,6 @@ class PrimerAdmin(admin.ModelAdmin):
 admin.site.register(Analysis_Type)
 admin.site.register(Gene, GeneAdmin)
 admin.site.register(Primer_Set)
-admin.site.register(Imported_By, Imported_ByAdmin)
+# admin.site.register(Imported_By, Imported_ByAdmin)
 admin.site.register(Amplicon, AmpliconAdmin)
 admin.site.register(Primer, PrimerAdmin)
