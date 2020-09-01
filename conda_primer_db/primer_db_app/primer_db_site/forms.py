@@ -24,3 +24,10 @@ class IndexSearchForm(forms.Form):
         if self.cleaned_data["Chromosome"]!="":
             if not re.match(Chr_regex, self.cleaned_data["Chromosome"]):
                 self.add_error("Chromosome", forms.ValidationError("Chromosome must be 1-22, X, Y or M"))
+
+class AmpliconOrderForm(forms.Form):
+    reason = forms.ChoiceField(label=u"Reason for Reorder", choices=[("Repeat order","Repeat order"),("New Gene/Version","New Gene/Version"),
+                                                                      ("NGS Confirmation","NGS Confirmation"), ("Scientist - R&D","Scientist - R&D"),
+                                                                      ("Other","Other")])
+
+    # ReOrderedBy = forms.ModelChoiceField(label=u"Reordered By", queryset = Imported_By.objects.filter(status="current"))

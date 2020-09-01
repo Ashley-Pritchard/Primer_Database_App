@@ -170,33 +170,114 @@ def search(request,filters):
 #from the search results page, takes user clicking on specific amplicon as request and pulls respective primer information for those matching the amplicon id
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def amplicon(request,amplicon_input):
+    #pull information for the amplicon selected by the user from the database
+    amplicon = Amplicon.objects.get(amplicon_name=amplicon_input)
+    #pull primer information for amplicon
+    primer = amplicon.primer_set.all()
+    header=f"Primer Database: Amplicon {amplicon.amplicon_name}"
+    subheader=f"The following page provides a record of all OMGL primers associated with amplicon {amplicon.amplicon_name}. To <strong>reorder</strong> one or more of the below primers, <strong>select the box</strong> next to the primer and use the 'reorder' option at the bottom of the page."
 
-	#pull information for the amplicon selected by the user from the database
-	amplicon = Amplicon.objects.get(amplicon_name=amplicon_input)
+    form=AmpliconOrderForm
+    if request.method == "POST":
+        form=form(request.POST)
+        if "submit" not in request.POST or request.POST["submit"] != "save":
+            return HttpResponseRedirect(reverse("amplicon", args=[amplicon.amplicon_name]))
+        else:
+            reorder_list = request.POST.getlist("requests")
+            if reorder_list==[]:
+                return HttpResponseRedirect(reverse("reorder_archive_primer",args=[0,amplicon.amplicon_name]))
+            #May come back to tidy up if time...
+            #loop through list of primers
+            for i in reorder_list:
 
-	#pull primer information for amplicon
-	primer = amplicon.primer_set.all()
+                reorder = Primer.objects.get(pk=i)
 
-	#the rendered primer page will permit the reorder of the primer - this requires input of who is ordering - pull imported_by names from the database for drop-down menu
-	imp_by = Imported_By.objects.all()
+                #make changes to the primer table of the database
+                primer = Primer()
 
-	#provide a count of stocked primers as context for the page
-	count_stocked = 0
-	for p in primer:
-		if p.order_status != 'Stocked':
-			count_stocked += 1
+                #assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder
+                primer.name = reorder.name
+                primer.sequence = reorder.sequence
+                primer.genomic_location_start = reorder.genomic_location_start
+                primer.genomic_location_end = reorder.genomic_location_end
+                primer.direction = reorder.direction
+                primer.modification = reorder.modification
+                primer.modification_5 = reorder.modification_5
+                primer.alt_name = reorder.alt_name
+                primer.ngs_audit_number = reorder.ngs_audit_number
+                primer.version = reorder.version
+                primer.amplicon_id = reorder.amplicon_id
+                primer.comments = reorder.comments
+                primer.location = reorder.location
+                primer.date_testing_completed = reorder.date_testing_completed
+                primer.m13_tag = reorder.m13_tag
 
 
-	#provide context for the amplicon html page
-	context = {
-		'amplicon': amplicon,
-		'primer': primer,
-		'imp_by': imp_by,
-		'count_stocked': count_stocked
-	}
+                #assingn the 'imported_by' input selected by user to new primer record
+                primer.imported_by_id = request.user
 
-	#render the amplicon html page from the templates directory
-	return render(request, 'amplicon.html', context=context)
+                #assign the 'date imported' to the new primer record as todays date
+                today = date.today()
+                primer.date_imported = today
+                primer.date_order_placed = today
+
+                #assign the order status of the new primer record to 'ordered'
+                primer.order_status = "Ordered"
+
+                #add reason reordered input by user to the primer record
+                primer.reason_ordered = form.data["reason"]
+
+                #close the current primer record
+                reorder.order_status = "Closed"
+                reorder.save()
+
+                #update the database
+                primer.save()
+            return HttpResponseRedirect(reverse("reorder_archive_primer", args=[1,amplicon.amplicon_name]))
+        return HttpResponseRedirect(reverse("amplicon", args=[amplicon.amplicon_name]))
+    else:
+        form=form()
+
+
+
+        #list of heading (text) and primer attribute tuples. primer attr will be used to eval the actual attribute in a loop
+        #e.g in headings[0] the title is "Primer" and the attr is "name" (e.g primer.name)
+        in_stock_headings=[("Primer","name"), ("Order Status","order_status"), ("Analysis","amplicon_id.analysis_type_id.analysis_type"),
+                  ("Gene", "amplicon_id.gene_id.gene_name"), ("Chromosome","amplicon_id.gene_id.chromosome"), ("Exon","amplicon_id.exon"),
+                  ("Direction","direction"), ("Start","genomic_location_start"), ("End","genomic_location_end"),
+                  ("Set","amplicon_id.primer_set_id.primer_set"), ("Location","location"), ("Sequence", "sequence"),
+                  ("NGS Audit Number","ngs_audit_number"), ("Requested By", "imported_by_id.username"), ("Date Imported","date_imported"),
+                  ("Amplicon Name", "amplicon_id.amplicon_name"), ("Alternative Name", "alt_name"), ("m13 tag", "m13_tag"),
+                  ("3' Modification", "modification"), ("5' Modification","modification_5"), ("Version", "version"),
+                  ("Reason Ordered","reason_ordered"), ("Comments","comments"), ("Date Testing Completed","date_testing_completed")]
+        non_stock_headings=in_stock_headings[:-1]
+        stocked_body, non_stocked_body=[],[]
+        for p in primer:
+            temp_body=[]
+            if p.order_status=="Stocked":
+                for h in in_stock_headings:
+                    temp_body.append((h[0],eval(f"p.{h[1]}")))
+                stocked_body.append((temp_body,p.id,p.name))
+            else:
+                for h in non_stock_headings:
+                    temp_body.append((h[0],eval(f"p.{h[1]}")))
+                if p.order_status=="Archived":
+                    temp_body.append(("Date Archived",p.date_archived))
+                non_stocked_body.append(temp_body)
+
+        #provide context for the amplicon html page
+        context = {
+            'header': header,
+            'subheader': subheader,
+            "stocked_body":stocked_body,
+            "non_stocked_body":non_stocked_body,
+            "form":form,
+            "url":reverse("amplicon", args=[amplicon.amplicon_name]),
+            "cancelurl": reverse("amplicon",args=[amplicon.amplicon_name]),
+        }
+
+        #render the amplicon html page from the templates directory
+        return render(request, 'amplicon.html', context=context)
 
 
 
@@ -204,79 +285,21 @@ def amplicon(request,amplicon_input):
 
 #from the amplicon search result pages, the user can reorder a primer - function takes input of the user clicking 'reorder primer' as request.(Note that the archive in name is left over from a removed option to enable archiving primers)
 @user_passes_test(is_logged_in, login_url=LOGINURL)
-def reorder_archive_primer(request):
+def reorder_archive_primer(request,success,amplicon):
+    if success=="1":
+        return render(request, "submit_order.html")
+	#if primer was not selected
+    elif success=="0":
 
-	#if user selects 'reorder primer'
-	if 'reorder' in request.POST:
-
-		#pull specific primer(s) from the database
-		reorder_list = request.POST.getlist('primer')
-
-		#check a primer was selected
-		if len(reorder_list) != 0:
-
-			#loop through list of primers
-			for i in reorder_list:
-				reorder = Primer.objects.get(pk=i)
-
-				#make changes to the primer table of the database
-				primer = Primer()
-
-				#assign new primer record with the same sequence, genomic location, direction, modification, alt name, ngs audit number, version, amplicon id comments and location as the primer record selected for reorder
-				primer.name = reorder.name
-				primer.sequence = reorder.sequence
-				primer.genomic_location_start = reorder.genomic_location_start
-				primer.genomic_location_end = reorder.genomic_location_end
-				primer.direction = reorder.direction
-				primer.modification = reorder.modification
-				primer.modification_5 = reorder.modification_5
-				primer.alt_name = reorder.alt_name
-				primer.ngs_audit_number = reorder.ngs_audit_number
-				primer.version = reorder.version
-				primer.amplicon_id = reorder.amplicon_id
-				primer.comments = reorder.comments
-				primer.location = reorder.location
-				primer.date_testing_completed = reorder.date_testing_completed
-				primer.m13_tag = reorder.m13_tag
-
-
-				#assingn the 'imported_by' input selected by user to new primer record
-				find_imp = Imported_By.objects.filter(imported_by=request.POST.get('imp_by'))
-				for f in find_imp:
-					primer.imported_by_id = f
-
-				#assign the 'date imported' to the new primer record as todays date
-				today = date.today()
-				primer.date_imported = today.strftime("%d/%m/%Y")
-				primer.date_order_placed = today.strftime("%d/%m/%Y")
-
-				#assign the order status of the new primer record to 'ordered'
-				primer.order_status = "Ordered"
-
-				#add reason reordered input by user to the primer record
-				primer.reason_ordered = request.POST.get('reason_reordered')
-
-				#close the current primer record
-				reorder.order_status = "Closed"
-				reorder.save()
-
-				#update the database
-				primer.save()
-
-			#render the 'submitted reorder primer' html page from the templates directory
-			return render(request, 'submitted_reorder_primer.html')
-
-		#if primer was not selected
-		else:
-
-			#render the 'warning' html page from the templates directory
-			return render(request, 'warning.html')
+    #render the 'warning' html page from the templates directory
+        return render(request, 'warning.html', context={"message":"please click here to go back to reorder a primer",
+                                                "url":f"/primer_database/amplicon/{amplicon}"})
 
 
 
 
 
-##Order Primer Page ##
+
 
 
 #provides context for the order page - takes request from users clicking on the 'order new gene/version' option of the searchbar

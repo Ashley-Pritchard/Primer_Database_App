@@ -3,202 +3,44 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
+  {% if stocked_body %}
+  <form action="{{ url }}" method="POST">
 
-  <h1>Primer Database: Amplicon {{ amplicon.amplicon_name }}</h1>
-  <p> The following page provides a record of all OMGL primers associated with amplicon {{ amplicon.amplicon_name }}. To <strong>reorder</strong> one or more of the below primers, <strong>select the box</strong> next to the primer and use the 'reorder' option at the bottom of the page.<br><br><br>
-  {% for p in primer %}
-    {% if p.order_status == 'Stocked' %}
+    {% for table, checked, name in stocked_body %}
+
     <table class="table2" style="table-layout: fixed; width: 100%">
-    <form action="{% url 'reorder_archive_primer' %}" method="POST" id="order">
-      <tr>
-        <td>
-            <strong>Primer:</strong>
+    <tr>
+      <input type="checkbox" name="requests" value="{{ checked }}" style="float: left; margin-top: 5px;>">
+        <div style="margin-left: 25px;">
+         Check to Reorder {{ name }}
+        </div>
+      {% for head, text in table %}
+
           <td>
-            {{ p.name }}
+            <strong>{{ head }}</strong>
           </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-            <input class="checkbox" type="checkbox" name="primer" id="primer" value="{{ p.id }}" class="order_select">
-          </td>
-      <tr>
-      <tr>
-        <td>
-            <strong>Order Status:</strong>
-          <td>
-            {{ p.order_status }}
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-      <tr>
-        <td>
-          <strong>Analysis</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.analysis_type_id.analysis_type }}
-        </td>
-        <td>
-          <strong>Gene</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.gene_id.gene_name }}
-        </td>
-        <td>
-          <strong>Chromosome</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.gene_id.chromosome }}
-        </td>
-      <tr>
-        <td>
-          <strong>Exon</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.exon }}
-        </td>
-        <td>
-          <strong>Direction</strong>:
-        </td>
-        <td>
-          {{ p.direction }}
-        </td>
-        <td>
-          <strong>Start</strong>:
-        </td>
-        <td>
-          {{ p.genomic_location_start }}
-        </td>
-      <tr>
-        <td>
-          <strong>End</strong>:
-        </td>
-        <td>
-          {{ p.genomic_location_end }}
-        </td>
-        <td>
-          <strong>Set</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.primer_set_id.primer_set }}
-        </td>
-        <td>
-          <strong>Location</strong>:
-        </td>
-        <td>
-          {{ p.location }}
-        </td>
-      <tr>
-        <td>
-          <strong>Sequence</strong>:
-        </td>
-        <td style="word-wrap: break-word">
-          {{ p.sequence }}
-        </td>
-        <td>
-          <strong>NGS Audit Number</strong>:
-        </td>
-        <td>
-          {{ p.ngs_audit_number }}
-        </td>
-        <td>
-          <strong>Requested By</strong>:
-        </td>
-        <td>
-          {{ p.imported_by_id.imported_by }}
-        </td>
-      <tr>
-        <td>
-          <strong>Date Imported</strong>:
-        </td>
-        <td>
-          {{ p.date_imported }}
-        </td>
-        <td>
-          <strong>Amplicon Name</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.amplicon_name }}
-        </td>
-        <td>
-          <strong>Alternative Name</strong>:
-        </td>
-        <td>
-          {{ p.alt_name }}
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <strong>m13_tag</strong>:
-        </td>
-        <td>
-          {{ p.m13_tag }}
-        </td>
-        <td>
-          <strong>3' Modification</strong>:
-        </td>
-        <td>
-          {{ p.modification }}
-        </td>
-        <td>
-          <strong> 5' Modification</strong>:
-        </td>
-        <td>
-          {{ p.modification_5 }}
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <strong>Version:</strong>
-        </td>
-        <td>
-          {{ p.version }}
-          </td>
-          <td>
-            <strong>Reason Ordered</strong>:
-          </td>
-          <td>
-            {{ p.reason_ordered }}
-          </td>
-          <td>
-            <strong>Date Testing Completed:</strong>
-          </td>
-          <td>
-            {{ p.date_testing_completed }}
-          </td>
-      </tr>
-      </table><br>
-    <p><strong>Comments:</strong> {{ p.comments }}</p><br><br>
-    {% endif %}
-  {% endfor %}
-      <p> To <strong>reorder</strong> selected primer(s), please use the drop-down menu to select your initials and then click the 'Reorder Primer(s)' button</p>
-      Reason for Reorder:
-      <select name="reason_reordered" type="text" required=True>
-        <option value="">---</option>
-        <option value="Repeat order">Repeat order</option>
-        <option value="New gene / version">New gene / version</option>
-        <option value="NGS confirmation">NGS confirmation</otion>
-        <option value="Scientist - R&D">Scientist - R&D</otion>
-        <option value="Other">Other</otion></select>&nbsp;&nbsp;&nbsp;&nbsp;
-    Reordered By:
-    <select name="imp_by" type="text" required=True>
-      <option value="">---</option>
-      {% for i in imp_by %}
-        {% if i.status == "current" %}
-          <option value='{{ i.imported_by }}'>{{ i.imported_by }}</option>
+          <td>{{ text }}</td>
+
+        {% if forloop.counter == 3 or forloop.counter == 6 or forloop.counter == 9 or forloop.counter == 12 or forloop.counter == 15 or forloop.counter == 18 or forloop.counter == 21 or forloop.counter == 24  %}
+          </tr>
+          <tr>
         {% endif %}
-      {% endfor %}</select>&nbsp;&nbsp;&nbsp;&nbsp;
-    <input class="p1" type="submit" name = "reorder" value="Reorder Primer(s)"><br><br>
+      {% endfor %}
+    <!-- <br><br><br> -->
+    {% endfor %}
+    </table>
+    <p> To <strong>reorder</strong> selected primer(s), Select the Reason for re-oreder and then click the 'Save' button</p>
+    Reason for Reorder:
+    {% for field in form.visible_fields %}
+      {{ field }} {% if field.errors %}{{ field.errors }}{% endif %}
+    {% endfor %}
+    <br>
+    <input type="submit" class="btn btn-success" name="submit" value="save" />
+    <a class="btn btn-danger" href="{{ cancelurl }}">cancel</a>
+    <!-- <input class="p1" type="submit" name = "reorder" value="Reorder Primer(s)"><br><br> -->
     </form><br><br>
+  {% endif %}
+
 
 <button onclick="myFunction()">Click to Show / Hide Ordered and Archived Primers</button><br>
 
@@ -206,183 +48,26 @@
   {% if count_stocked == 0 %}
     <p>No records found.</p>
   {% endif %}
-    {% for p in primer %}
-      {% if p.order_status != 'Stocked' %}
-    <br><br><table class="table2" style="table-layout: fixed; width: 100%">
-      <tr>
-        <td>
-            <strong>Primer:</strong>
+  {% if non_stocked_body %}
+    {% for table in non_stocked_body %}
+    <table class="table2" style="table-layout: fixed; width: 100%">
+    <tr>
+      {% for head, text in table %}
+
           <td>
-            {{ p.name }}
+            <strong>{{ head }}</strong>
           </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-      <tr>
-      <tr>
-        <td>
-            <strong>Order Status:</strong>
-          <td>
-            {{ p.order_status }}
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-          <td>
-          </td>
-      <tr>
-        <td>
-          <strong>Analysis</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.analysis_type_id.analysis_type }}
-        </td>
-        <td>
-          <strong>Gene</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.gene_id.gene_name }}
-        </td>
-        <td>
-          <strong>Chromosome</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.gene_id.chromosome }}
-        </td>
-      <tr>
-        <td>
-          <strong>Exon</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.exon }}
-        </td>
-        <td>
-          <strong>Direction</strong>:
-        </td>
-        <td>
-          {{ p.direction }}
-        </td>
-        <td>
-          <strong>Start</strong>:
-        </td>
-        <td>
-          {{ p.genomic_location_start }}
-        </td>
-      <tr>
-        <td>
-          <strong>End</strong>:
-        </td>
-        <td>
-          {{ p.genomic_location_end }}
-        </td>
-        <td>
-          <strong>Set</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.primer_set_id.primer_set }}
-        </td>
-        <td>
-          <strong>Location</strong>:
-        </td>
-        <td>
-          {{ p.location }}
-        </td>
-      <tr>
-        <td>
-          <strong>Sequence</strong>:
-        </td>
-        <td style="word-wrap: break-word">
-          {{ p.sequence }}
-        </td>
-        <td>
-          <strong>NGS Audit Number</strong>:
-        </td>
-        <td>
-          {{ p.ngs_audit_number }}
-        </td>
-        <td>
-          <strong>Requested By</strong>:
-        </td>
-        <td>
-          {{ p.imported_by_id.imported_by }}
-        </td>
-      <tr>
-        <td>
-          <strong>Date Imported</strong>:
-        </td>
-        <td>
-          {{ p.date_imported }}
-        </td>
-        <td>
-          <strong>Amplicon Name</strong>:
-        </td>
-        <td>
-          {{ p.amplicon_id.amplicon_name }}
-        </td>
-        <td>
-          <strong>Alternative Name</strong>:
-        </td>
-        <td>
-          {{ p.alt_name }}
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <strong>m13_tag</strong>:
-        </td>
-        <td>
-          {{ p.m13_tag }}
-        </td>
-        <td>
-          <strong>3' Modification</strong>
-        </td>
-        <td>
-          {{ p.modification }}
-        </td>
-        <td>
-          <strong>5' Modification</strong>
-        </td>
-        <td>
-          {{ p.modification_5 }}
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <strong>Version:</strong>
-        </td>
-        <td>
-          {{ p.version }}
-          </td>
-          <td>
-            <strong>Reason Ordered</strong>:
-          </td>
-          <td>
-            {{ p.reason_ordered }}
-          </td>
-          <td>
-            {% if p.order_status == 'Archived' %}
-            <strong>Date Archived</strong>:
-          </td>
-          <td>
-            {{ p.date_archived }}
-          </td>
-            {% else %}
-          <td>
-          </td>
-            {% endif %}
-        </tr>
-      </table><br>
-    <p><strong>Comments:</strong> {{ p.comments }}</p><br><br>
-    {% endif %}
-  {% endfor %}
+          <td>{{ text }}</td>
+
+        {% if forloop.counter == 3 or forloop.counter == 6 or forloop.counter == 9 or forloop.counter == 12 or forloop.counter == 15 or forloop.counter == 18 or forloop.counter == 21 or forloop.counter == 24  %}
+          </tr>
+          <tr>
+        {% endif %}
+      {% endfor %}
+    <br><br><br>
+    {% endfor %}
+    </table>
+  {% endif %}
 </div>
 
 <script>
