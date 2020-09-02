@@ -37,7 +37,7 @@ def loginview(httprequest):
                 user = authenticate(username=form.cleaned_data["username"], password=form.cleaned_data["password"])
                 if user is not None and user.is_active:
                     login(httprequest, user)
-                    return HttpResponseRedirect(reverse("index"))
+                    return HttpResponseRedirect(httprequest.GET["next"] if "next" in httprequest.GET.keys() else reverse("index"))
 
                 else:
                     try:
