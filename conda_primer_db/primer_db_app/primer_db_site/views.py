@@ -527,9 +527,9 @@ def ordered(request):
 
                 #write the relevant primer information to a csv file
                 writer = csv.writer(response)
-                writer.writerow(['name', 'sequence', '3\' modification', '5\' modification', 'location', 'reason_for_order', 'date received'])
+                writer.writerow(['name', 'sequence',  'location', '3\' modification', '5\' modification', 'reason_for_order', 'date received'])
                 for primer in primer_list:
-                    writer.writerow([primer.name, (primer.m13_tag + primer.sequence) if primer.m13_tag is not None else primer.sequence, primer.modification, primer.modification_5, primer.location, primer.reason_ordered])
+                    writer.writerow([primer.name, (primer.m13_tag + primer.sequence) if primer.m13_tag is not None else primer.sequence, primer.location, primer.modification, primer.modification_5, primer.reason_ordered])
 
                 #export the csv file
                 return response
