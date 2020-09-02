@@ -761,50 +761,49 @@ def in_testing(request,type):
 #takes user clicking the 'failed validation' searchbar link as request and pulls the information of all primers with an order status of 'failed validation'
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def failed(request):
-
-	#pull primers with order status of failed validation
-	failed = Primer.objects.filter(order_status = "Failed Validation")
-
-	#provide context for the failed html page
-	context = {
-		"failed": failed
-	}
-
-	#render the failed html page from the templates directory
-	return render(request, 'failed.html', context=context)
-
-
-
-
-
-#allows users to remove primers from the 'failed validation' primers by changing their order status to archived - takes users selecting primers and clicking on 'remove' as request
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def remove_failed(request):
-
-	#pull selected primer(s) from the database
-	update_list = request.POST.getlist('primer')
-
-	#if choose to discard primer
-	if 'discard' in request.POST:
-		#iterate through primer list, update order status and save changes to database
-		for i in update_list:
-			update = Primer.objects.get(pk=i)
-			update.order_status = 'Failed_Validation_Archived'
-			update.save()
-
-	#if choose to retest primer
-	if 'retest' in request.POST:
-		#iterate through primer list, update order status and save changes to database
-		for i in update_list:
-			update = Primer.objects.get(pk=i)
-			update.order_status = "Retesting"
-			update.save()
-
-	#render the remove failed html page from templates directory
-	return render(request, 'remove_failed.html')
-
+    if request.method=="POST":
+        primer_list = Primer.objects.filter(id__in=request.POST.getlist('primers'))
+        if len(primer_list)==0:
+            return render(request, 'warning.html', context={"message":"please click here to go back to the failed validation page",
+                                                    "url":f"/primer_database/failed/"})
+        #if choose to discard primer
+        if ('discard' in request.POST) or ('retest' in request.POST):
+            if 'retest' in request.POST:
+                status="Retesting"
+            elif "discard" in request.POST:
+                status="Failed_Validation_Archived"
+            for primer in primer_list:
+                primer.order_status=status
+                primer.save()
+            return render(request, "action_completed.html")
+    else:
+        header="Primer Database: Failed Validation"
+        subheader="Primer information for primers that have failed validation:"
+        #pull primers with order status of ordered
+        headers=["Primer ID", "Requested By", "Location", "Worksheet", "Select"]
+        values=[]
+        ids=[]
+        ordered = Primer.objects.filter(order_status = "Failed Validation")
+        for primer in ordered:
+            values.append([primer.name,
+                          primer.imported_by_id.username,
+                          primer.location,
+                          primer.worksheet_number,
+                          ])
+            ids.append(primer.id)
+        #provide context for the ordered html page
+        buttons=[["success", "submit", "retest", "Retest", ""],
+                 ["danger", "submit", "discard", "Discard", ""]]
+        context = {
+            "headers": headers,
+            "body":zip(values,ids),
+            "header":header,
+            "subheader":subheader,
+            "extrabuttons":buttons,
+        }
 
 
+        return render(request, 'checked_list.html', context=context)
 
 
 ##Retesting Page##
