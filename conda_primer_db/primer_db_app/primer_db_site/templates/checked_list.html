@@ -25,11 +25,9 @@
       {% endfor %}
       </table>
       <br><br>
-      <table>
-        <tr>
-        <input class="btn btn-success" type="submit" name="csv" value="Download Order Information">
-        <input class="btn btn-success" type="submit" name="ordered" value="Mark As Ordered">
-        <input class="btn btn-danger" onclick="return confirm('Are you sure you wish to delete?');" type="submit" name="delete" value="Delete">
-        </tr>
-      </form>
+      {% for style, type, name, value, onclick in extrabuttons %}
+        <input class="btn btn-{{ style }}" onclick="{{ onclick }}" type="{{ type }}" name="{{ name }}" value="{{ value }}">
+      {% endfor %}
+
+
 {% endblock content %}

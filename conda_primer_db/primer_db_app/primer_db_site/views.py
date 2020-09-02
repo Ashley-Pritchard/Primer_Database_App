@@ -556,15 +556,19 @@ def ordered(request):
                           ])
             ids.append(primer.id)
         #provide context for the ordered html page
+        buttons=[["success", "submit", "csv", "Download Order Information", ""],
+                 ["success", "submit", "ordered", "Mark As Ordered", ""],
+                 ["danger", "submit", "delete", "Delete", "return confirm('Are you sure you wish to delete?');"]]
         context = {
             "headers": headers,
             "body":zip(values,ids),
             "header":header,
             "subheader":subheader,
+            "extrabuttons":buttons,
         }
 
         #render the ordered html page from the templates directory
-        return render(request, 'ordered.html', context=context)
+        return render(request, 'checked_list.html', context=context)
 
 
 ## Primers on Order Page ##
