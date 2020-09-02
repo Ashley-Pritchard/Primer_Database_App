@@ -14,7 +14,6 @@ urlpatterns = [
     path('ordered/', views.ordered, name='ordered'),
     re_path(r'reorder_archive_primer/(.*)/(.*)/$', views.reorder_archive_primer, name='reorder_archive_primer'),
     path('order_placed/', views.order_placed, name='order_placed'),
-    path('order_recieved/', views.order_recieved, name='order_recieved'),
     path('location_updated/', views.location_updated, name='location_updated'),
     path('in_testing_sanger/', views.in_testing_sanger, name='in_testing_sanger'),
     path('in_testing_non_sanger/', views.in_testing_non_sanger, name='in_testing_non_sanger'),

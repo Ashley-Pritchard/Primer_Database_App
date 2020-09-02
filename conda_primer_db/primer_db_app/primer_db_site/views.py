@@ -285,7 +285,7 @@ def amplicon(request,amplicon_input):
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def reorder_archive_primer(request,success,amplicon):
     if success=="1":
-        return render(request, "submit_order.html")
+        return render(request, "action_completed.html")
 	#if primer was not selected
     elif success=="0":
 
@@ -532,12 +532,12 @@ def ordered(request):
                     primer.order_status = 'Order Placed'
                     primer.date_order_placed = date.today()
                     primer.save()
-                return render(request, 'submit_order.html')
+                return render(request, 'action_completed.html')
             #if the 'delete' button is clicked - iterate through the list of primers selected and delete from the database
             elif 'delete' in request.POST:
                 for primer in primer_list:
                     primer.delete()
-                return render(request, 'submit_order.html')
+                return render(request, 'action_completed.html')
         else:
             return render(request, 'warning.html', context={"message":"please click here to go back to the Primers to be Ordered page",
                                                     "url":"/primer_database/ordered/"})
@@ -575,76 +575,79 @@ def ordered(request):
 #takes user clicking the 'primers on order' searchbar link as request and pulls the information of all primers with an order status of 'order placed'
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def order_placed(request):
+    if request.method=="POST":
+        primer_list = Primer.objects.filter(id__in=request.POST.getlist('primers'))
+        if len(primer_list)!=0:
+            #if 'testing required sanger' is clicked - iterate through the list of primers selected, update the order status to 'in testing sanger', assign the 'date_order_received' as todays date and save changes to the database
+            if ('test_sanger' in request.POST) or ('test_non_sanger' in request.POST):
+                if 'test_sanger' in request.POST:
+                    status='In Testing Sanger'
+                elif 'test_non_sanger' in request.POST:
+                    status='In Testing Non-Sanger'
+                for primer in primer_list:
+                    primer.order_status = status
+                    primer.date_order_recieved = date.today()
+                    primer.save()
 
-	#pull primers with order status of order placed
-	ordered = Primer.objects.filter(order_status = "Order Placed")
-
-	#provide context for the order placed html page
-	context = {
-		"ordered": ordered
-	}
-
-	#render the order placed html page from the templates directory
-	return render(request, 'order_placed.html', context=context)
+                #return the order recieved html page from the templates directory
+                return render(request, 'action_completed.html')
 
 
+            #if 'testing not required' is clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_order_received' as todays date and save changes to the database
+            elif 'stock' in request.POST:
+                header="Primer Database"
+                subheader="Please update location information:"
+                headers=["Primer ID", "Alternative Name", "Direction", "Imported By", "Location"]
+                values=[]
+                ids=[]
+                locs=[]
+                for primer in primer_list:
+                    values.append([primer.name,
+                                   primer.alt_name,
+                                   primer.direction,
+                                  primer.imported_by_id.username,
+                                  ])
+                    locs.append(primer.location if primer.location is not None else "")
+                    ids.append(primer.id)
+                context = {
+                    "header":header,
+                    "subheader":subheader,
+                    "headers":headers,
+                    "body":zip(values,locs,ids),
+                }
 
+                #instead render the 'order recieved' html page from the templates directory - this will direct users to update lab location for these primers as they are being moved to 'stocked'
+                return render(request, 'order_recieved_non_test.html', context=context)
 
+    else:
+        #pull primers with order status of order placed
+        primers = Primer.objects.filter(order_status = "Order Placed")
+        header="Primer Database: Ordered Primers"
+        subheader="Primer information for primers on order:"
+        headers=["Primer ID", "Reason Ordered", "Requested By", "Select"]
+        values=[]
+        ids=[]
+        ordered = Primer.objects.filter(order_status = "Ordered")
+        for primer in ordered:
+            values.append([primer.name,
+                          primer.reason_ordered,
+                          primer.imported_by_id.username,
+                          ])
+            ids.append(primer.id)
+        buttons=[["success", "submit", "test_sanger", "Testing Required: Sanger", ""],
+                 ["success", "submit", "test_non_sanger", "Testing Required: Non-Sanger", ""],
+                 ["success", "submit", "stock", "Testing Not Required", ""]]
+        #provide context for the order placed html page
+        context = {
+            "headers": headers,
+            "body":zip(values,ids),
+            "header":header,
+            "subheader":subheader,
+            "extrabuttons":buttons,
+        }
 
-#from the 'primers to be ordered' page, allow users to update the status of a primer from having been requested to order placed with the company - takes users selecting primer(s) and clicking on either 'recieved: testing required' or 'recieved: testing not required' as request
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def order_recieved(request):
-
-	#pull the selected primer(s) based on the checkboxes selected on the 'primers to be ordered' html page.
-	primer_list = request.POST.getlist('primer')
-
-	#calculate how many primers have been selected from the length of the primer list
-	list_len = len(request.POST.getlist('primer'))
-
-	#if 'testing required sanger' is clicked - iterate through the list of primers selected, update the order status to 'in testing sanger', assign the 'date_order_received' as todays date and save changes to the database
-	if 'test_sanger' in request.POST:
-		for i in range(list_len):
-			recieved = Primer.objects.get(pk=primer_list[i])
-			recieved.order_status = 'In Testing Sanger'
-			today = date.today()
-			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
-			recieved.save()
-
-		#return the order recieved html page from the templates directory
-		return render(request, 'order_recieved.html')
-
-	#if 'testing required non sanger' is clicked - iterate through the list of primers selected, update the order to 'in testing non sanger',assign the 'date order received' as todays date and save changes to the database
-	if 'test_non_sanger' in request.POST:
-		for i in range(list_len):
-			recieved = Primer.objects.get(pk=primer_list[i])
-			recieved.order_status = 'In Testing Non-Sanger'
-			today = date.today()
-			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
-			recieved.save()
-
-		#return the order recieved html page from the templates directory
-		return render(request, 'order_recieved.html')
-
-	#if 'testing not required' is clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_order_received' as todays date and save changes to the database
-	if 'stock' in request.POST:
-		for i in range(list_len):
-			recieved = Primer.objects.get(pk=primer_list[i])
-			recieved.order_status = 'Stocked'
-			today = date.today()
-			recieved.date_order_recieved = today.strftime("%d/%m/%Y")
-			recieved.save()
-
-		#provide context of submitted primers for the order_recieved html page
-		location_list = []
-		for i in range(list_len):
-			location_list.append(Primer.objects.get(pk=primer_list[i]))
-
-		context = {
-			"location_list":location_list
-		}
-
-		#instead render the 'order recieved' html page from the templates directory - this will direct users to update lab location for these primers as they are being moved to 'stocked'
-		return render(request, 'order_recieved_non_test.html', context=context)
+        #render the order placed html page from the templates directory
+        return render(request, 'checked_list.html', context=context)
 
 
 
@@ -653,20 +656,19 @@ def order_recieved(request):
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def location_updated(request):
 
-	#pull lists of submitted primers and locations
-	primer = request.POST.getlist('primer')
-	location_list = request.POST.getlist('location')
-	list_len = len(request.POST.getlist('location'))
+    #pull lists of submitted primers and locations
+    primers = Primer.objects.filter(id__in=request.POST.getlist('primer'))
+    location_list = request.POST.getlist('location')
 
-	#update the location info for primers locations were submitted for
-	for i in range(list_len):
-		update = Primer.objects.get(pk=primer[i])
-		if location_list[i] != "":
-			update.location = location_list[i]
-		update.save()
+    #update the location info for primers locations were submitted for
+    for primer, loc in zip(primers,location_list):
+        primer.order_status = 'Stocked'
+        primer.date_order_recieved = date.today()
+        primer.location=loc
+        primer.save()
 
-	#render the 'location_updated' html page from the templates directory
-	return render(request, 'location_updated.html')
+    #render the 'location_updated' html page from the templates directory
+    return render(request, 'action_completed.html')
 
 
 
