@@ -254,11 +254,17 @@ def amplicon(request,amplicon_input):
             temp_body=[]
             if p.order_status=="Stocked":
                 for h in in_stock_headings:
-                    temp_body.append((h[0],eval(f"p.{h[1]}")))
+                    try:
+                        temp_body.append((h[0],eval(f"p.{h[1]}")))
+                    except:
+                        temp_body.append((h[0],""))
                 stocked_body.append((temp_body,p.id,p.name))
             else:
                 for h in non_stock_headings:
-                    temp_body.append((h[0],eval(f"p.{h[1]}")))
+                    try:
+                        temp_body.append((h[0],eval(f"p.{h[1]}")))
+                    except:
+                        temp_body.append((h[0],""))
                 if p.order_status=="Archived":
                     temp_body.append(("Date Archived",p.date_archived))
                 non_stocked_body.append(temp_body)
