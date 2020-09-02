@@ -13,7 +13,6 @@ urlpatterns = [
     re_path(r'order_form/(.*)/$', views.order_form, name='order_form'),
     path('ordered/', views.ordered, name='ordered'),
     re_path(r'reorder_archive_primer/(.*)/(.*)/$', views.reorder_archive_primer, name='reorder_archive_primer'),
-    path('submit_order/', views.submit_order, name='submit_order'),
     path('order_placed/', views.order_placed, name='order_placed'),
     path('order_recieved/', views.order_recieved, name='order_recieved'),
     path('location_updated/', views.location_updated, name='location_updated'),

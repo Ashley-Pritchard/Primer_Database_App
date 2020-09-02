@@ -512,73 +512,62 @@ def order_form(request,number):
 #takes user clicking the 'primers on order' searchbar link as request and pulls the information of all primers with an order status of 'ordered'
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def ordered(request):
+    if request.method == "POST":
+        primer_list = Primer.objects.filter(id__in=request.POST.getlist('primers'))
+        if len(primer_list)!=0:
+            if "csv" in request.POST:
+                response = HttpResponse(content_type='text/csv')
+                response['Content-Disposition'] = 'attachment; filename="order_information.csv"'
 
-	#pull primers with order status of ordered
-	ordered = Primer.objects.filter(order_status = "Ordered")
+                #write the relevant primer information to a csv file
+                writer = csv.writer(response)
+                writer.writerow(['name', 'sequence', '3\' modification', '5\' modification', 'location', 'reason_for_order', 'date received'])
+                for primer in primer_list:
+                    writer.writerow([primer.name, (primer.m13_tag + primer.sequence) if primer.m13_tag is not None else primer.sequence, primer.modification, primer.modification_5, primer.location, primer.reason_ordered])
 
-	#provide context for the ordered html page
-	context = {
-		"ordered": ordered
-	}
+                #export the csv file
+                return response
+            elif 'ordered' in request.POST:
+                for primer in primer_list:
+                    primer.order_status = 'Order Placed'
+                    primer.date_order_placed = date.today()
+                    primer.save()
+                return render(request, 'submit_order.html')
+            #if the 'delete' button is clicked - iterate through the list of primers selected and delete from the database
+            elif 'delete' in request.POST:
+                for primer in primer_list:
+                    primer.delete()
+                return render(request, 'submit_order.html')
+        else:
+            return render(request, 'warning.html', context={"message":"please click here to go back to the Primers to be Ordered page",
+                                                    "url":"/primer_database/ordered/"})
+    else:
+        header="Primer Database: Primers to be Ordered"
+        subheader="Primer information for primers to be order:"
+        #pull primers with order status of ordered
+        headers=["Primer ID", "Requested By", "Comments", "Select"]
+        values=[]
+        ids=[]
+        ordered = Primer.objects.filter(order_status = "Ordered")
+        for primer in ordered:
+            values.append([primer.name,
+                          primer.imported_by_id.username,
+                          primer.comments,
+                          ])
+            ids.append(primer.id)
+        #provide context for the ordered html page
+        context = {
+            "headers": headers,
+            "body":zip(values,ids),
+            "header":header,
+            "subheader":subheader,
+        }
 
-	#render the ordered html page from the templates directory
-	return render(request, 'ordered.html', context=context)
-
-
-
-
-
-#from the 'primers on order page', users are able to select primers and can click one of three buttons to either download the primer information for placing an order for the primers with a company, change the status of the primer to having been ordered with a company or delete the primer order before it is ordered from a company - this function takes the user clicking on any of these buttons as request
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def submit_order(request):
-
-	#pull the selected primers based on the checkboxes selected on the 'primers to be ordered' html page
-	primer_list = request.POST.getlist('primer')
-
-	#if the 'download order information' button is clicked, provide a pop up for accepting the download of a csv file
-	if 'csv' in request.POST:
-		response = HttpResponse(content_type='text/csv')
-		response['Content-Disposition'] = 'attachment; filename="order_information.csv"'
-
-		#write the relevant primer information to a csv file
-		writer = csv.writer(response)
-		writer.writerow(['name', 'sequence', '3\' modification', '5\' modification', 'location', 'reason_for_order', 'date received'])
-		for primer in primer_list:
-			export = Primer.objects.get(pk=primer)
-			if export.m13_tag != 'None':
-				writer.writerow([export.name, export.m13_tag + export.sequence, export.modification, export.modification_5, export.location, export.reason_ordered])
-			else:
-				writer.writerow([export.name, export.sequence, export.modification, export.modification_5, export.location, export.reason_ordered])
-
-		#export the csv file
-		return response
-
-
-	#if the 'ordered' button is clicked - iterate through the list of primers selected, update the order status and assign the 'date_order_placed' as todays date.
-	if 'ordered' in request.POST:
-		for primer in primer_list:
-			order = Primer.objects.get(pk=primer)
-			order.order_status = 'Order Placed'
-			today = date.today()
-			order.date_order_placed = today.strftime("%d/%m/%Y")
-			order.save()
-
-	#if the 'delete' button is clicked - iterate through the list of primers selected and delete from the database
-	if 'delete' in request.POST:
-		for primer in primer_list:
-			delete = Primer.objects.get(pk=primer)
-			delete.delete()
-
-	#render the 'submit order' html page from the templates directory
-	return render(request, 'submit_order.html')
-
-
-
+        #render the ordered html page from the templates directory
+        return render(request, 'ordered.html', context=context)
 
 
 ## Primers on Order Page ##
-
-
 #takes user clicking the 'primers on order' searchbar link as request and pulls the information of all primers with an order status of 'order placed'
 @user_passes_test(is_logged_in, login_url=LOGINURL)
 def order_placed(request):

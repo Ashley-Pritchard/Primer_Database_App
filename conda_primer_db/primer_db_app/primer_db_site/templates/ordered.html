@@ -4,39 +4,32 @@
 
 {% block content %}
 
-  <h1>Primer Database: Primers to be Ordered</h1>
-  <p> Primer information for primers to be order:<br><br><br><br>
-    {% if ordered %}<td><input type="button" onclick="ToggleAll()" value="Select/Deselect All"</td>{% endif %}
-  {% for p in ordered %}
-    <table class="table" style="table-layout: auto-fit; width: 100%">
-    <form action="{% url 'submit_order' %}" method="POST">
-      <tr>
-      <tr>
-        <td>
-          <strong>Primer ID</strong>:
-        </td>
-        <td style="word-wrap: break-word">
-          {{ p.name }}
-        </td>
-        <td>
-          <strong>Requested By</strong>:
-        </td>
-        <td>
-          {{ p.imported_by_id.imported_by }}
-        </td>
-        <td>
-          <strong>Comments:</strong>
-        </td>
-        <td>
-          {{ p.comments }}
-        </td>
-        <td>
-          <input type="checkbox" name="primer" id="primer" value="{{ p.id }}" checked="checked">
-        </td>
-    </table>
-  {% endfor %}<br><br>
-      <input class="p1" type="submit" name="csv" value="Download Order Information">
-      <input class="p1" type="submit" name="ordered" value="Ordered">
-      <input class="p1" onclick="return confirm('Are you sure you wish to delete?');" type="submit" name="delete" value="Delete">
-    </form>
-{% endblock %}
+{% if body %}<td><input type="button" onclick="ToggleAll()" value="Select/Deselect All"</td>{% endif %}
+<form method="POST">
+   <table class="table" style="table-layout: auto-fit; width: 100%">
+            <tr>
+                {% for entry in headers %}
+                <th scope="col">{{ entry }}</th>
+                {% endfor %}
+
+            </tr>
+            {% for row, request_id in body %}
+            <tr>
+                {% for entry in row %}
+                <td>
+                    {{ entry }}
+                </td>
+                {% endfor %}
+                <td><input type="checkbox" style="width:0;" name="primers" value="{{ request_id }}" checked="checked" /></td>
+            </tr>
+      {% endfor %}
+      </table>
+      <br><br>
+      <table>
+        <tr>
+        <input class="btn btn-success" type="submit" name="csv" value="Download Order Information">
+        <input class="btn btn-success" type="submit" name="ordered" value="Mark As Ordered">
+        <input class="btn btn-danger" onclick="return confirm('Are you sure you wish to delete?');" type="submit" name="delete" value="Delete">
+        </tr>
+      </form>
+{% endblock content %}
