@@ -618,7 +618,9 @@ def order_placed(request):
 
                 #instead render the 'order recieved' html page from the templates directory - this will direct users to update lab location for these primers as they are being moved to 'stocked'
                 return render(request, 'order_recieved_non_test.html', context=context)
-
+        else:
+            return render(request, 'warning.html', context={"message":"please click here to go back to the Ordered Primers page",
+                                                    "url":"/primer_database/ordered/"})
     else:
         #pull primers with order status of order placed
         primers = Primer.objects.filter(order_status = "Order Placed")
@@ -684,7 +686,9 @@ def in_testing(request,type):
         primer_list = Primer.objects.filter(id__in=request.POST.getlist('primers'))
         location_list = request.POST.getlist('location')
         worksheet_list = request.POST.getlist('worksheet')
-
+        if len(primer_list)==0:
+            return render(request, 'warning.html', context={"message":f"please click here to go back to the {type} testing page",
+                                                    "url":f"/primer_database/in_testing/{type}"})
         for primer, location, worklist in zip(primer_list, location_list, worksheet_list):
             primer.location=location
             primer.worksheet_number=worklist
