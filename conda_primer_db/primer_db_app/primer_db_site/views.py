@@ -719,7 +719,11 @@ def in_testing(request,type):
 
             #export the csv file
             return response
-
+        elif 'discard' in request.POST:
+            for primer in primer_list:
+                primer.order_status = 'Failed_Validation_Archived'
+                primer.date_retesting_completed = date.today()
+                primer.save()
         #render the 'tested' html page from the templates directory
         return render(request, 'action_completed.html')
     else:
@@ -729,6 +733,9 @@ def in_testing(request,type):
         elif type=="non_sanger":
             header="Primer Database: Primers in Testing -  Non Sanger"
             testing = Primer.objects.filter(order_status = "In Testing Non-Sanger")
+        elif type=="retesting":
+            header="Primer Database: Retesting"
+            testing = Primer.objects.filter(order_status = "Retesting")
         else:
             return HttpResponseRedirect(reverse("index"))
         subheader="Primer information for primers in testing. Remember to <strong>update location</strong> before validating"
@@ -744,10 +751,15 @@ def in_testing(request,type):
             ids.append(primer.id)
             worksheets.append(primer.worksheet_number if primer.worksheet_number else "")
             locs.append(primer.location if primer.location else "")
-        buttons=[["success", "submit", "save", "Save changes"],
-                 ["success", "submit", "export", "Export Name and Sequence"],
-                 ["success", "submit", "validated", "Validated"],
-                 ["success", "submit", "not", "Failed Validation"]]
+        if type=="retesting":
+            buttons=[["success", "submit", "save", "Save changes"],
+                     ["success", "submit", "validated", "Validated"],
+                     ["danger", "submit", "discard", "Discard"]]
+        else:
+            buttons=[["success", "submit", "save", "Save changes"],
+                     ["success", "submit", "export", "Export Name and Sequence"],
+                     ["success", "submit", "validated", "Validated"],
+                     ["success", "submit", "not", "Failed Validation"]]
         context = {
             "header":header,
             "subheader":subheader,
@@ -808,90 +820,3 @@ def failed(request):
 
 
         return render(request, 'checked_list.html', context=context)
-
-
-##Retesting Page##
-
-
-#takes user cliking on the 'primers in retesting' searchbar link as request and pulls the information of all primers with an order status of 'retesting'
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def retesting(request):
-
-	#pull primers with an order status of retesting
-	testing = Primer.objects.filter(order_status = "Retesting")
-
-	#provide context for the retesting html page
-	context = {
-		"testing": testing
-	}
-
-	#render the retesting html page from the templates directory
-	return render(request, 'retesting.html', context=context)
-
-
-
-
-#from the 'retesting' page, allows users to update the status of a primer from retesting to either stocked or failed testing archived - takes user selecting primers and clicking validated or not validated as request:
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def retested(request):
-
-	#pull all primers from 'restesting' page
-	all_primer_list = request.POST.getlist('all_primers')
-
-	#pull worksheet info from freetext field fo all primers
-	worksheet_list = request.POST.getlist('worksheet')
-
-	#pull the selected primers based on the checkbox selected on the retesting page
-	primer_list = request.POST.getlist('primer')
-
-	#update any changes made to the worklist field
-	list_len = len(worksheet_list)
-	for i in range(list_len):
-		update = Primer.objects.get(pk=all_primer_list[i])
-		if worksheet_list[i] != "":
-			update.worksheet_number = worksheet_list[i]
-		update.save()
-
-	#repeat for location
-	location_list = request.POST.getlist('location')
-
-	list_len_loc = len(location_list)
-	for i in range(list_len_loc):
-		update_loc = Primer.objects.get(pk=all_primer_list[i])
-		if location_list[i] != "":
-			update_loc.location = location_list[i]
-		update_loc.save()
-
-	#if 'save' was selected, reload the page
-	if 'save' in request.POST:
-		#pull primers with order status of retesting
-		testing = Primer.objects.filter(order_status = "Retesting")
-
-		#provide context for the retesting html page
-		context = {
-			"testing": testing
-		}
-
-		#render the retesting html page from the templates directory
-		return render(request, 'retesting.html', context=context)
-
-	#if 'validated' clicked - iterate through the list of primers selected, update the order status to stocked, assign the 'date retesting completed' as todays date and save the changes to the database
-	if 'validated' in request.POST:
-		for primer in primer_list:
-			tested = Primer.objects.get(pk=primer)
-			tested.order_status = 'Stocked'
-			today = date.today()
-			tested.date_retesting_completed = today.strftime("%d/%m/%Y")
-			tested.save()
-
-	#if 'not validated' clicked - iterate through the list of primers selected, update the order status to 'failed validation archived', assign the 'date retesting completed' as todays date and save to database
-	if 'not' in request.POST:
-		for primer in primer_list:
-			tested = Primer.objects.get(pk=primer)
-			tested.order_status = 'Failed_Validation_Archived'
-			today = date.today()
-			tested.date_retesting_completed = today.strftime("%d/%m/%Y")
-			tested.save()
-
-	#render the  'tested' html page from the templates directory
-	return render(request, 'tested.html')
