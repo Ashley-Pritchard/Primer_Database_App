@@ -679,138 +679,80 @@ def location_updated(request):
 
 #takes user clicking the 'in testing:sanger' searchbar link as request and pulls the information of all sanger primers with an order status of 'in testing'
 @user_passes_test(is_logged_in, login_url=LOGINURL)
-def in_testing_sanger(request):
+def in_testing(request,type):
+    if request.method=="POST":
+        primer_list = Primer.objects.filter(id__in=request.POST.getlist('primers'))
+        location_list = request.POST.getlist('location')
+        worksheet_list = request.POST.getlist('worksheet')
 
-	#pull primers with order status of in testing and analysis type of sanger
-	testing = Primer.objects.filter(order_status = "In Testing Sanger")
+        for primer, location, worklist in zip(primer_list, location_list, worksheet_list):
+            primer.location=location
+            primer.worksheet_number=worklist
+            primer.save()
+        if 'save' in request.POST:
+            return HttpResponseRedirect(reverse("in_testing", args=[type]))
 
-	#provide context for the in testing: sanger html page
-	context = {
-		"testing": testing
-	}
+        elif 'validated' in request.POST or 'not' in request.POST:
+            if 'not' in request.POST:
+                status="Failed Validation"
+            elif "validated" in request.POST:
+                status="Stocked"
+            for primer in primer_list:
+                primer.order_status = status
+                primer.date_testing_completed = date.today()
+                primer.save()
 
-	#render the in testing: sanger html page from the templates directory
-	return render(request, 'in_testing_sanger.html', context=context)
+        #if 'export name and sequence' selected, download a csv file with resepctive information
+        elif 'export' in request.POST:
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="primer_testing.csv"'
 
+            #write information to csv file
+            writer = csv.writer(response)
+            writer.writerow(['name', 'sequence'])
+            for primer in primer_list:
+                writer.writerow([primer.name, primer.m13_tag + primer.sequence])
 
+            #export the csv file
+            return response
 
+        #render the 'tested' html page from the templates directory
+        return render(request, 'action_completed.html')
+    else:
+        if type=="sanger":
+            header="Primer Database: Primers in Testing - Sanger"
+            testing = Primer.objects.filter(order_status = "In Testing Sanger")
+        elif type=="non_sanger":
+            header="Primer Database: Primers in Testing -  Non Sanger"
+            testing = Primer.objects.filter(order_status = "In Testing Non-Sanger")
+        else:
+            return HttpResponseRedirect(reverse("index"))
+        subheader="Primer information for primers in testing. Remember to <strong>update location</strong> before validating"
+        headers=["Primer ID", "Comments", "Worksheet", "Location", "Select"]
+        values=[]
+        ids=[]
+        worksheets=[]
+        locs=[]
+        for primer in testing:
+            values.append([primer.name,
+                          primer.comments,
+                          ])
+            ids.append(primer.id)
+            worksheets.append(primer.worksheet_number if primer.worksheet_number else "")
+            locs.append(primer.location if primer.location else "")
+        buttons=[["success", "submit", "save", "Save changes"],
+                 ["success", "submit", "export", "Export Name and Sequence"],
+                 ["success", "submit", "validated", "Validated"],
+                 ["success", "submit", "not", "Failed Validation"]]
+        context = {
+            "header":header,
+            "subheader":subheader,
+            "headers":headers,
+            "body":zip(values,ids,worksheets,locs) if values!=[] else None,
+            "extrabuttons":buttons,
+        }
 
-#takes user clicking the 'in testing: non sanger' searchbar link as request and pulls information of all non sanger primers in testing
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def in_testing_non_sanger(request):
-
-	#pulls primers with order status of in testing and analysis type of non-sanger
-	testing = Primer.objects.filter(order_status = "In Testing Non-Sanger")
-
-	#provide context for the in testing: non-sanger html page
-	context = {
-		"testing": testing
-	}
-
-	#return the in testing: non sanger html page from the templates directory
-	return render(request, 'in_testing_non_sanger.html', context=context)
-
-
-
-
-#from the 'in testing' page, allows users to update the status of a primer from in testing to either stocked or failed validation - takes user selecting primers and clicking 'validated' or 'not validated' as request
-@user_passes_test(is_logged_in, login_url=LOGINURL)
-def tested(request):
-
-	#pull all primers from 'in testing' page
-	all_primer_list = request.POST.getlist('all_primers')
-
-	#pull worksheet info from free text field for all primers
-	worksheet_list = request.POST.getlist('worksheet')
-
-	#pull the selected primers based on the checkboxes selected on the 'in testing' page
-	primer_list = request.POST.getlist('primer')
-
-	#update any changes to the worksheet number
-	list_len = len(worksheet_list)
-	for i in range(list_len):
-		update = Primer.objects.get(pk=all_primer_list[i])
-		if worksheet_list[i] != "":
-			update.worksheet_number = worksheet_list[i]
-		update.save()
-
-	#repeat for location
-	location_list = request.POST.getlist('location')
-
-	list_len_loc = len(location_list)
-	for i in range(list_len_loc):
-		update_loc = Primer.objects.get(pk=all_primer_list[i])
-		if location_list[i] != "":
-			update_loc.location = location_list[i]
-		update_loc.save()
-
-	#if save was selcted
-	if 'save' in request.POST:
-		check_status = Primer.objects.get(pk=all_primer_list[0])
-		if check_status.order_status == 'In Testing Sanger':
-
-			#pull primers with order status of in testing sanger
-			testing = Primer.objects.filter(order_status = "In Testing Sanger")
-
-			#provide context for the in testing html page
-			context = {
-				"testing": testing
-			}
-
-			#render the in testing sanger html page from the templates directory
-			return render(request, 'in_testing_sanger.html', context=context)
-
-		else:
-
-			#pull primers with order status of in testing non sanger
-			testing = Primer.objects.filter(order_status = "In Testing Non-Sanger")
-
-			#provide context for the in testing html page
-			context = {
-				"testing": testing
-			}
-
-			#render the in testing non sanger html page from the templates directory
-			return render(request, 'in_testing_non_sanger.html', context=context)
-
-	#if 'validated' clicked - iterate through the list of primers selected, update the order status to 'stocked', assign the 'date_testing_completed' as todays date and save changes to database
-	if 'validated' in request.POST:
-		for primer in primer_list:
-			tested = Primer.objects.get(pk=primer)
-			tested.order_status = 'Stocked'
-			today = date.today()
-			tested.date_testing_completed = today.strftime("%d/%m/%Y")
-			tested.save()
-
-	#if 'not validated' selected, iterate through the list of primers selected, update the order status to 'failed validation', assign the 'date_testing_completed' as todays date and save changes to database
-	if 'not' in request.POST:
-		for primer in primer_list:
-			tested = Primer.objects.get(pk=primer)
-			tested.order_status = 'Failed Validation'
-			today = date.today()
-			tested.date_testing_completed = today.strftime("%d/%m/%Y")
-			tested.save()
-
-	#if 'export name and sequence' selected, download a csv file with resepctive information
-	if 'export' in request.POST:
-		response = HttpResponse(content_type='text/csv')
-		response['Content-Disposition'] = 'attachment; filename="primer_testing.csv"'
-
-		#write information to csv file
-		writer = csv.writer(response)
-		writer.writerow(['name', 'sequence'])
-		for primer in primer_list:
-			export = Primer.objects.get(pk=primer)
-			writer.writerow([export.name, export.m13_tag + export.sequence])
-
-		#export the csv file
-		return response
-
-	#render the 'tested' html page from the templates directory
-	return render(request, 'tested.html')
-
-
-
+        return render(request, 'in_testing.html', context=context)
 
 
 ## Failed Validation Page ##

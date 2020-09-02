@@ -1,0 +1,32 @@
+<!-- html page to display the primers that have been ordered -->
+
+{% extends "base_generic.html" %}
+
+{% block content %}
+    {% if body %}<td><input type="button" onclick="ToggleAll()" value="Select/Deselect All"</td>{% endif %}
+    <form method="POST">
+       <table class="table" style="table-layout: auto-fit; width: 100%">
+                <tr>
+                    {% for entry in headers %}
+                    <th scope="col">{{ entry }}</th>
+                    {% endfor %}
+
+                </tr>
+                {% for row, request_id, worksheet, location in body %}
+                <tr>
+                    {% for entry in row %}
+                    <td>
+                        {{ entry }}
+                    </td>
+                    {% endfor %}
+                    <td><textarea name="worksheet" type="text">{{ worksheet }}</textarea><br></td>
+                    <td><textarea name="location" type="text">{{ location }}</textarea><br></td>
+                    <td><input type="checkbox" style="width:0;" name="primers" value="{{ request_id }}" checked="checked" /></td>
+                </tr>
+          {% endfor %}
+          </table>
+          <br><br>
+          {% for style, type, name, value in extrabuttons %}
+            <input class="btn btn-{{ style }}" type="{{ type }}" name="{{ name }}" value="{{ value }}">
+          {% endfor %}
+{% endblock %}
