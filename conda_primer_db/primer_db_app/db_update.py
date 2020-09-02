@@ -56,7 +56,7 @@ with engine.connect() as conn:
         try:
             first, last = user["imported_name"].split(" ")
         except:
-            continue
+            first, last = "HISTORICAL", "DATA"
         for django_user in django_users:
             if django_user["first_name"]==first and django_user["last_name"]==last:
                 imported_to_django[user["User_ID"]]=django_user["User_ID"]
