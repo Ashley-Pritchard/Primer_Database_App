@@ -374,7 +374,7 @@ def order_form(request,number):
                 if audit_no=="":
                     primer_form.add_error("ngs_number","If amplicon type is NGS an audit number must be entered")
         if amplicon_form.is_valid() and primer_form.is_valid():
-            genes = Gene.objects.filter(gene_name__icontains=amplicon_form.data["gene"], chromosome=amplicon_form.data["chromosome"])
+            genes = Gene.objects.filter(gene_name=amplicon_form.data["gene"].upper(), chromosome=amplicon_form.data["chromosome"])
 
             #if the submitted gene is not in the gene list, add the gene and respective chromosome to the database
             if genes.first() is None:
@@ -386,31 +386,45 @@ def order_form(request,number):
                 gene=genes.first()
 
             analysis_type=Analysis_Type.objects.get(id=amplicon_form.data["analysis_type"])
+            exot=amplicon_form.data["exon"]
+            primer_set=amplicon_form.data["primer_set"]
             for i in range(0,int(number)):
+                seq=primer_form.data.getlist("sequence")[i]
+                direction=primer_form.data.getlist("direction")[i]
+                start = primer_form.data.getlist('start')[i]
+                end = primer_form.data.getlist('end')[i]
+                m13 = primer_form.data.getlist('m13')[i]
+                mod_3 = ('3\'' + primer_form.data.getlist('prime3')[i]) if primer_form.data.getlist('prime3')[i] is not "" else ""
+                mod_5 = ('5\'' + primer_form.data.getlist('prime5')[i]) if primer_form.data.getlist('prime5')[i] is not "" else ""
+                ngs = primer_form.data.getlist('ngs_number')[i]
+                alt_name = primer_form.data.getlist('alt_name')[i]
+                comments = primer_form.data.getlist('comments')[i]
+                reason = primer_form.data.getlist('reason')[i]
+
                 if analysis_type.analysis_type == 'Sanger':
-                    new_amplicon = str(Primer_Set.objects.get(id=amplicon_form.data["primer_set"])) + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = str(Primer_Set.objects.get(id=primer_set)) + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'NGS':
-                    new_amplicon = str(Primer_Set.objects.get(id=amplicon_form.data["primer_set"])) + '_' + gene.gene_name + '_NGS-' + primer_form.data.getlist("ngs_number")[i]
+                    new_amplicon = str(Primer_Set.objects.get(id=primer_set)) + '_' + gene.gene_name + '_NGS-' + ngs
                 elif analysis_type.analysis_type == 'Light Scanner':
-                    new_amplicon = 'LS' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'LS' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'MLPA':
-                    new_amplicon = 'ML' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'ML' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'Fluorescent':
-                    new_amplicon = 'GM' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'GM' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'Long Range':
-                    new_amplicon = 'LR' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'LR' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'RT-PCR':
-                    new_amplicon = 'RT' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'RT' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'Taqman':
-                    new_amplicon = 'TQ' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'TQ' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'Pyrosequencing':
-                    new_amplicon = 'P' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'P' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'ARMS: Mutant':
-                    new_amplicon = 'ARMS_M' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'ARMS_M' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'ARMS: Normal':
-                    new_amplicon = 'ARMS_N' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'ARMS_N' + '_' + gene.gene_name + '-' + exon
                 elif analysis_type.analysis_type == 'Probe':
-                    new_amplicon = 'Probe' + '_' + gene.gene_name + '-' + amplicon_form.data["exon"]
+                    new_amplicon = 'Probe' + '_' + gene.gene_name + '-' + exon
                 amplicons=Amplicon.objects.filter(amplicon_name=new_amplicon)
                 if amplicons.first() is None:
                     amplicon = Amplicon()
@@ -431,17 +445,7 @@ def order_form(request,number):
 
 
 
-                seq=primer_form.data.getlist("sequence")[i]
-                direction=primer_form.data.getlist("direction")[i]
-                start = primer_form.data.getlist('start')[i]
-                end = primer_form.data.getlist('end')[i]
-                m13 = primer_form.data.getlist('m13')[i]
-                mod_3 = ('3\'' + primer_form.data.getlist('prime3')[i]) if primer_form.data.getlist('prime3')[i] is not "" else ""
-                mod_5 = ('5\'' + primer_form.data.getlist('prime5')[i]) if primer_form.data.getlist('prime5')[i] is not "" else ""
-                ngs = primer_form.data.getlist('ngs_number')[i]
-                alt_name = primer_form.data.getlist('alt_name')[i]
-                comments = primer_form.data.getlist('comments')[i]
-                reason = primer_form.data.getlist('reason')[i]
+
 
                 if analysis_type.analysis_type == 'Sanger':
                     new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
@@ -472,7 +476,7 @@ def order_form(request,number):
                 matching_primers=Primer.objects.filter(name__icontains=new_primer)
                 version_count = 0
                 version_number = []
-                version = ()
+                version = 1
                 for p in matching_primers:
                     version_number.append(p.version)
                     #if sequecen matches, close current primer and assign same version number
@@ -490,6 +494,8 @@ def order_form(request,number):
                 primer = Primer()
                 primer.sequence = seq.upper()
                 primer.direction = direction.upper()
+                primer.genomic_location_start=start if start is not "" else None
+                primer.genomic_location_end=end if end is not "" else None
                 primer.modification = mod_3.upper()
                 primer.modification_5 = mod_5.upper()
                 primer.alt_name = alt_name
@@ -513,10 +519,10 @@ def order_form(request,number):
                 primer.imported_by_id=request.user
                 primer.amplicon_id=amplicon
                 primer.save()
-        if "quit" in request.POST:
-            return render(request, "action_completed.html")
-        elif "reorder" in request.POST:
-            return HttpResponseRedirect(reverse("order"))
+            if "quit" in request.POST:
+                return render(request, "action_completed.html")
+            elif "reorder" in request.POST:
+                return HttpResponseRedirect(reverse("order"))
 
     else:
         amplicon_form=amplicon_form()
