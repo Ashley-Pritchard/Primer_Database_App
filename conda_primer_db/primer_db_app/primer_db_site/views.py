@@ -797,7 +797,7 @@ def in_testing(request,type):
             buttons=[["success", "submit", "save", "Save changes"],
                      ["success", "submit", "export", "Export Name and Sequence"],
                      ["success", "submit", "validated", "Validated"],
-                     ["success", "submit", "not", "Failed Validation"]]
+                     ["danger", "submit", "not", "Failed Validation"]]
         context = {
             "header":header,
             "subheader":subheader,
