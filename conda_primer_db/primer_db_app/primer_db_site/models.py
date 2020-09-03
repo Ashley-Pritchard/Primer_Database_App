@@ -38,12 +38,12 @@ class Primer_Set(models.Model):
 	def __str__(self):
 		return self.primer_set
 
-class Imported_By(models.Model):
-	def __str__(self):
-		return(self.imported_by)
-	imported_by = models.CharField(max_length=30)
-	choice = [("current", "current"), ("ex", "ex")]
-	status = models.CharField(max_length = 10, default = 'current', choices = choice)
+# class Imported_By(models.Model):
+# 	def __str__(self):
+# 		return(self.imported_by)
+# 	imported_by = models.CharField(max_length=30)
+# 	choice = [("current", "current"), ("ex", "ex")]
+# 	status = models.CharField(max_length = 10, default = 'current', choices = choice)
 
 class Amplicon(models.Model):
 
