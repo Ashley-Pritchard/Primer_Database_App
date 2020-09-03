@@ -768,9 +768,12 @@ def in_testing(request,type):
         elif type=="non_sanger":
             header="Primer Database: Primers in Testing -  Non Sanger"
             testing = Primer.objects.filter(order_status = "In Testing Non-Sanger")
-        elif type=="retesting":
-            header="Primer Database: Retesting"
-            testing = Primer.objects.filter(order_status = "Retesting")
+        elif type=="retesting_sanger":
+            header="Primer Database: Retesting - Sanger"
+            testing = Primer.objects.filter(order_status = "Retesting", amplicon_id__analysis_type_id__analysis_type = "Sanger")
+        elif type=="retesting_non_sanger":
+            header="Primer Database: Retesting - Non Sanger"
+            testing = Primer.objects.filter(order_status = "Retesting").exclude(amplicon_id__analysis_type_id__analysis_type = "Sanger")
         else:
             return HttpResponseRedirect(reverse("index"))
         subheader="Primer information for primers in testing. Remember to <strong>update location</strong> before validating"
