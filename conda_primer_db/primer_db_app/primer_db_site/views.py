@@ -21,30 +21,30 @@ import csv
 
 LOGINURL = settings.LOGIN_URL
 
-def update(httprequest):
-    imported_by=Imported_By.objects.all()
-    for name in imported_by:
-        try:
-            first,last=name.imported_by.split(" ")
-            new_user=User()
-            new_user.first_name=first
-            new_user.last_name=last
-            new_user.is_staff=False
-            new_user.is_active=True if name.status=="current" else False
-            new_user.username=first+last[0]
-            new_user.set_password("PrimerBD1")
-            new_user.save()
-
-        except:continue
-    first,last="HISTORICAL", "DATA"
-    new_user=User()
-    new_user.first_name=first
-    new_user.last_name=last
-    new_user.is_staff=False
-    new_user.is_active=False
-    new_user.username=first+"_"+last
-    new_user.save()
-    return render(httprequest, "action_completed.html")
+# def update(httprequest):
+#     imported_by=Imported_By.objects.all()
+#     for name in imported_by:
+#         try:
+#             first,last=name.imported_by.split(" ")
+#             new_user=User()
+#             new_user.first_name=first
+#             new_user.last_name=last
+#             new_user.is_staff=False
+#             new_user.is_active=True if name.status=="current" else False
+#             new_user.username=first+last[0]
+#             new_user.set_password("PrimerBD1")
+#             new_user.save()
+#
+#         except:continue
+#     first,last="HISTORICAL", "DATA"
+#     new_user=User()
+#     new_user.first_name=first
+#     new_user.last_name=last
+#     new_user.is_staff=False
+#     new_user.is_active=False
+#     new_user.username=first+"_"+last
+#     new_user.save()
+#     return render(httprequest, "action_completed.html")
 #used in user_passes_test decorator to check if someone if logged in
 def is_logged_in(user):
     return user.is_active

@@ -17,5 +17,5 @@ urlpatterns = [
     path('location_updated/', views.location_updated, name='location_updated'),
     re_path('in_testing/(.*)/$', views.in_testing, name='in_testing'),
     path('failed/', views.failed, name='failed'),
-    re_path(r'update/$', views.update, name='update')
+    # re_path(r'update/$', views.update, name='update')
 ]
