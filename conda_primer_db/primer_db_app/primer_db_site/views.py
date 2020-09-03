@@ -514,7 +514,7 @@ def order_form(request,number):
                 primer.amplicon_id=amplicon
                 primer.save()
         if "quit" in request.POST:
-            return render(request, "submitted.html")
+            return render(request, "action_completed.html")
         elif "reorder" in request.POST:
             return HttpResponseRedirect(reverse("order"))
 
