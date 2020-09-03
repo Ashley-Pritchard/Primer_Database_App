@@ -653,13 +653,12 @@ def order_placed(request):
                                                     "url":"/primer_database/ordered/"})
     else:
         #pull primers with order status of order placed
-        primers = Primer.objects.filter(order_status = "Order Placed")
         header="Primer Database: Ordered Primers"
         subheader="Primer information for primers on order:"
         headers=["Primer ID", "Reason Ordered", "Requested By", "Select"]
         values=[]
         ids=[]
-        ordered = Primer.objects.filter(order_status = "Ordered")
+        ordered = Primer.objects.filter(order_status = "Order Placed")
         for primer in ordered:
             values.append([primer.name,
                           primer.reason_ordered,
