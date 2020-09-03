@@ -386,7 +386,7 @@ def order_form(request,number):
                 gene=genes.first()
 
             analysis_type=Analysis_Type.objects.get(id=amplicon_form.data["analysis_type"])
-            exot=amplicon_form.data["exon"]
+            exon=amplicon_form.data["exon"]
             primer_set=amplicon_form.data["primer_set"]
             for i in range(0,int(number)):
                 seq=primer_form.data.getlist("sequence")[i]
