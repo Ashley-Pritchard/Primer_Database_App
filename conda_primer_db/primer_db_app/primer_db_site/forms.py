@@ -64,3 +64,9 @@ class OrderFormPrimer(forms.Form):
     alt_name=forms.CharField(label=u"Alternative Name", required=False, max_length=255)
     comments=forms.CharField(label=u"Comments", required=False, max_length=255)
     reason = forms.ChoiceField(label=u"Reason for Reorder", choices=Primer.choice_3)
+    
+    def clean(self):
+        super(OrderFormPrimer, self).clean()
+        seq_regex="^[ATCG]+$"
+        if not re.match(seq_regex, self.cleaned_data["sequence"]):
+            self.add_error("sequence", "Sequence contains invalid characters. Sequence must only contain A, T, C or G")
