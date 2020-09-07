@@ -36,12 +36,30 @@ class AmpliconAdmin(admin.ModelAdmin):
 	active.boolean = True
 
 class PrimerAdmin(admin.ModelAdmin):
-	list_display = ('name', 'sequence', 'genomic_location_start', 'genomic_location_end', 'location', 'direction', 'alt_name', 'ngs_audit_number', 'comments', 'date_imported', 'version', 'm13_tag', 'new_modification_id', 'new_modification_5_id',  'order_status', 'date_order_placed', 'date_order_recieved', 'date_testing_completed', 'reason_ordered', 'reason_archived', 'date_archived', 'worksheet_number')
-	search_fields = ('name', 'location', 'direction', 'ngs_audit_number', 'new_modification_id', 'new_modification_5_id', 'order_status', 'reason_ordered', 'reason_archived', 'm13_tag', 'worksheet_number')
+	list_display = ('name', 'sequence', 'genomic_location_start', 'genomic_location_end', 'location',
+					'direction', 'alt_name', 'ngs_audit_number', 'comments', 'date_imported', 'version',
+					'm13_tag', 'prime_3_mod', 'prime_5_mod',  'order_status', 'date_order_placed', 'date_order_recieved',
+					'date_testing_completed', 'reason_ordered', 'reason_archived', 'date_archived', 'worksheet_number')
+	search_fields = ('name', 'location', 'direction', 'ngs_audit_number', 'new_modification', 'new_modification_5',
+					'order_status', 'reason_ordered', 'reason_archived', 'm13_tag', 'worksheet_number')
 
 	def active(self, obj):
 		return obj.is_active == 1
 
+	def prime_3_mod(self,obj):
+		if obj.new_modification is not None:
+			return obj.new_modification.modification
+		else:
+			return None
+	def prime_5_mod(self,obj):
+		if obj.new_modification_5 is not None:
+			return obj.new_modification_5.modification
+		else:
+			return None
+	prime_3_mod.short_description = "3' Modification"
+	prime_3_mod.admin_order_field  = "new_modification"
+	prime_5_mod.short_description = "5' Modification"
+	prime_5_mod.admin_order_field  = "new_modification_5"
 	active.boolean = True
 
 #admin.site.register(Primer, PrimerAdmin, Analysis_Type, Analysis_TypeAdmin, Gene, GeneAdmin, Primer_Set, Primer_SetAdmin, Imported_By, Imported_ByAdmin, Amplicon, AmpliconAdmin)
