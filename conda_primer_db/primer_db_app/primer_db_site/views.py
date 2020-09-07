@@ -225,8 +225,8 @@ def amplicon(request,amplicon_input):
                 primer.genomic_location_start = reorder.genomic_location_start
                 primer.genomic_location_end = reorder.genomic_location_end
                 primer.direction = reorder.direction
-                primer.modification = reorder.modification
-                primer.modification_5 = reorder.modification_5
+                primer.new_modification = reorder.new_modification
+                primer.new_modification_5 = reorder.new_modification_5
                 primer.alt_name = reorder.alt_name
                 primer.ngs_audit_number = reorder.ngs_audit_number
                 primer.version = reorder.version
@@ -270,7 +270,7 @@ def amplicon(request,amplicon_input):
                   ("Set","amplicon_id.primer_set_id.primer_set"), ("Location","location"), ("Sequence", "sequence"),
                   ("NGS Audit Number","ngs_audit_number"), ("Requested By", "imported_by_id.username"), ("Date Imported","date_imported"),
                   ("Amplicon Name", "amplicon_id.amplicon_name"), ("Alternative Name", "alt_name"), ("m13 tag", "m13_tag"),
-                  ("3' Modification", "modification"), ("5' Modification","modification_5"), ("Version", "version"),
+                  ("3' Modification", "new_modification"), ("5' Modification","new_modification_5"), ("Version", "version"),
                   ("Reason Ordered","reason_ordered"), ("Comments","comments"), ("Date Testing Completed","date_testing_completed")]
         non_stock_headings=in_stock_headings[:-1]
         stocked_body, non_stocked_body=[],[]
@@ -394,8 +394,8 @@ def order_form(request,number):
                 start = primer_form.data.getlist('start')[i]
                 end = primer_form.data.getlist('end')[i]
                 m13 = primer_form.data.getlist('m13')[i]
-                mod_3 = ('3\'' + primer_form.data.getlist('prime3')[i]) if primer_form.data.getlist('prime3')[i] is not "" else ""
-                mod_5 = ('5\'' + primer_form.data.getlist('prime5')[i]) if primer_form.data.getlist('prime5')[i] is not "" else ""
+                mod_3 = (Modification.objects.get(pk=primer_form.data.getlist('prime3')[i])) if primer_form.data.getlist('prime3')[i] is not "" else ""
+                mod_5 = (Modification.objects.get(pk=primer_form.data.getlist('prime5')[i])) if primer_form.data.getlist('prime5')[i] is not "" else ""
                 ngs = primer_form.data.getlist('ngs_number')[i]
                 alt_name = primer_form.data.getlist('alt_name')[i]
                 comments = primer_form.data.getlist('comments')[i]
@@ -448,29 +448,29 @@ def order_form(request,number):
 
 
                 if analysis_type.analysis_type == 'Sanger':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'NGS':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Light Scanner':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'MLPA':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Fluorescent':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Long Range':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'RT-PCR':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Taqman':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Pyrosequencing':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'ARMS: Mutant':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'ARMS: Normal':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Probe':
-                    new_primer = str(amplicon) + '___' + direction + '_' + mod_3 + '_' + '_' + mod_5
+                    new_primer = str(amplicon) + '___' + direction + '_' +  f"3'{str(mod_3)}" + '_' + '_' +  f"5'{str(mod_5)}"
 
 
                 matching_primers=Primer.objects.filter(name__icontains=new_primer)
@@ -496,8 +496,8 @@ def order_form(request,number):
                 primer.direction = direction.upper()
                 primer.genomic_location_start=start if start is not "" else None
                 primer.genomic_location_end=end if end is not "" else None
-                primer.modification = mod_3.upper()
-                primer.modification_5 = mod_5.upper()
+                primer.new_modification = mod_3
+                primer.new_modification_5 = mod_5
                 primer.alt_name = alt_name
                 primer.comments = comments
                 primer.reason_ordered = reason
@@ -559,7 +559,7 @@ def ordered(request):
                 writer = csv.writer(response)
                 writer.writerow(['name', 'sequence',  'location', '3\' modification', '5\' modification', 'reason_for_order', 'date received'])
                 for primer in primer_list:
-                    writer.writerow([primer.name, (primer.m13_tag + primer.sequence) if primer.m13_tag is not None else primer.sequence, primer.location, primer.modification, primer.modification_5, primer.reason_ordered])
+                    writer.writerow([primer.name, (primer.m13_tag + primer.sequence) if primer.m13_tag is not None else primer.sequence, primer.location, str(primer.new_modification), str(primer.new_modification_5), primer.reason_ordered])
 
                 #export the csv file
                 return response

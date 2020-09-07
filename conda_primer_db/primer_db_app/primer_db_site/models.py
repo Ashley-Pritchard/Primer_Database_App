@@ -55,6 +55,11 @@ class Amplicon(models.Model):
 	analysis_type_id = models.ForeignKey(Analysis_Type, on_delete = models.SET_NULL, null=True, blank=True)
 	primer_set_id = models.ForeignKey(Primer_Set, on_delete = models.SET_NULL, null=True, blank=True)
 
+class Modification(models.Model):
+	def __str__(self):
+		return self.modification
+	modification = models.CharField(max_length=20)
+
 class Primer(models.Model):
 	name = models.TextField(max_length=150)
 	sequence = models.TextField(max_length=150)
@@ -72,6 +77,8 @@ class Primer(models.Model):
 	choice_1 = [("", ""), ("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN")]
 	modification = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
 	modification_5 = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
+	new_modification = models.ForeignKey(Modification, on_delete = models.PROTECT, null=True, default=None, related_name="new_modification")
+	new_modification_5 = models.ForeignKey(Modification, on_delete = models.PROTECT, null=True, default=None, related_name="new_modification_5")
 	choice_2 = [("Stocked", "Stocked"), ("Ordered", "Ordered"), ("Order Placed", "Order Placed"), ("Recieved", "Recieved"), ("In Testing Sanger", "In Testing Sanger"), ("In Testing Non-Sanger", "In Testing Non-Sanger"), ("Failed Validation", "Failed Validation"), ("Archived", "Archived")]
 	order_status = models.CharField(max_length=50, default='Stocked', choices=choice_2)
 	reason_archived = models.CharField(max_length=1000, null=True, blank=True)

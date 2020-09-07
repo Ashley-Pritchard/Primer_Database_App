@@ -49,7 +49,7 @@ class OrderFormAmplicon(forms.Form):
             self.add_error("primer_set",f"Primer Set must be selected for {self.cleaned_data['analysis_type'].analysis_type}")
         if self.cleaned_data["analysis_type"].analysis_type!="NGS" and self.cleaned_data["analysis_type"] is not None and self.cleaned_data["exon"] is None:
             self.add_error("exon", f"Exon must be selected for analysis type {self.cleaned_data['analysis_type'].analysis_type}")
-        
+
 
 class OrderFormPrimer(forms.Form):
     sequence=forms.CharField(max_length=150, label=u"Sequence")
@@ -58,13 +58,13 @@ class OrderFormPrimer(forms.Form):
     start=forms.IntegerField(label=u"Genomic Location Start", required=False)
     end=forms.IntegerField(label=u"Genomic Location End", required=False)
     m13=forms.ChoiceField(label=u"M13 Tag (for R/F primers) Note: auto-added for Sanger", choices=[("YES","YES"),("NO","NO")])
-    prime3=forms.ChoiceField(label=u"3' Modification", required=False, choices=Primer.choice_1)
-    prime5=forms.ChoiceField(label=u"5' Modification", required=False, choices=Primer.choice_1)
+    prime3=forms.ModelChoiceField(queryset=Modification.objects.all(),label=u"3' Modification", required=False)
+    prime5=forms.ModelChoiceField(queryset=Modification.objects.all(),label=u"5' Modification", required=False)
     ngs_number=forms.CharField(label=u"NGS Audit Number", required=False, max_length=25)
     alt_name=forms.CharField(label=u"Alternative Name", required=False, max_length=255)
     comments=forms.CharField(label=u"Comments", required=False, max_length=255)
     reason = forms.ChoiceField(label=u"Reason for Reorder", choices=Primer.choice_3)
-    
+
     def clean(self):
         super(OrderFormPrimer, self).clean()
         seq_regex="^[ATCG]+$"
