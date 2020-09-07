@@ -75,8 +75,8 @@ class Primer(models.Model):
 	amplicon_id = models.ForeignKey(Amplicon, on_delete = models.SET_NULL, null=True, blank=True)
 	version = models.IntegerField(blank=True, default='1')
 	choice_1 = [("", ""), ("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN")]
-	modification = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
-	modification_5 = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
+	#modification = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
+	#modification_5 = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
 	new_modification = models.ForeignKey(Modification, on_delete = models.PROTECT, null=True, default=None, related_name="new_modification")
 	new_modification_5 = models.ForeignKey(Modification, on_delete = models.PROTECT, null=True, default=None, related_name="new_modification_5")
 	choice_2 = [("Stocked", "Stocked"), ("Ordered", "Ordered"), ("Order Placed", "Order Placed"), ("Recieved", "Recieved"), ("In Testing Sanger", "In Testing Sanger"), ("In Testing Non-Sanger", "In Testing Non-Sanger"), ("Failed Validation", "Failed Validation"), ("Archived", "Archived")]
