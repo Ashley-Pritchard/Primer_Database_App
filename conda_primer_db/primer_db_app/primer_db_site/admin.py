@@ -40,7 +40,7 @@ class PrimerAdmin(admin.ModelAdmin):
 					'get_direction', 'alt_name', 'ngs_audit_number', 'comments', 'date_imported', 'version',
 					'm13_tag', 'prime_3_mod', 'prime_5_mod',  'order_status', 'date_order_placed', 'date_order_recieved',
 					'date_testing_completed', 'reason_ordered', 'reason_archived', 'date_archived', 'worksheet_number')
-	search_fields = ('name', 'location', 'direction', 'ngs_audit_number', 'new_modification__modification', 'new_modification_5__modification',
+	search_fields = ('name', 'location', 'new_direction', 'ngs_audit_number', 'new_modification__modification', 'new_modification_5__modification',
 					'order_status', 'reason_ordered', 'reason_archived', 'm13_tag', 'worksheet_number')
 
 	def active(self, obj):
@@ -57,9 +57,9 @@ class PrimerAdmin(admin.ModelAdmin):
 		else:
 			return None
 	def get_direction(self, obj):
-		return obj.direction
+		return obj.new_direction
 	get_direction.short_description = "Direction"
-	get_direction.admin_order_field = "direction"
+	get_direction.admin_order_field = "new_direction"
 	prime_3_mod.short_description = "3' Modification"
 	prime_3_mod.admin_order_field  = "new_modification"
 	prime_5_mod.short_description = "5' Modification"
