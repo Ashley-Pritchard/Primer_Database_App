@@ -60,6 +60,12 @@ class Modification(models.Model):
 		return self.modification
 	modification = models.CharField(max_length=20)
 
+class Direction(models.Model):
+	def __str__(self):
+		return self.direction
+	direction = models.CharField(max_length=10)
+
+
 class Primer(models.Model):
 	name = models.TextField(max_length=150)
 	sequence = models.TextField(max_length=150)
@@ -67,6 +73,7 @@ class Primer(models.Model):
 	genomic_location_end = models.IntegerField(null=True, blank=True)
 	location = models.CharField(max_length=50, null=True, blank=True)
 	direction = models.CharField(max_length=5)
+	new_direction = models.ForeignKey(Direction, on_delete=models.PROTECT, null=True, blank=True)
 	alt_name = models.TextField(max_length=255, null=True, blank=True)
 	ngs_audit_number = models.IntegerField(null=True, blank=True)
 	comments = models.CharField(max_length=1000, null=True, blank=True)
@@ -74,7 +81,7 @@ class Primer(models.Model):
 	date_imported = models.DateField(null=True, blank=True)
 	amplicon_id = models.ForeignKey(Amplicon, on_delete = models.SET_NULL, null=True, blank=True)
 	version = models.IntegerField(blank=True, default='1')
-	choice_1 = [("", ""), ("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN")]
+	#choice_1 = [("", ""), ("HEX", "HEX"), ("6FAM", "6FAM"), ("5FAM", "5FAM"), ("TAM", "TAM"), ("BIOTIN", "BIOTIN")]
 	#modification = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
 	#modification_5 = models.CharField(max_length=10, choices=choice_1, null=True, blank=True)
 	new_modification = models.ForeignKey(Modification, on_delete = models.PROTECT, null=True, default=None, related_name="new_modification")

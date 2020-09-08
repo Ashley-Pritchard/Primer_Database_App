@@ -224,7 +224,7 @@ def amplicon(request,amplicon_input):
                 primer.sequence = reorder.sequence
                 primer.genomic_location_start = reorder.genomic_location_start
                 primer.genomic_location_end = reorder.genomic_location_end
-                primer.direction = reorder.direction
+                primer.new_direction = reorder.new_direction
                 primer.new_modification = reorder.new_modification
                 primer.new_modification_5 = reorder.new_modification_5
                 primer.alt_name = reorder.alt_name
@@ -266,7 +266,7 @@ def amplicon(request,amplicon_input):
         #e.g in headings[0] the title is "Primer" and the attr is "name" (e.g primer.name)
         in_stock_headings=[("Primer","name"), ("Order Status","order_status"), ("Analysis","amplicon_id.analysis_type_id.analysis_type"),
                   ("Gene", "amplicon_id.gene_id.gene_name"), ("Chromosome","amplicon_id.gene_id.chromosome"), ("Exon","amplicon_id.exon"),
-                  ("Direction","direction"), ("Start","genomic_location_start"), ("End","genomic_location_end"),
+                  ("Direction","new_direction"), ("Start","genomic_location_start"), ("End","genomic_location_end"),
                   ("Set","amplicon_id.primer_set_id.primer_set"), ("Location","location"), ("Sequence", "sequence"),
                   ("NGS Audit Number","ngs_audit_number"), ("Requested By", "imported_by_id.username"), ("Date Imported","date_imported"),
                   ("Amplicon Name", "amplicon_id.amplicon_name"), ("Alternative Name", "alt_name"), ("m13 tag", "m13_tag"),
@@ -390,12 +390,12 @@ def order_form(request,number):
             primer_set=amplicon_form.data["primer_set"]
             for i in range(0,int(number)):
                 seq=primer_form.data.getlist("sequence")[i]
-                direction=primer_form.data.getlist("direction")[i]
+                direction= Direction.objects.get(pk=primer_form.data.getlist("direction")[i])
                 start = primer_form.data.getlist('start')[i]
                 end = primer_form.data.getlist('end')[i]
                 m13 = primer_form.data.getlist('m13')[i]
-                mod_3 = (Modification.objects.get(pk=primer_form.data.getlist('prime3')[i])) if primer_form.data.getlist('prime3')[i] is not "" else ""
-                mod_5 = (Modification.objects.get(pk=primer_form.data.getlist('prime5')[i])) if primer_form.data.getlist('prime5')[i] is not "" else ""
+                mod_3 = (Modification.objects.get(pk=primer_form.data.getlist('prime3')[i])) if primer_form.data.getlist('prime3')[i] is not "" else None
+                mod_5 = (Modification.objects.get(pk=primer_form.data.getlist('prime5')[i])) if primer_form.data.getlist('prime5')[i] is not "" else None
                 ngs = primer_form.data.getlist('ngs_number')[i]
                 alt_name = primer_form.data.getlist('alt_name')[i]
                 comments = primer_form.data.getlist('comments')[i]
@@ -448,29 +448,29 @@ def order_form(request,number):
 
 
                 if analysis_type.analysis_type == 'Sanger':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'NGS':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Light Scanner':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'MLPA':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Fluorescent':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Long Range':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'RT-PCR':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Taqman':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Pyrosequencing':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'ARMS: Mutant':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'ARMS: Normal':
-                    new_primer = str(amplicon) + '___' + direction + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' + f"3'{str(mod_3)}" + '_' + f"5'{str(mod_5)}"
                 elif analysis_type.analysis_type == 'Probe':
-                    new_primer = str(amplicon) + '___' + direction + '_' +  f"3'{str(mod_3)}" + '_' + '_' +  f"5'{str(mod_5)}"
+                    new_primer = str(amplicon) + '___' + str(direction) + '_' +  f"3'{str(mod_3)}" + '_' + '_' +  f"5'{str(mod_5)}"
 
 
                 matching_primers=Primer.objects.filter(name__icontains=new_primer)
@@ -493,7 +493,7 @@ def order_form(request,number):
                     version = 1
                 primer = Primer()
                 primer.sequence = seq.upper()
-                primer.direction = direction.upper()
+                primer.new_direction = direction
                 primer.genomic_location_start=start if start is not "" else None
                 primer.genomic_location_end=end if end is not "" else None
                 primer.new_modification = mod_3
@@ -504,13 +504,13 @@ def order_form(request,number):
                 primer.version = version
                 primer.name = str(new_primer) + '_v' + str(version)
 
-                if analysis_type.analysis_type == 'Sanger' and direction.upper() == 'F':
+                if analysis_type.analysis_type == 'Sanger' and str(direction) == 'F':
                     primer.m13_tag = 'GATAAACGACGGCCAGT'
-                elif request.POST.get('analysis_type') == 'Sanger' and direction.upper() == 'R':
+                elif request.POST.get('analysis_type') == 'Sanger' and str(direction) == 'R':
                     primer.m13_tag = 'CAGGAAACAGCTATGAC'
-                elif m13 == "yes" and direction.upper() == "F":
+                elif m13 == "yes" and str(direction) == "F":
                     primer.m13_tag = "GATAAACGACGGCCAGT"
-                elif m13 == "yes" and direction.upper() == "R":
+                elif m13 == "yes" and str(direction) == "R":
                     primer.m13_tag = "CAGGAAACAGCTATGAC"
                 else:
                     primer.m13_tag = ""
@@ -640,7 +640,7 @@ def order_placed(request):
                 for primer in primer_list:
                     values.append([primer.name,
                                    primer.alt_name,
-                                   primer.direction,
+                                   str(primer.new_direction),
                                   primer.imported_by_id.username,
                                   ])
                     locs.append(primer.location if primer.location is not None else "")

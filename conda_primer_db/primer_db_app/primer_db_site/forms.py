@@ -53,8 +53,7 @@ class OrderFormAmplicon(forms.Form):
 
 class OrderFormPrimer(forms.Form):
     sequence=forms.CharField(max_length=150, label=u"Sequence")
-    direction=forms.ChoiceField(label=u"Direction", choices=[("",""), ("F","F"), ("R","R"), ("T","T"), ("Left","Left"),
-                                                                             ("Right","Right"), ("SF","SF"), ("SR","SR")])
+    direction=forms.ModelChoiceField(queryset=Direction.objects.all(), label=u"Direction")
     start=forms.IntegerField(label=u"Genomic Location Start", required=False)
     end=forms.IntegerField(label=u"Genomic Location End", required=False)
     m13=forms.ChoiceField(label=u"M13 Tag (for R/F primers) Note: auto-added for Sanger", choices=[("YES","YES"),("NO","NO")])
