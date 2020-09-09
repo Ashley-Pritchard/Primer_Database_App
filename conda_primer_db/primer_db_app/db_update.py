@@ -37,6 +37,8 @@ primer_db_site_primer = Table("primer_db_site_primer", metadata,
                               Column("modification_5", String(10)),
                               Column("new_modification_id", Integer),
                               Column("new_modification_5_id", Integer),
+                              Column("reason_ordered", String(10)),
+                              Column("new_reason_ordered_id", Integer),
                               Column("archived_by_id_id", String(30)))
 
 primer_db_site_modification = Table("primer_db_site_modification", metadata,
@@ -46,6 +48,10 @@ primer_db_site_modification = Table("primer_db_site_modification", metadata,
 primer_db_site_direction = Table("primer_db_site_direction", metadata,
                                    Column("id", Integer, primary_key=True),
                                    Column("direction", String(10)))
+
+primer_db_site_order_reason = Table("primer_db_site_order_reason", metadata,
+                                   Column("id", Integer, primary_key=True),
+                                   Column("reason", String(30)))
 
 with engine.connect() as conn:
     #sets everything to KH (for testing)
@@ -209,12 +215,22 @@ with engine.connect() as conn:
     #     to_update=update(primer_db_site_primer).where(primer_db_site_primer.c.modification_5==mod).\
     #     values(new_modification_5_id=key)
     #     conn.execute(to_update)
-    sql = select([primer_db_site_direction.c.id, primer_db_site_direction.c.direction]). \
-          select_from(primer_db_site_direction). \
-          where(primer_db_site_direction.c.id is not None)
+    # sql = select([primer_db_site_direction.c.id, primer_db_site_direction.c.direction]). \
+    #       select_from(primer_db_site_direction). \
+    #       where(primer_db_site_direction.c.id is not None)
+    # mods={k:v for k,v in conn.execute(sql)}
+    # for key, mod in mods.items():
+    #     to_update=update(primer_db_site_primer).where(func.upper(primer_db_site_primer.c.direction)==func.upper(mod.upper())).\
+    #     values(new_direction_id=key)
+    #     conn.execute(to_update)
+    sql = select([primer_db_site_order_reason.c.id, primer_db_site_order_reason.c.reason]). \
+          select_from(primer_db_site_order_reason). \
+          where(primer_db_site_order_reason.c.id is not None)
     mods={k:v for k,v in conn.execute(sql)}
-    for key, mod in mods.items():
-        to_update=update(primer_db_site_primer).where(func.upper(primer_db_site_primer.c.direction)==func.upper(mod.upper())).\
-        values(new_direction_id=key)
+    for key, rsn in mods.items():
+        to_update=update(primer_db_site_primer).where(func.upper(primer_db_site_primer.c.reason_ordered)==func.upper(rsn.upper())).\
+        values(new_reason_ordered_id=key)
         conn.execute(to_update)
-
+    to_update=update(primer_db_site_primer).where(primer_db_site_primer.c.new_reason_ordered_id == None). \
+              values(new_reason_ordered_id=5)
+    conn.execute(to_update)

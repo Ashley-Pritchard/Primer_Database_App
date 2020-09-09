@@ -1,6 +1,6 @@
 from django.contrib import admin
 from primer_db_site.models import Primer
-from primer_db_site.models import Amplicon, Analysis_Type, Gene, Primer_Set, Modification, Direction
+from primer_db_site.models import Amplicon, Analysis_Type, Gene, Primer_Set, Modification, Direction, Order_reason
 
 #Changes titles on Admin Site
 admin.site.site_header="Primer Database Admin Page"
@@ -39,9 +39,9 @@ class PrimerAdmin(admin.ModelAdmin):
 	list_display = ('name', 'sequence', 'genomic_location_start', 'genomic_location_end', 'location',
 					'get_direction', 'alt_name', 'ngs_audit_number', 'comments', 'date_imported', 'version',
 					'm13_tag', 'prime_3_mod', 'prime_5_mod',  'order_status', 'date_order_placed', 'date_order_recieved',
-					'date_testing_completed', 'reason_ordered', 'reason_archived', 'date_archived', 'worksheet_number')
-	search_fields = ('name', 'location', 'new_direction', 'ngs_audit_number', 'new_modification__modification', 'new_modification_5__modification',
-					'order_status', 'reason_ordered', 'reason_archived', 'm13_tag', 'worksheet_number')
+					'date_testing_completed', 'order_reason', 'reason_archived', 'date_archived', 'worksheet_number')
+	search_fields = ('name', 'location', 'new_direction__direction', 'ngs_audit_number', 'new_modification__modification', 'new_modification_5__modification',
+					'order_status', 'new_reason_ordered__reason', 'reason_archived', 'm13_tag', 'worksheet_number')
 
 	def active(self, obj):
 		return obj.is_active == 1
@@ -58,6 +58,11 @@ class PrimerAdmin(admin.ModelAdmin):
 			return None
 	def get_direction(self, obj):
 		return obj.new_direction
+	def order_reason(self,obj):
+		return obj.new_reason_ordered
+
+	order_reason.short_description = "Reason Ordered"
+	order_reason.admin_order_field= "new_reason_ordered"
 	get_direction.short_description = "Direction"
 	get_direction.admin_order_field = "new_direction"
 	prime_3_mod.short_description = "3' Modification"
@@ -72,6 +77,7 @@ admin.site.register(Gene, GeneAdmin)
 admin.site.register(Primer_Set)
 admin.site.register(Modification)
 admin.site.register(Direction)
+admin.site.register(Order_reason)
 # admin.site.register(Imported_By, Imported_ByAdmin)
 admin.site.register(Amplicon, AmpliconAdmin)
 admin.site.register(Primer, PrimerAdmin)

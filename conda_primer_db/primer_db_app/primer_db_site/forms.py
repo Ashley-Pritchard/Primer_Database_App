@@ -26,7 +26,7 @@ class IndexSearchForm(forms.Form):
                 self.add_error("Chromosome", forms.ValidationError("Chromosome must be 1-22, X, Y or M"))
 
 class AmpliconOrderForm(forms.Form):
-    reason = forms.ChoiceField(label=u"Reason for Reorder", choices=Primer.choice_3)
+    reason=forms.ModelChoiceField(queryset=Order_reason.objects.all(), label=u"Reason for Order")
 class NewPrimerOrderForm(forms.Form):
     number=forms.IntegerField(min_value=1, label="How many primers would you like to order for your amplicon set?")
 
@@ -62,7 +62,7 @@ class OrderFormPrimer(forms.Form):
     ngs_number=forms.CharField(label=u"NGS Audit Number", required=False, max_length=25)
     alt_name=forms.CharField(label=u"Alternative Name", required=False, max_length=255)
     comments=forms.CharField(label=u"Comments", required=False, max_length=255)
-    reason = forms.ChoiceField(label=u"Reason for Reorder", choices=Primer.choice_3)
+    reason=forms.ModelChoiceField(queryset=Order_reason.objects.all(), label=u"Reason for Order")
 
     def clean(self):
         super(OrderFormPrimer, self).clean()

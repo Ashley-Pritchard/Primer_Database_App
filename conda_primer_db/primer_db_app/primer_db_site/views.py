@@ -249,7 +249,7 @@ def amplicon(request,amplicon_input):
                 primer.order_status = "Ordered"
 
                 #add reason reordered input by user to the primer record
-                primer.reason_ordered = form.data["reason"]
+                primer.new_reason_ordered = form.data["reason"]
 
                 #close the current primer record
                 reorder.order_status = "Closed"
@@ -271,7 +271,7 @@ def amplicon(request,amplicon_input):
                   ("NGS Audit Number","ngs_audit_number"), ("Requested By", "imported_by_id.username"), ("Date Imported","date_imported"),
                   ("Amplicon Name", "amplicon_id.amplicon_name"), ("Alternative Name", "alt_name"), ("m13 tag", "m13_tag"),
                   ("3' Modification", "new_modification"), ("5' Modification","new_modification_5"), ("Version", "version"),
-                  ("Reason Ordered","reason_ordered"), ("Comments","comments"), ("Date Testing Completed","date_testing_completed")]
+                  ("Reason Ordered","new_reason_ordered"), ("Comments","comments"), ("Date Testing Completed","date_testing_completed")]
         non_stock_headings=in_stock_headings[:-1]
         stocked_body, non_stocked_body=[],[]
         for p in primer:
@@ -399,7 +399,7 @@ def order_form(request,number):
                 ngs = primer_form.data.getlist('ngs_number')[i]
                 alt_name = primer_form.data.getlist('alt_name')[i]
                 comments = primer_form.data.getlist('comments')[i]
-                reason = primer_form.data.getlist('reason')[i]
+                reason = (Order_reason.objects.get(pk=primer_form.data.getlist('reason')[i])) if primer_form.data.getlist('reason')[i] is not "" else None
 
                 if analysis_type.analysis_type == 'Sanger':
                     new_amplicon = str(Primer_Set.objects.get(id=primer_set)) + '_' + gene.gene_name + '-' + exon
@@ -500,7 +500,7 @@ def order_form(request,number):
                 primer.new_modification_5 = mod_5
                 primer.alt_name = alt_name
                 primer.comments = comments
-                primer.reason_ordered = reason
+                primer.new_reason_ordered = reason
                 primer.version = version
                 primer.name = str(new_primer) + '_v' + str(version)
 
@@ -559,7 +559,7 @@ def ordered(request):
                 writer = csv.writer(response)
                 writer.writerow(['name', 'sequence',  'location', '3\' modification', '5\' modification', 'reason_for_order', 'date received'])
                 for primer in primer_list:
-                    writer.writerow([primer.name, (primer.m13_tag + primer.sequence) if primer.m13_tag is not None else primer.sequence, primer.location, str(primer.new_modification), str(primer.new_modification_5), primer.reason_ordered])
+                    writer.writerow([primer.name, (primer.m13_tag + primer.sequence) if primer.m13_tag is not None else primer.sequence, primer.location, str(primer.new_modification), str(primer.new_modification_5), str(primer.new_reason_ordered)])
 
                 #export the csv file
                 return response
@@ -667,7 +667,7 @@ def order_placed(request):
         ordered = Primer.objects.filter(order_status = "Order Placed")
         for primer in ordered:
             values.append([primer.name,
-                          primer.reason_ordered,
+                          primer.new_reason_ordered,
                           primer.imported_by_id.username,
                           ])
             ids.append(primer.id)
