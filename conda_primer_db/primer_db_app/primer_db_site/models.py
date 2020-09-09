@@ -100,9 +100,9 @@ class Primer(models.Model):
 	date_order_recieved = models.DateField(null=True, blank=True)
 	date_testing_completed = models.DateField(null=True, blank=True)
 	date_retesting_completed = models.DateField(null=True, blank=True)
-	choice_3 = [("",""), ("Repeat order", "Repeat order"), ("New gene / version", "New gene / version"), ("NGS confirmation", "NGS confirmation"), ("Scientist R&D", "Scientist - R&D"), ("Other", "Other")]
-	reason_ordered = models.CharField(max_length=100, default="", choices=choice_3)
-	new_reason_ordered = models.ForeignKey(Order_reason, on_delete = models.PROTECT, null=True, blank=True)
+	# choice_3 = [("",""), ("Repeat order", "Repeat order"), ("New gene / version", "New gene / version"), ("NGS confirmation", "NGS confirmation"), ("Scientist R&D", "Scientist - R&D"), ("Other", "Other")]
+	# reason_ordered = models.CharField(max_length=100, default="", choices=choice_3)
+	new_reason_ordered = models.ForeignKey(Order_reason, on_delete = models.PROTECT)
 	choice_4 = [("", ""), ("GTAAAACGACGGCCAGT", "GTAAAACGACGGCCAGT"), ("CAGGAAACAGCTATGAC", "CAGGAAACAGCTATGAC")]
 	m13_tag = models.CharField(max_length=20, default="", choices=choice_4, null=True, blank=True)
 	worksheet_number = models.CharField(max_length=1000, null=True, blank=True)
